@@ -5,15 +5,18 @@ import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.UserRolesEnum;
 import bg.propertymanager.repository.RoleRepository;
 import bg.propertymanager.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
 
 @Service
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -21,6 +24,7 @@ public class UserService {
     private final UserDetailsService appUserDetailsService;
     private final String adminPass;
 
+    @Autowired
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
                        PasswordEncoder passwordEncoder,
