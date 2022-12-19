@@ -1,7 +1,8 @@
 package bg.propertymanager.model.entity;
 
 import bg.propertymanager.model.enums.TaxTypeEnum;
-import jakarta.persistence.*;
+
+import javax.persistence.*;
 
 import java.math.BigDecimal;
 
@@ -31,8 +32,9 @@ public class TaxEntity {
         return id;
     }
 
-    public void setId(Long id) {
+    public TaxEntity setId(Long id) {
         this.id = id;
+        return this;
     }
 
     @Enumerated(EnumType.STRING)
@@ -40,8 +42,9 @@ public class TaxEntity {
         return taxType;
     }
 
-    public void setTaxType(TaxTypeEnum taxType) {
+    public TaxEntity setTaxType(TaxTypeEnum taxType) {
         this.taxType = taxType;
+        return this;
     }
 
     @Column(name = "amount", nullable = false)
@@ -49,8 +52,9 @@ public class TaxEntity {
         return amount;
     }
 
-    public void setAmount(BigDecimal amount) {
+    public TaxEntity setAmount(BigDecimal amount) {
         this.amount = amount;
+        return this;
     }
 
     @Column(name = "is_paid", nullable = false)
@@ -58,8 +62,9 @@ public class TaxEntity {
         return isPaid;
     }
 
-    public void setPaid(boolean paid) {
+    public TaxEntity setPaid(boolean paid) {
         isPaid = paid;
+        return this;
     }
 
     @Column(name = "description", nullable = false)
@@ -67,8 +72,9 @@ public class TaxEntity {
         return description;
     }
 
-    public void setDescription(String description) {
+    public TaxEntity setDescription(String description) {
         this.description = description;
+        return this;
     }
 
     @Column(name = "start_date", nullable = false)
@@ -76,8 +82,9 @@ public class TaxEntity {
         return startDate;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
+    public TaxEntity setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
+        return this;
     }
 
     @Column(name = "due_date", nullable = false)
@@ -85,8 +92,9 @@ public class TaxEntity {
         return dueDate;
     }
 
-    public void setDueDate(LocalDateTime dueDate) {
+    public TaxEntity setDueDate(LocalDateTime dueDate) {
         this.dueDate = dueDate;
+        return this;
     }
 
     @ManyToOne
@@ -94,8 +102,9 @@ public class TaxEntity {
         return building;
     }
 
-    public void setBuilding(BuildingEntity building) {
+    public TaxEntity setBuilding(BuildingEntity building) {
         this.building = building;
+        return this;
     }
 
     @ManyToOne
@@ -103,8 +112,9 @@ public class TaxEntity {
         return owner;
     }
 
-    public void setOwner(UserEntity owner) {
+    public TaxEntity setOwner(UserEntity owner) {
         this.owner = owner;
+        return this;
     }
 
     @ManyToOne
@@ -112,8 +122,9 @@ public class TaxEntity {
         return apartment;
     }
 
-    public void setApartment(ApartmentEntity apartment) {
+    public TaxEntity setApartment(ApartmentEntity apartment) {
         this.apartment = apartment;
+        return this;
     }
 
     @ManyToOne
@@ -121,7 +132,8 @@ public class TaxEntity {
         return manager;
     }
 
-    public void setManager(UserEntity manager) {
+    public TaxEntity setManager(UserEntity manager) {
         this.manager = manager;
+        return this;
     }
 }

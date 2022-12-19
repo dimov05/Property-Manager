@@ -1,6 +1,8 @@
 package bg.propertymanager.model.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.util.Set;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -31,8 +33,9 @@ public class ApartmentEntity {
         return id;
     }
 
-    public void setId(Long id) {
+    public ApartmentEntity setId(Long id) {
         this.id = id;
+        return this;
     }
 
     @Column(name = "apartment_number", nullable = false)
@@ -40,8 +43,9 @@ public class ApartmentEntity {
         return apartmentNumber;
     }
 
-    public void setApartmentNumber(String apartmentNumber) {
+    public ApartmentEntity setApartmentNumber(String apartmentNumber) {
         this.apartmentNumber = apartmentNumber;
+        return this;
     }
 
     @Column(name = "floor", nullable = false)
@@ -49,8 +53,9 @@ public class ApartmentEntity {
         return floor;
     }
 
-    public void setFloor(int floor) {
+    public ApartmentEntity setFloor(int floor) {
         this.floor = floor;
+        return this;
     }
 
     @Column(name = "area", nullable = false)
@@ -58,8 +63,9 @@ public class ApartmentEntity {
         return area;
     }
 
-    public void setArea(double area) {
+    public ApartmentEntity setArea(double area) {
         this.area = area;
+        return this;
     }
 
     @Column(name = "elevator_chips_count", nullable = false)
@@ -67,8 +73,9 @@ public class ApartmentEntity {
         return elevatorChipsCount;
     }
 
-    public void setElevatorChipsCount(int elevatorChipsCount) {
+    public ApartmentEntity setElevatorChipsCount(int elevatorChipsCount) {
         this.elevatorChipsCount = elevatorChipsCount;
+        return this;
     }
 
     @Column(name = "dogs_count", nullable = false)
@@ -76,8 +83,9 @@ public class ApartmentEntity {
         return dogsCount;
     }
 
-    public void setDogsCount(int dogsCount) {
+    public ApartmentEntity setDogsCount(int dogsCount) {
         this.dogsCount = dogsCount;
+        return this;
     }
 
     @Column(name = "roommates_count", nullable = false)
@@ -85,8 +93,9 @@ public class ApartmentEntity {
         return roommateCount;
     }
 
-    public void setRoommateCount(int roommateCount) {
+    public ApartmentEntity setRoommateCount(int roommateCount) {
         this.roommateCount = roommateCount;
+        return this;
     }
 
     @Column(name = "periodic_tax", nullable = false)
@@ -94,8 +103,9 @@ public class ApartmentEntity {
         return periodicTax;
     }
 
-    public void setPeriodicTax(BigDecimal periodicTax) {
+    public ApartmentEntity setPeriodicTax(BigDecimal periodicTax) {
         this.periodicTax = periodicTax;
+        return this;
     }
 
     @Column(name = "money_owed")
@@ -103,8 +113,9 @@ public class ApartmentEntity {
         return moneyOwed;
     }
 
-    public void setMoneyOwed(BigDecimal moneyOwed) {
+    public ApartmentEntity setMoneyOwed(BigDecimal moneyOwed) {
         this.moneyOwed = moneyOwed;
+        return this;
     }
 
     @Column(name = "total_paid_money")
@@ -112,8 +123,9 @@ public class ApartmentEntity {
         return totalMoneyPaid;
     }
 
-    public void setTotalMoneyPaid(BigDecimal totalMoneyPaid) {
+    public ApartmentEntity setTotalMoneyPaid(BigDecimal totalMoneyPaid) {
         this.totalMoneyPaid = totalMoneyPaid;
+        return this;
     }
 
     @ManyToOne
@@ -121,8 +133,9 @@ public class ApartmentEntity {
         return building;
     }
 
-    public void setBuilding(BuildingEntity building) {
+    public ApartmentEntity setBuilding(BuildingEntity building) {
         this.building = building;
+        return this;
     }
 
     @ManyToOne
@@ -130,8 +143,9 @@ public class ApartmentEntity {
         return owner;
     }
 
-    public void setOwner(UserEntity owner) {
+    public ApartmentEntity setOwner(UserEntity owner) {
         this.owner = owner;
+        return this;
     }
 
     @OneToMany(mappedBy = "apartment")
@@ -139,7 +153,8 @@ public class ApartmentEntity {
         return taxes;
     }
 
-    public void setTaxes(Set<TaxEntity> taxes) {
+    public ApartmentEntity setTaxes(Set<TaxEntity> taxes) {
         this.taxes = taxes;
+        return this;
     }
 }

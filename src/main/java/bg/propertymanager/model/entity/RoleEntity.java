@@ -1,7 +1,9 @@
 package bg.propertymanager.model.entity;
 
 import bg.propertymanager.model.enums.UserRolesEnum;
-import jakarta.persistence.*;
+
+import javax.persistence.*;
+
 
 @Entity
 @Table(name = "roles")
@@ -20,16 +22,19 @@ public class RoleEntity {
         return id;
     }
 
-    public void setId(Long id) {
+    public RoleEntity setId(Long id) {
         this.id = id;
+        return this;
     }
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     public UserRolesEnum getRole() {
         return role;
     }
 
-    public void setRole(UserRolesEnum role) {
+    public RoleEntity setRole(UserRolesEnum role) {
         this.role = role;
+        return this;
     }
 }

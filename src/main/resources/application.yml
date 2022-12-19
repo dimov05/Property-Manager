@@ -12,3 +12,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  app:
+    default:
+      admin:
+        password: admin

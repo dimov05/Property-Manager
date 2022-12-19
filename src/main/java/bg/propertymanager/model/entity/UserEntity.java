@@ -1,7 +1,8 @@
 package bg.propertymanager.model.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -15,7 +16,7 @@ public class UserEntity {
     private String country;
     private String city;
     private String street;
-    private Set<RoleEntity> roles;
+    private List<RoleEntity> roles;
     private Set<BuildingEntity> managerInBuildings;
     private Set<BuildingEntity> ownerInBuildings;
     private Set<ApartmentEntity> apartments;
@@ -32,8 +33,10 @@ public class UserEntity {
         return id;
     }
 
-    public void setId(Long id) {
+
+    public UserEntity setId(Long id) {
         this.id = id;
+        return this;
     }
 
     @Column(name = "username", unique = true, nullable = false)
@@ -41,17 +44,20 @@ public class UserEntity {
         return username;
     }
 
-    public void setUsername(String username) {
+    public UserEntity setUsername(String username) {
         this.username = username;
+        return this;
     }
+
 
     @Column(name = "password", nullable = false)
     public String getPassword() {
         return password;
     }
 
-    public void setPassword(String password) {
+    public UserEntity setPassword(String password) {
         this.password = password;
+        return this;
     }
 
     @Column(name = "email", unique = true, nullable = false)
@@ -59,17 +65,20 @@ public class UserEntity {
         return email;
     }
 
-    public void setEmail(String email) {
+    public UserEntity setEmail(String email) {
         this.email = email;
+        return this;
     }
+
 
     @Column(name = "full_name", nullable = false)
     public String getFullName() {
         return fullName;
     }
 
-    public void setFullName(String fullName) {
+    public UserEntity setFullName(String fullName) {
         this.fullName = fullName;
+        return this;
     }
 
     @Column(name = "country", nullable = false)
@@ -77,8 +86,9 @@ public class UserEntity {
         return country;
     }
 
-    public void setCountry(String country) {
+    public UserEntity setCountry(String country) {
         this.country = country;
+        return this;
     }
 
     @Column(name = "city", nullable = false)
@@ -86,8 +96,9 @@ public class UserEntity {
         return city;
     }
 
-    public void setCity(String city) {
+    public UserEntity setCity(String city) {
         this.city = city;
+        return this;
     }
 
     @Column(name = "street", nullable = false)
@@ -95,21 +106,24 @@ public class UserEntity {
         return street;
     }
 
-    public void setStreet(String street) {
+    public UserEntity setStreet(String street) {
         this.street = street;
+        return this;
     }
+
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")}
     )
-    public Set<RoleEntity> getRoles() {
+    public List<RoleEntity> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<RoleEntity> roles) {
+    public UserEntity setRoles(List<RoleEntity> roles) {
         this.roles = roles;
+        return this;
     }
 
     @OneToMany(mappedBy = "manager")
@@ -117,8 +131,9 @@ public class UserEntity {
         return managerInBuildings;
     }
 
-    public void setManagerInBuildings(Set<BuildingEntity> managerInBuildings) {
+    public UserEntity setManagerInBuildings(Set<BuildingEntity> managerInBuildings) {
         this.managerInBuildings = managerInBuildings;
+        return this;
     }
 
     @ManyToMany()
@@ -130,8 +145,9 @@ public class UserEntity {
         return ownerInBuildings;
     }
 
-    public void setOwnerInBuildings(Set<BuildingEntity> ownerInBuildings) {
+    public UserEntity setOwnerInBuildings(Set<BuildingEntity> ownerInBuildings) {
         this.ownerInBuildings = ownerInBuildings;
+        return this;
     }
 
     @OneToMany(mappedBy = "owner")
@@ -139,8 +155,9 @@ public class UserEntity {
         return apartments;
     }
 
-    public void setApartments(Set<ApartmentEntity> apartments) {
+    public UserEntity setApartments(Set<ApartmentEntity> apartments) {
         this.apartments = apartments;
+        return this;
     }
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -149,25 +166,32 @@ public class UserEntity {
         return selectedBuilding;
     }
 
-    public void setSelectedBuilding(BuildingEntity selectedBuilding) {
+    public UserEntity setSelectedBuilding(BuildingEntity selectedBuilding) {
         this.selectedBuilding = selectedBuilding;
+        return this;
     }
+
 
     @OneToMany(mappedBy = "author")
     public Set<MessageEntity> getMessages() {
         return messages;
     }
 
-    public void setMessages(Set<MessageEntity> messages) {
+    public UserEntity setMessages(Set<MessageEntity> messages) {
         this.messages = messages;
+        return this;
     }
+
 
     @OneToMany(mappedBy = "owner")
     public Set<TaxEntity> getTaxes() {
         return taxes;
     }
 
-    public void setTaxes(Set<TaxEntity> taxes) {
+    public UserEntity setTaxes(Set<TaxEntity> taxes) {
         this.taxes = taxes;
+        return this;
     }
+
+
 }

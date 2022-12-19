@@ -1,6 +1,6 @@
 package bg.propertymanager.model.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 
 import java.time.LocalDateTime;
 
@@ -22,8 +22,9 @@ public class MessageEntity {
         return id;
     }
 
-    public void setId(Long id) {
+    public MessageEntity setId(Long id) {
         this.id = id;
+        return this;
     }
 
     @ManyToOne
@@ -31,9 +32,9 @@ public class MessageEntity {
         return author;
     }
 
-
-    public void setAuthor(UserEntity author) {
+    public MessageEntity setAuthor(UserEntity author) {
         this.author = author;
+        return this;
     }
 
     @ManyToOne
@@ -41,23 +42,26 @@ public class MessageEntity {
         return building;
     }
 
-    public void setBuilding(BuildingEntity building) {
+    public MessageEntity setBuilding(BuildingEntity building) {
         this.building = building;
+        return this;
     }
 
     public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(LocalDateTime createdDate) {
+    public MessageEntity setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
+        return this;
     }
 
     public String getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public MessageEntity setContent(String content) {
         this.content = content;
+        return this;
     }
 }

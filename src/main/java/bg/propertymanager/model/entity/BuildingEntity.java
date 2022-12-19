@@ -1,7 +1,7 @@
 package bg.propertymanager.model.entity;
 
-import jakarta.persistence.*;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Set;
 
@@ -34,8 +34,9 @@ public class BuildingEntity {
         return id;
     }
 
-    public void setId(Long id) {
+    public BuildingEntity setId(Long id) {
         this.id = id;
+        return this;
     }
 
     @Column(name = "name", nullable = false, unique = true)
@@ -43,8 +44,9 @@ public class BuildingEntity {
         return name;
     }
 
-    public void setName(String name) {
+    public BuildingEntity setName(String name) {
         this.name = name;
+        return this;
     }
 
     @Column(name = "floors", nullable = false)
@@ -52,8 +54,9 @@ public class BuildingEntity {
         return floors;
     }
 
-    public void setFloors(int floors) {
+    public BuildingEntity setFloors(int floors) {
         this.floors = floors;
+        return this;
     }
 
     @Column(name = "country", nullable = false)
@@ -61,8 +64,9 @@ public class BuildingEntity {
         return country;
     }
 
-    public void setCountry(String country) {
+    public BuildingEntity setCountry(String country) {
         this.country = country;
+        return this;
     }
 
     @Column(name = "city", nullable = false)
@@ -70,8 +74,9 @@ public class BuildingEntity {
         return city;
     }
 
-    public void setCity(String city) {
+    public BuildingEntity setCity(String city) {
         this.city = city;
+        return this;
     }
 
     @Column(name = "street", nullable = false)
@@ -79,8 +84,9 @@ public class BuildingEntity {
         return street;
     }
 
-    public void setStreet(String street) {
+    public BuildingEntity setStreet(String street) {
         this.street = street;
+        return this;
     }
 
     @Column(name = "elevators", nullable = false)
@@ -88,8 +94,9 @@ public class BuildingEntity {
         return elevators;
     }
 
-    public void setElevators(int elevators) {
+    public BuildingEntity setElevators(int elevators) {
         this.elevators = elevators;
+        return this;
     }
 
     @Column(name = "image_url", nullable = false)
@@ -97,8 +104,9 @@ public class BuildingEntity {
         return imageUrl;
     }
 
-    public void setImageUrl(String imageUrl) {
+    public BuildingEntity setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+        return this;
     }
 
     @Column(name = "balance", nullable = false)
@@ -106,8 +114,9 @@ public class BuildingEntity {
         return balance;
     }
 
-    public void setBalance(BigDecimal balance) {
+    public BuildingEntity setBalance(BigDecimal balance) {
         this.balance = balance;
+        return this;
     }
 
     @Column(name = "tax_per_person", nullable = false)
@@ -115,8 +124,9 @@ public class BuildingEntity {
         return taxPerPerson;
     }
 
-    public void setTaxPerPerson(BigDecimal taxPerPerson) {
+    public BuildingEntity setTaxPerPerson(BigDecimal taxPerPerson) {
         this.taxPerPerson = taxPerPerson;
+        return this;
     }
 
     @Column(name = "tax_per_dog", nullable = false)
@@ -124,8 +134,9 @@ public class BuildingEntity {
         return taxPerDog;
     }
 
-    public void setTaxPerDog(BigDecimal taxPerDog) {
+    public BuildingEntity setTaxPerDog(BigDecimal taxPerDog) {
         this.taxPerDog = taxPerDog;
+        return this;
     }
 
     @Column(name = "tax_per_elevator_chip", nullable = false)
@@ -133,8 +144,9 @@ public class BuildingEntity {
         return taxPerElevatorChip;
     }
 
-    public void setTaxPerElevatorChip(BigDecimal taxPerElevatorChip) {
+    public BuildingEntity setTaxPerElevatorChip(BigDecimal taxPerElevatorChip) {
         this.taxPerElevatorChip = taxPerElevatorChip;
+        return this;
     }
 
     @ManyToOne()
@@ -142,33 +154,39 @@ public class BuildingEntity {
         return manager;
     }
 
-    public void setManager(UserEntity manager) {
+    public BuildingEntity setManager(UserEntity manager) {
         this.manager = manager;
+        return this;
     }
-
 
     @ManyToMany
     public Set<UserEntity> getNeighbours() {
         return neighbours;
     }
 
-    public void setNeighbours(Set<UserEntity> neighbours) {
+    public BuildingEntity setNeighbours(Set<UserEntity> neighbours) {
+
         this.neighbours = neighbours;
+        return this;
     }
-@OneToMany(mappedBy = "building")
+
+    @OneToMany(mappedBy = "building")
     public Set<TaxEntity> getTaxes() {
         return taxes;
     }
 
-    public void setTaxes(Set<TaxEntity> taxes) {
+    public BuildingEntity setTaxes(Set<TaxEntity> taxes) {
         this.taxes = taxes;
+        return this;
     }
-@OneToMany(mappedBy = "building")
+
+    @OneToMany(mappedBy = "building")
     public Set<MessageEntity> getMessages() {
         return messages;
     }
 
-    public void setMessages(Set<MessageEntity> messages) {
+    public BuildingEntity setMessages(Set<MessageEntity> messages) {
         this.messages = messages;
+        return this;
     }
 }
