@@ -29,7 +29,7 @@ public class PropertyManagerSecurityConfiguration {
         http
                 .authorizeRequests()
                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                .antMatchers("/", "/users/login", "/users/register").permitAll()
+                .antMatchers("/", "/users/login", "/users/register", "/contact-us", "/pricing-and-plans").permitAll()
                 // TODO add ant matchers for ADMIN access pages
                 .anyRequest()
                 .authenticated()
