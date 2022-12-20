@@ -13,4 +13,13 @@ public class HomeController {
     public String home(){
         return "home";
     }
+    @GetMapping("/contact-us")
+    public String contactUs(){
+        return "coming-soon";
+    }
+    @GetMapping("/pricing-and-plans")
+    public String pricingAndPlan(){
+        return "coming-soon";
+    }
+
 }
