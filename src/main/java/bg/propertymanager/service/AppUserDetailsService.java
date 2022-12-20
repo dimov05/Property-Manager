@@ -23,11 +23,11 @@ public class AppUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository
                 .findByUsername(username)
-                .map(this::map)
+                .map(this::mapUser)
                 .orElseThrow(() -> new UsernameNotFoundException("User with email " + username + " does not exist!"));
     }
 
-    private UserDetails map(UserEntity userEntity) {
+    private UserDetails mapUser(UserEntity userEntity) {
         return User
                 .builder()
                 .username(userEntity.getUsername())
@@ -35,12 +35,12 @@ public class AppUserDetailsService implements UserDetailsService {
                 .authorities(userEntity
                         .getRoles()
                         .stream()
-                        .map(this::map)
+                        .map(this::mapRole)
                         .collect(Collectors.toList()))
                 .build();
     }
 
-    private GrantedAuthority map(RoleEntity userRole) {
+    private GrantedAuthority mapRole(RoleEntity userRole) {
         return new SimpleGrantedAuthority("ROLE_" + userRole.getRole().name());
     }
 }
