@@ -1,5 +1,6 @@
 package bg.propertymanager.service;
 
+import bg.propertymanager.model.dto.UserRegisterDTO;
 import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.UserRolesEnum;
@@ -7,13 +8,16 @@ import bg.propertymanager.repository.RoleRepository;
 import bg.propertymanager.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -77,28 +81,24 @@ public class UserService {
         userRepository.save(admin);
     }
 
-//    public void registerAndLogin(UserRegisterDTO userRegisterDTO) {
-//        UserEntity newUser =
-//                new UserEntity().
-//                        setEmail(userRegisterDTO.getEmail()).
-//                        setFirstName(userRegisterDTO.getFirstName()).
-//                        setLastName(userRegisterDTO.getLastName()).
-//                        setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()));
-//
-//        userRepository.save(newUser);
-//
-//        UserDetails userDetails =
-//                appUserDetailsService.loadUserByUsername(newUser.getEmail());
-//
-//        Authentication auth =
-//                new UsernamePasswordAuthenticationToken(
-//                        userDetails,
-//                        userDetails.getPassword(),
-//                        userDetails.getAuthorities()
-//                );
-//
-//        SecurityContextHolder.
-//                getContext().
-//                setAuthentication(auth);
-//    }
+    public UserEntity register(UserRegisterDTO userRegisterDTO) {
+        UserEntity newUser =
+                new UserEntity()
+                        .setUsername(userRegisterDTO.getUsername())
+                        .setRoles(List.of(new RoleEntity().setRole(UserRolesEnum.USER)))
+                        .setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()))
+                        .setEmail(userRegisterDTO.getEmail())
+                        .setFullName(userRegisterDTO.getFullName())
+                        .setCountry(userRegisterDTO.getCountry())
+                        .setCity(userRegisterDTO.getCity())
+                        .setStreet(userRegisterDTO.getStreet());
+
+        userRepository.save(newUser);
+
+        return newUser;
+    }
+
+    public UserEntity findUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
+    }
 }
