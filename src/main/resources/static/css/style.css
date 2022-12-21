@@ -782,5 +782,7 @@ label.valid:after {
         margin-bottom: 10px;
     }
 }
-
+body > section > div > div > div > div > div > div > div.col-md-10.col-lg-6.col-xl-5.order-2.order-lg-1 > p{
+    color: #6dabe4;
+}
 /*# sourceMappingURL=style.css.map */
