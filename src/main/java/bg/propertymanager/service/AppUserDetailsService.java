@@ -2,15 +2,12 @@ package bg.propertymanager.service;
 
 import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
+import bg.propertymanager.model.user.AppUserDetails;
 import bg.propertymanager.repository.UserRepository;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-
-import java.util.stream.Collectors;
 
 public class AppUserDetailsService implements UserDetailsService {
     private final UserRepository userRepository;
@@ -20,24 +17,28 @@ public class AppUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public AppUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository
                 .findByUsername(username)
                 .map(this::mapUser)
                 .orElseThrow(() -> new UsernameNotFoundException("User with email " + username + " does not exist!"));
     }
 
-    private UserDetails mapUser(UserEntity userEntity) {
-        return User
-                .builder()
-                .username(userEntity.getUsername())
-                .password(userEntity.getPassword())
-                .authorities(userEntity
-                        .getRoles()
-                        .stream()
-                        .map(this::mapRole)
-                        .collect(Collectors.toList()))
-                .build();
+    private AppUserDetails mapUser(UserEntity userEntity) {
+        return new AppUserDetails(userEntity.getId(),
+                userEntity.getUsername(),
+                userEntity.getPassword(),
+                userEntity.getEmail(),
+                userEntity.getPhoneNumber(),
+                userEntity.getFullName(),
+                userEntity.getCountry(),
+                userEntity.getCity(),
+                userEntity.getStreet(),
+                userEntity.
+                        getRoles().
+                        stream().
+                        map(this::mapRole).
+                        toList());
     }
 
     private GrantedAuthority mapRole(RoleEntity userRole) {
