@@ -38,47 +38,54 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="/">Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" sec:authorize="!isAuthenticated()" href="/contact-us">Contact us</a>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link active" href="/contact-us">Contact us</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" sec:authorize="!isAuthenticated()" href="/pricing-and-plans">Pricing
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link active" href="/pricing-and-plans">Pricing
                             &
                             Plans</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" sec:authorize="hasRole('ADMIN')" href="/pricing-and-plans">Buildings</a>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link active"
+                           href="/pricing-and-plans">Buildings</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" sec:authorize="hasRole('ADMIN')" href="/pricing-and-plans">Manage users</a>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link active" href="/pricing-and-plans">Manage
+                            users</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" sec:authorize="hasRole('USER')" href="/pricing-and-plans">Dashboard</a>
+                    <li class="nav-item" sec:authorize="hasRole('USER')">
+                        <a class="nav-link active"
+                           href="/pricing-and-plans">Dashboard</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" sec:authorize="hasRole('USER')" href="/pricing-and-plans">Expenses</a>
+                    <li class="nav-item" sec:authorize="hasRole('USER')">
+                        <a class="nav-link active"
+                           href="/pricing-and-plans">Expenses</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" sec:authorize="hasRole('USER')" href="/pricing-and-plans">Neighbours</a>
+                    <li class="nav-item" sec:authorize="hasRole('USER')">
+                        <a class="nav-link active"
+                           href="/pricing-and-plans">Neighbours</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" sec:authorize="hasRole('USER')" href="/pricing-and-plans">Messages</a>
+                    <li class="nav-item" sec:authorize="hasRole('USER')">
+                        <a class="nav-link active"
+                           href="/pricing-and-plans">Messages</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" sec:authorize="!isAuthenticated()"
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link active"
                            href="/users/login">Login</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" sec:authorize="!isAuthenticated()"
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link active"
                            href="/users/register">Register</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" sec:authorize="isAuthenticated()"
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link active"
                            href="/users/register">Profile</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" sec:authorize="isAuthenticated()"
-                           th:href="@{/users/logout}">Logout</a>
+                    <li  sec:authorize="isAuthenticated()">
+                        <form th:action="@{/users/logout}" th:method="post">
+                            <input type="submit" value="Logout">
+                        </form>
                     </li>
                 </ul>
                 <!-- Left links -->

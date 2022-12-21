@@ -4020,6 +4020,9 @@ textarea.form-control-lg {
     flex: 1 1 auto;
     text-align: center
 }
+#navbarSupportedContent > ul > li:nth-child(7) > form{
+    background: transparent;
+}
 
 .nav-justified .nav-item, .nav-justified > .nav-link {
     flex-basis: 0;
