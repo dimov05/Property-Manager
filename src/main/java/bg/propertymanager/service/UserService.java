@@ -28,6 +28,24 @@ public class UserService {
     private final UserDetailsService appUserDetailsService;
     private final String adminPass;
 
+    public UserEntity register(UserRegisterDTO userRegisterDTO) {
+        UserEntity newUser =
+                new UserEntity()
+                        .setUsername(userRegisterDTO.getUsername())
+                        .setRoles(List.of(roleRepository.getById(2L)))
+                        .setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()))
+                        .setEmail(userRegisterDTO.getEmail())
+                        .setPhoneNumber(userRegisterDTO.getPhoneNumber())
+                        .setFullName(userRegisterDTO.getFullName())
+                        .setCountry(userRegisterDTO.getCountry())
+                        .setCity(userRegisterDTO.getCity())
+                        .setStreet(userRegisterDTO.getStreet());
+
+        userRepository.save(newUser);
+
+        return newUser;
+    }
+
     @Autowired
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
@@ -61,6 +79,7 @@ public class UserService {
                 .setPassword(passwordEncoder.encode("user"))
                 .setFullName("Dimo Dimov")
                 .setEmail("user@user.com")
+                .setPhoneNumber("+359878123456")
                 .setCountry("Bulgaria")
                 .setCity("Plovdiv")
                 .setStreet("Vasil Levski 37");
@@ -75,27 +94,11 @@ public class UserService {
                 .setPassword(passwordEncoder.encode(adminPass))
                 .setFullName("Admin Adminov")
                 .setEmail("admin@admin.com")
+                .setPhoneNumber("+359877779292")
                 .setCountry("Bulgaria")
                 .setCity("Plovdiv")
                 .setStreet("Vasil Levski 34");
         userRepository.save(admin);
-    }
-
-    public UserEntity register(UserRegisterDTO userRegisterDTO) {
-        UserEntity newUser =
-                new UserEntity()
-                        .setUsername(userRegisterDTO.getUsername())
-                        .setRoles(List.of(new RoleEntity().setRole(UserRolesEnum.USER)))
-                        .setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()))
-                        .setEmail(userRegisterDTO.getEmail())
-                        .setFullName(userRegisterDTO.getFullName())
-                        .setCountry(userRegisterDTO.getCountry())
-                        .setCity(userRegisterDTO.getCity())
-                        .setStreet(userRegisterDTO.getStreet());
-
-        userRepository.save(newUser);
-
-        return newUser;
     }
 
     public UserEntity findUserByUsername(String username) {
