@@ -45,8 +45,12 @@ public class PropertyManagerSecurityConfiguration {
                 // Logout configuration
                 .logout()
                 .logoutUrl("/users/logout")
+                .logoutSuccessUrl("/")
                 .invalidateHttpSession(true)
-                .deleteCookies("JSESSIONID");
+                .deleteCookies("JSESSIONID")
+                .and()
+                .csrf().disable();
+
         return http.build();
     }
 }
