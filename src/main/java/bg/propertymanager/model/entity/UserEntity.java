@@ -13,6 +13,7 @@ public class UserEntity {
     private String password;
     private String email;
     private String fullName;
+    private String phoneNumber;
     private String country;
     private String city;
     private String street;
@@ -78,6 +79,15 @@ public class UserEntity {
 
     public UserEntity setFullName(String fullName) {
         this.fullName = fullName;
+        return this;
+    }
+    @Column(name = "phone_number", nullable = false)
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public UserEntity setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
         return this;
     }
 
