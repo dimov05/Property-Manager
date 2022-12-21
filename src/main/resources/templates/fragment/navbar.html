@@ -1,4 +1,25 @@
 <th:block>
+    <!doctype html>
+    <html lang="en"
+          xmlns:th="http://www.thymeleaf.org"
+          xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Bootstrap CSS -->
+
+        <link rel="stylesheet" href="/css/material-design-iconic-font.min.css">
+        <link rel="stylesheet" href="/css/reset.css"/>
+        <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="/css/style.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+        <script src="/js/jquery-3.3.1.min.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+
+        <title>Property Manager</title>
+    </head>
     <div class="banner">
         <p><img class="banner-img" src="/images/header.jpg" alt=""></p>
     </div>
@@ -18,18 +39,46 @@
                         <a class="nav-link active" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/contact-us">Contact us</a>
+                        <a class="nav-link active" sec:authorize="!isAuthenticated()" href="/contact-us">Contact us</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/pricing-and-plans">Pricing & Plans</a>
+                        <a class="nav-link active" sec:authorize="!isAuthenticated()" href="/pricing-and-plans">Pricing
+                            &
+                            Plans</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active"
+                        <a class="nav-link active" sec:authorize="hasRole('ADMIN')" href="/pricing-and-plans">Buildings</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" sec:authorize="hasRole('ADMIN')" href="/pricing-and-plans">Manage users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" sec:authorize="hasRole('USER')" href="/pricing-and-plans">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" sec:authorize="hasRole('USER')" href="/pricing-and-plans">Expenses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" sec:authorize="hasRole('USER')" href="/pricing-and-plans">Neighbours</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" sec:authorize="hasRole('USER')" href="/pricing-and-plans">Messages</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" sec:authorize="!isAuthenticated()"
                            href="/users/login">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active"
+                        <a class="nav-link active" sec:authorize="!isAuthenticated()"
                            href="/users/register">Register</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" sec:authorize="isAuthenticated()"
+                           href="/users/register">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" sec:authorize="isAuthenticated()"
+                           th:href="@{/users/logout}">Logout</a>
                     </li>
                 </ul>
                 <!-- Left links -->
@@ -41,4 +90,5 @@
         <!-- Container wrapper -->
     </nav>
     <!-- Navbar -->
+    </html>
 </th:block>
