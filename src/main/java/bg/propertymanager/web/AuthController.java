@@ -2,11 +2,9 @@ package bg.propertymanager.web;
 
 import bg.propertymanager.model.dto.UserRegisterDTO;
 import bg.propertymanager.model.entity.UserEntity;
-import bg.propertymanager.model.view.UserProfileView;
 import bg.propertymanager.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,7 +14,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
-import java.security.Principal;
 
 @Controller
 @RequestMapping("/users")
@@ -24,15 +21,12 @@ public class AuthController {
     private final UserService userService;
 
     @Autowired
-    public AuthController(UserService userService ) {
+    public AuthController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping("/login")
-    public String login(Model model) {
-        /*if(!model.containsAttribute("userLoginDTO")){
-            model.addAttribute("userLoginDTO", new UserLoginDTO());
-        }*/
+    public String login() {
         return "auth-login";
     }
 
@@ -60,11 +54,11 @@ public class AuthController {
 
     @PostMapping("/register")
     public String registerConfirm(@Valid UserRegisterDTO userRegisterDTO,
-                                  BindingResult bindingResult, RedirectAttributes redirectAttributes,
-                                  Model model) {
+                                  BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         UserEntity existingUser = userService.findUserByUsername(userRegisterDTO.getUsername());
         if (existingUser != null && existingUser.getUsername() != null && !existingUser.getUsername().isEmpty()) {
             bindingResult.rejectValue("username", null, "There is already an account registered with the same username");
+            redirectAttributes.addFlashAttribute("sameUser", true);
         }
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("userRegisterDTO", userRegisterDTO);
@@ -75,16 +69,13 @@ public class AuthController {
         return "redirect:login";
     }
 
+    @PreAuthorize("#name == principal.username")
     @GetMapping("/profile/{name}")
-    public ModelAndView viewProfile(@PathVariable("name") String name, @AuthenticationPrincipal Principal principal) {
+    public ModelAndView viewProfile(@PathVariable("name") String name) {
         UserEntity userProfileView = userService.findUserByUsername(name);
         ModelAndView mav = new ModelAndView("view-profile");
         mav.addObject("user", userProfileView);
         return mav;
-    }
-
-    private boolean isPasswordLikeConfirmPassword(UserRegisterDTO userRegisterDTO) {
-        return userRegisterDTO.getPassword().equals(userRegisterDTO.getMatchingPassword());
     }
 
 }
