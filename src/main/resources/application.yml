@@ -16,3 +16,7 @@ app:
   default:
     admin:
       password: admin
+server:
+  error:
+    whitelabel:
+      enabled: false
