@@ -1,32 +1,31 @@
 package bg.propertymanager.web;
 
-import bg.propertymanager.model.dto.UserLoginDTO;
 import bg.propertymanager.model.dto.UserRegisterDTO;
 import bg.propertymanager.model.entity.UserEntity;
-import bg.propertymanager.repository.UserRepository;
+import bg.propertymanager.model.view.UserProfileView;
 import bg.propertymanager.service.UserService;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.security.Principal;
 
 @Controller
 @RequestMapping("/users")
 public class AuthController {
     private final UserService userService;
-    private final UserRepository userRepository;
 
-    public AuthController(UserService userService,
-                          UserRepository userRepository) {
+    @Autowired
+    public AuthController(UserService userService ) {
         this.userService = userService;
-        this.userRepository = userRepository;
     }
 
     @GetMapping("/login")
@@ -45,8 +44,9 @@ public class AuthController {
 
         return "redirect:/users/login";
     }
+
     @GetMapping("/logout")
-    public String logout(){
+    public String logout() {
         return "redirect:/";
     }
 
@@ -73,6 +73,14 @@ public class AuthController {
         }
         userService.register(userRegisterDTO);
         return "redirect:login";
+    }
+
+    @GetMapping("/profile/{name}")
+    public ModelAndView viewProfile(@PathVariable("name") String name, @AuthenticationPrincipal Principal principal) {
+        UserEntity userProfileView = userService.findUserByUsername(name);
+        ModelAndView mav = new ModelAndView("view-profile");
+        mav.addObject("user", userProfileView);
+        return mav;
     }
 
     private boolean isPasswordLikeConfirmPassword(UserRegisterDTO userRegisterDTO) {

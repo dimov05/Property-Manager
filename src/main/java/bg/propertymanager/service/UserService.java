@@ -4,20 +4,19 @@ import bg.propertymanager.model.dto.UserRegisterDTO;
 import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.UserRolesEnum;
+import bg.propertymanager.model.view.UserProfileView;
 import bg.propertymanager.repository.RoleRepository;
 import bg.propertymanager.repository.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -26,7 +25,22 @@ public class UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserDetailsService appUserDetailsService;
+    private final ModelMapper modelMapper;
     private final String adminPass;
+
+    @Autowired
+    public UserService(UserRepository userRepository,
+                       RoleRepository roleRepository,
+                       PasswordEncoder passwordEncoder,
+                       UserDetailsService appUserDetailsService,
+                       ModelMapper modelMapper, @Value("${app.default.admin.password}") String adminPass) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.appUserDetailsService = appUserDetailsService;
+        this.modelMapper = modelMapper;
+        this.adminPass = adminPass;
+    }
 
     public UserEntity register(UserRegisterDTO userRegisterDTO) {
         UserEntity newUser =
@@ -46,17 +60,19 @@ public class UserService {
         return newUser;
     }
 
-    @Autowired
-    public UserService(UserRepository userRepository,
-                       RoleRepository roleRepository,
-                       PasswordEncoder passwordEncoder,
-                       UserDetailsService appUserDetailsService,
-                       @Value("${app.default.admin.password}") String adminPass) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.appUserDetailsService = appUserDetailsService;
-        this.adminPass = adminPass;
+    public UserProfileView findUserById(long id) {
+        Optional<UserEntity> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            return modelMapper.map(user, UserProfileView.class);
+        }
+        throw new NullPointerException("No profile existing with this id");
+    }
+    public Long findUserIdByUsername(String name){
+        Optional<UserEntity> user = userRepository.findByUsername(name);
+        if (user.isPresent()) {
+            return user.get().getId();
+        }
+        throw new NullPointerException("No profile existing with this name");
     }
 
     public void init() {
