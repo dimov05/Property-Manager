@@ -11,18 +11,18 @@
 
                                 <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Sign up</p>
 
-                                <form class="mx-1 mx-md-4" th:action="@{/users/register}" th:object="${userRegisterDTO}"
-                                      method="POST">
+                                <form class="mx-1 mx-md-4" th:action="@{/users/register}"
+                                      th:method="POST"
+                                      th:object="${userRegisterDTO}">
 
                                     <div class="d-flex flex-row align-items-center mb-4">
                                         <i class="fas fa-user fa-lg me-3 fa-fw"></i>
                                         <div class="form-outline flex-fill mb-0">
                                             <input th:field="*{username}" name="username" type="text"
                                                    id="username" placeholder="Enter username">
-                                            <p th:marginheight="3px" th:if="${#fields.hasErrors('username')}"
-                                               class="text-danger"
-                                               th:class="${#fields.hasErrors('username')}? error">
-                                                Invalid Username</p>
+                                            <p th:errors="*{username}" class="text-danger"
+                                               th:if="${#fields.hasErrors('username')}"></p>
+
                                         </div>
                                     </div>
 
@@ -42,8 +42,10 @@
                                         <i class="fas fa-key fa-lg me-3 fa-fw"></i>
                                         <div class="form-outline flex-fill mb-0">
                                             <input type="password" th:field="*{matchingPassword}" name="confirmPassword"
-                                                   id="confirmPassword"
+                                                   id="matchingPassword"
                                                    placeholder="Repeat your password"/>
+                                            <p th:errors="*{matchingPassword}" class="text-danger"
+                                               th:if="${#fields.hasErrors('matchingPassword')}"></p>
                                         </div>
                                     </div>
 

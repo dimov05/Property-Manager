@@ -1,0 +1,109 @@
+<th:block th:include="~{fragment/navbar}"></th:block>
+<section style="background-color: #eee;">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-body text-center" th:object="${user}">
+                        <h5 class="my-3" th:text="*{fullName}">Full Name</h5>
+                        <p class="text-muted mb-1">Owner of * apartments</p>
+                        <p class="text-muted mb-4" th:text="*{street} + ', ' + *{city} + ', ' + *{country}">Address</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <form class="card-body" th:object="${editProfileDTO}"
+                          th:action="@{/users/profile/edit/{name}(name = ${#authentication.getName()})}"
+                          th:method="POST">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Username</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0"
+                                   th:text="${user.username}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Email</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="email"
+                                       th:field="${user.email}"
+                                       th:placeholder="*{email}">
+                                <p th:errors="*{email}"  class="text-danger"
+                                   th:if="${#fields.hasErrors('email')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Phone number</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="phoneNumber"
+                                       th:field="${user.phoneNumber}"
+                                       th:placeholder="*{phoneNumber}">
+                                <p th:errors="*{phoneNumber}"  class="text-danger"
+                                   th:if="${#fields.hasErrors('phoneNumber')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Country</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="country"
+                                       th:field="${user.country}"
+                                       th:placeholder="*{country}">
+                                <p th:errors="*{country}"  class="text-danger"
+                                   th:if="${#fields.hasErrors('country')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">City</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="city"
+                                       th:field="${user.city}"
+                                       th:placeholder="*{city}">
+                                <p th:errors="*{city}"  class="text-danger"
+                                   th:if="${#fields.hasErrors('city')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Street Address</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="street"
+                                       th:field="${user.street}"
+                                       th:placeholder="*{street}">
+                                <p th:errors="*{street}"  class="text-danger"
+                                   th:if="${#fields.hasErrors('street')}"></p>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="form-group form-button align-content-center">
+                                <input type="submit" name="save" id="save" class="form-submit"
+                                       value="Save"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
