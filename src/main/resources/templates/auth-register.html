@@ -1,0 +1,129 @@
+<th:block th:include="~{fragment/navbar}"></th:block>
+<body>
+<section class="vh-100" style="background-color: #eee;">
+    <div class="container h-100">
+        <div class="row d-flex justify-content-center align-items-center h-100">
+            <div class="col-lg-12 col-xl-11">
+                <div class="card text-black" style="border-radius: 25px;">
+                    <div class="card-body p-md-5">
+                        <div class="row justify-content-center">
+                            <div class="col-md-10 col-lg-6 col-xl-5 order-2 order-lg-1">
+
+                                <p class="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Sign up</p>
+
+                                <form class="mx-1 mx-md-4" th:action="@{/users/register}" th:object="${userRegisterDTO}"
+                                      method="POST">
+
+                                    <div class="d-flex flex-row align-items-center mb-4">
+                                        <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                                        <div class="form-outline flex-fill mb-0">
+                                            <input th:field="*{username}" name="username" type="text"
+                                                   id="username" placeholder="Enter username">
+                                            <p th:marginheight="3px" th:if="${#fields.hasErrors('username')}"
+                                               class="text-danger"
+                                               th:class="${#fields.hasErrors('username')}? error">
+                                                Invalid Username</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-row align-items-center mb-4">
+                                        <i class="fas fa-lock fa-lg me-3 fa-fw"></i>
+                                        <div class="form-outline flex-fill mb-0">
+                                            <input
+                                                    th:field="*{password}"
+                                                    type="password"
+                                                    name="password" id="password" placeholder="Password"/>
+                                            <p th:errors="*{password}" class="text-danger"
+                                               th:if="${#fields.hasErrors('password')}"></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-row align-items-center mb-4">
+                                        <i class="fas fa-key fa-lg me-3 fa-fw"></i>
+                                        <div class="form-outline flex-fill mb-0">
+                                            <input type="password" th:field="*{matchingPassword}" name="confirmPassword"
+                                                   id="confirmPassword"
+                                                   placeholder="Repeat your password"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-row align-items-center mb-4">
+                                        <i class="fas fa-envelope fa-lg me-3 fa-fw"></i>
+                                        <div class="form-outline flex-fill mb-0">
+                                            <input th:field="*{email}" name="email" type="text"
+                                                   id="email" placeholder="Enter Email">
+                                            <p th:errors="*{email}" class="text-danger"
+                                               th:if="${#fields.hasErrors('email')}"></p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-row align-items-center mb-4">
+                                        <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                                        <div class="form-outline flex-fill mb-0">
+                                            <input th:field="*{phoneNumber}" name="phoneNumber" type="text"
+                                                   id="phoneNumber" placeholder="Enter phone number">
+                                            <p th:errors="*{phoneNumber}" class="text-danger"
+                                               th:if="${#fields.hasErrors('phoneNumber')}"></p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-row align-items-center mb-4">
+                                        <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                                        <div class="form-outline flex-fill mb-0">
+                                            <input th:field="*{fullName}" name="fullName" type="text"
+                                                   id="fullName" placeholder="Enter your full name">
+                                            <p th:errors="*{fullName}" class="text-danger"
+                                               th:if="${#fields.hasErrors('fullName')}"></p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-row align-items-center mb-4">
+                                        <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                                        <div class="form-outline flex-fill mb-0">
+                                            <input th:field="*{country}" name="country" type="text"
+                                                   id="country" placeholder="Enter Country">
+                                            <p th:errors="*{country}" class="text-danger"
+                                               th:if="${#fields.hasErrors('country')}"></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-row align-items-center mb-4">
+                                        <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                                        <div class="form-outline flex-fill mb-0">
+                                            <input th:field="*{city}" name="city" type="text"
+                                                   id="city" placeholder="Enter City">
+                                            <p th:errors="*{city}" class="text-danger"
+                                               th:if="${#fields.hasErrors('city')}"></p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-row align-items-center mb-4">
+                                        <i class="fas fa-user fa-lg me-3 fa-fw"></i>
+                                        <div class="form-outline flex-fill mb-0">
+                                            <input th:field="*{street}" name="street" type="text"
+                                                   id="street" placeholder="Enter Street address">
+                                            <p th:errors="*{street}" class="text-danger"
+                                               th:if="${#fields.hasErrors('street')}"></p>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group form-button">
+                                        <input type="submit" name="signup" id="signup" class="form-submit"
+                                               value="Register"/>
+                                    </div>
+
+                                </form>
+
+                            </div>
+                            <div class="col-md-10 col-lg-6 col-xl-7 d-flex align-items-center order-1 order-lg-2">
+
+                                <figure><img src="/images/signup-image.jpg" alt="sing up image"></figure>
+
+                            </div>
+
+                        </div>
+                        <a th:href="@{/users/login}" class="signup-image-link">I already have an account</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
