@@ -1,5 +1,7 @@
 package bg.propertymanager.service;
 
+import bg.propertymanager.model.dto.EditProfileDTO;
+import bg.propertymanager.model.dto.PasswordChangeDTO;
 import bg.propertymanager.model.dto.UserRegisterDTO;
 import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
@@ -15,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,7 +70,8 @@ public class UserService {
         }
         throw new NullPointerException("No profile existing with this id");
     }
-    public Long findUserIdByUsername(String name){
+
+    public Long findUserIdByUsername(String name) {
         Optional<UserEntity> user = userRepository.findByUsername(name);
         if (user.isPresent()) {
             return user.get().getId();
@@ -119,5 +123,35 @@ public class UserService {
 
     public UserEntity findUserByUsername(String username) {
         return userRepository.findByUsername(username).orElse(null);
+    }
+
+    public UserEntity findUserByEmail(String email) {
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    public void updateProfile(EditProfileDTO editProfileDTO) {
+        UserEntity userToSave = userRepository
+                .findById(editProfileDTO.getId())
+                .orElseThrow(() -> new NullPointerException("The user you are searching is null"));
+        userToSave
+                .setEmail(editProfileDTO.getEmail())
+                .setPhoneNumber(editProfileDTO.getPhoneNumber())
+                .setCountry(editProfileDTO.getCountry())
+                .setCity(editProfileDTO.getCity())
+                .setStreet(editProfileDTO.getStreet());
+        userRepository.save(userToSave);
+    }
+
+    public void updatePassword(PasswordChangeDTO passwordChangeDTO) {
+        UserEntity userToChangePassword = userRepository
+                .findById(passwordChangeDTO.getId())
+                .orElseThrow(() -> new NullPointerException("The user you are searching is null"));
+        userToChangePassword.setPassword(passwordEncoder.encode(passwordChangeDTO.getNewPassword()));
+        userRepository.save(userToChangePassword);
+    }
+
+    public boolean checkIfOldPasswordIsCorrect(PasswordChangeDTO passwordChangeDTO, Principal principal) {
+        String actualOldPassword = this.findUserByUsername(principal.getName()).getPassword();
+        return passwordEncoder.matches(passwordChangeDTO.getOldPassword(), actualOldPassword);
     }
 }

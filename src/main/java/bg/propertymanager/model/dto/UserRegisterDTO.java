@@ -69,7 +69,7 @@ public class UserRegisterDTO {
         return this;
     }
     @NotEmpty(message = "Phone number must be valid")
-    @Pattern(regexp = "^[+]?[(]?[0-9]{3}[)]?[-\\s.]?[0-9]{3}[-\\s.]?[0-9]{3,6}$", message = "Password should be at least 6 symbols")
+    @Pattern(regexp = "^[+]?[(]?[0-9]{3}[)]?[-\\s.]?[0-9]{3}[-\\s.]?[0-9]{3,6}$", message = "Phone number must be valid - +359*********")
     public String getPhoneNumber() {
         return phoneNumber;
     }
