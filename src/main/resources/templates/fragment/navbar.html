@@ -14,6 +14,7 @@
         <link rel="stylesheet" href="/css/reset.css"/>
         <link rel="stylesheet" href="/css/bootstrap.min.css"/>
         <link rel="stylesheet" href="/css/style.css"/>
+        <link rel="stylesheet" href="/css/manage-users.css"/>
         <link rel="stylesheet" type="text/css" href="/css/style.css"/>
         <script src="/js/jquery-3.3.1.min.js"></script>
         <script src="/js/bootstrap.min.js"></script>
@@ -39,36 +40,36 @@
                         <a class="nav-link active" href="/">Home</a>
                     </li>
                     <li class="nav-item" th:if="${@userViewEntity.selectedBuilding} == null">
-                        <a class="nav-link active" href="/contact-us">Contact us</a>
+                        <a class="nav-link active" href="/coming-soon">Contact us</a>
                     </li>
                     <li class="nav-item" th:if="${@userViewEntity.selectedBuilding} == null">
-                        <a class="nav-link active" href="/pricing-and-plans">Pricing
+                        <a class="nav-link active" href="/coming-soon">Pricing
                             &
                             Plans</a>
                     </li>
                     <li class="nav-item" sec:authorize="hasRole('ADMIN')">
                         <a class="nav-link active"
-                           href="/pricing-and-plans">Buildings</a>
+                           href="/coming-soon">Buildings</a>
                     </li>
                     <li class="nav-item" sec:authorize="hasRole('ADMIN')">
-                        <a class="nav-link active" href="/pricing-and-plans">Manage
+                        <a class="nav-link active" th:href="@{/admin/users}">Manage
                             users</a>
                     </li>
                     <li class="nav-item" th:if="${@userViewEntity.selectedBuilding} != null">
                         <a class="nav-link active"
-                           href="/pricing-and-plans">Dashboard</a>
+                           href="/coming-soon">Dashboard</a>
                     </li>
                     <li class="nav-item" th:if="${@userViewEntity.selectedBuilding} != null">
                         <a class="nav-link active"
-                           href="/pricing-and-plans">Expenses</a>
+                           href="/coming-soon">Expenses</a>
                     </li>
                     <li class="nav-item" th:if="${@userViewEntity.selectedBuilding} != null">
                         <a class="nav-link active"
-                           href="/pricing-and-plans">Neighbours</a>
+                           href="/coming-soon">Neighbours</a>
                     </li>
                     <li class="nav-item" th:if="${@userViewEntity.selectedBuilding} != null">
                         <a class="nav-link active"
-                           href="/pricing-and-plans">Messages</a>
+                           href="/coming-soon">Messages</a>
                     </li>
                     <li class="nav-item" sec:authorize="!isAuthenticated()">
                         <a class="nav-link active"
