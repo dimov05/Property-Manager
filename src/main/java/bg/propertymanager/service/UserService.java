@@ -6,6 +6,7 @@ import bg.propertymanager.model.dto.UserRegisterDTO;
 import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.UserRolesEnum;
+import bg.propertymanager.model.view.AdminViewUserProfile;
 import bg.propertymanager.model.view.UserProfileView;
 import bg.propertymanager.repository.RoleRepository;
 import bg.propertymanager.repository.UserRepository;
@@ -153,5 +154,13 @@ public class UserService {
     public boolean checkIfOldPasswordIsCorrect(PasswordChangeDTO passwordChangeDTO, Principal principal) {
         String actualOldPassword = this.findUserByUsername(principal.getName()).getPassword();
         return passwordEncoder.matches(passwordChangeDTO.getOldPassword(), actualOldPassword);
+    }
+
+    public List<AdminViewUserProfile> findAll() {
+        List<UserEntity> usersList = userRepository.findAll();
+        return usersList
+                .stream()
+                .map(u -> modelMapper.map(u, AdminViewUserProfile.class))
+                .toList();
     }
 }
