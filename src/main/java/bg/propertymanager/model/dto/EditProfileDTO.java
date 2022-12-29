@@ -8,7 +8,7 @@ import javax.validation.constraints.Pattern;
 
 public class EditProfileDTO {
     private Long id;
-
+    private String username;
     private String email;
 
     private String fullName;
@@ -29,6 +29,15 @@ public class EditProfileDTO {
 
     public EditProfileDTO setId(Long id) {
         this.id = id;
+        return this;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public EditProfileDTO setUsername(String username) {
+        this.username = username;
         return this;
     }
 
