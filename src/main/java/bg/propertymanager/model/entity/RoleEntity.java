@@ -12,6 +12,7 @@ public class RoleEntity {
     private Long id;
 
     private UserRolesEnum role;
+    private String name;
 
     public RoleEntity() {
     }
@@ -35,6 +36,15 @@ public class RoleEntity {
 
     public RoleEntity setRole(UserRolesEnum role) {
         this.role = role;
+        return this;
+    }
+
+    public String getName() {
+        return role.name();
+    }
+
+    public RoleEntity setName(String name) {
+        this.name = name;
         return this;
     }
 }
