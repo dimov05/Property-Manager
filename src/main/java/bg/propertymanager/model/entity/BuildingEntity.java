@@ -22,6 +22,7 @@ public class BuildingEntity {
     private String city;
     private String street;
     private Set<UserEntity> neighbours;
+    private Set<ApartmentEntity> apartments;
     private Set<TaxEntity> taxes;
     private Set<MessageEntity> messages;
 
@@ -149,7 +150,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.EAGER)
     public UserEntity getManager() {
         return manager;
     }
@@ -159,7 +160,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     public Set<UserEntity> getNeighbours() {
         return neighbours;
     }
@@ -170,7 +171,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "building")
+    @OneToMany(mappedBy = "building",fetch = FetchType.EAGER)
     public Set<TaxEntity> getTaxes() {
         return taxes;
     }
@@ -180,13 +181,23 @@ public class BuildingEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "building")
+    @OneToMany(mappedBy = "building",fetch = FetchType.EAGER)
     public Set<MessageEntity> getMessages() {
         return messages;
     }
 
     public BuildingEntity setMessages(Set<MessageEntity> messages) {
         this.messages = messages;
+        return this;
+    }
+
+    @OneToMany(mappedBy = "building",fetch = FetchType.EAGER)
+    public Set<ApartmentEntity> getApartments() {
+        return apartments;
+    }
+
+    public BuildingEntity setApartments(Set<ApartmentEntity> apartments) {
+        this.apartments = apartments;
         return this;
     }
 }
