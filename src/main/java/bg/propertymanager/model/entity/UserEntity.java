@@ -2,6 +2,7 @@ package bg.propertymanager.model.entity;
 
 import javax.persistence.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -17,6 +18,7 @@ public class UserEntity {
     private String country;
     private String city;
     private String street;
+    private LocalDate registrationDate;
     private List<RoleEntity> roles;
     private Set<BuildingEntity> managerInBuildings;
     private Set<BuildingEntity> ownerInBuildings;
@@ -81,6 +83,7 @@ public class UserEntity {
         this.fullName = fullName;
         return this;
     }
+
     @Column(name = "phone_number", nullable = false)
     public String getPhoneNumber() {
         return phoneNumber;
@@ -121,6 +124,15 @@ public class UserEntity {
         return this;
     }
 
+    @Column(name = "registration_date",columnDefinition = "DATE", nullable = false)
+    public LocalDate getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public UserEntity setRegistrationDate(LocalDate registrationDate) {
+        this.registrationDate = registrationDate;
+        return this;
+    }
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
