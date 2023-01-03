@@ -1,7 +1,7 @@
 package bg.propertymanager.service;
 
-import bg.propertymanager.model.dto.EditProfileDTO;
 import bg.propertymanager.model.dto.PasswordChangeDTO;
+import bg.propertymanager.model.dto.UserEditDTO;
 import bg.propertymanager.model.dto.UserRegisterDTO;
 import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,28 +58,14 @@ public class UserService {
                         .setFullName(userRegisterDTO.getFullName())
                         .setCountry(userRegisterDTO.getCountry())
                         .setCity(userRegisterDTO.getCity())
-                        .setStreet(userRegisterDTO.getStreet());
+                        .setStreet(userRegisterDTO.getStreet())
+                        .setRegistrationDate(LocalDate.now());
 
         userRepository.save(newUser);
 
         return newUser;
     }
 
-    public UserProfileView findUserById(long id) {
-        Optional<UserEntity> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            return modelMapper.map(user, UserProfileView.class);
-        }
-        throw new NullPointerException("No profile existing with this id");
-    }
-
-    public Long findUserIdByUsername(String name) {
-        Optional<UserEntity> user = userRepository.findByUsername(name);
-        if (user.isPresent()) {
-            return user.get().getId();
-        }
-        throw new NullPointerException("No profile existing with this name");
-    }
 
     public void init() {
         if (userRepository.count() == 0 && roleRepository.count() == 0) {
@@ -126,20 +113,17 @@ public class UserService {
         return userRepository.findByUsername(username).orElse(null);
     }
 
-    public UserEntity findUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
-    }
 
-    public void updateProfile(EditProfileDTO editProfileDTO) {
+    public void updateProfile(UserEditDTO userEditDTO) {
         UserEntity userToSave = userRepository
-                .findById(editProfileDTO.getId())
+                .findById(userEditDTO.getId())
                 .orElseThrow(() -> new NullPointerException("The user you are searching is null"));
         userToSave
-                .setEmail(editProfileDTO.getEmail())
-                .setPhoneNumber(editProfileDTO.getPhoneNumber())
-                .setCountry(editProfileDTO.getCountry())
-                .setCity(editProfileDTO.getCity())
-                .setStreet(editProfileDTO.getStreet());
+                .setEmail(userEditDTO.getEmail())
+                .setPhoneNumber(userEditDTO.getPhoneNumber())
+                .setCountry(userEditDTO.getCountry())
+                .setCity(userEditDTO.getCity())
+                .setStreet(userEditDTO.getStreet());
         userRepository.save(userToSave);
     }
 
@@ -162,5 +146,10 @@ public class UserService {
                 .stream()
                 .map(u -> modelMapper.map(u, AdminViewUserProfile.class))
                 .toList();
+    }
+
+    public UserEntity findById(long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new NullPointerException("No such user with this Id"));
     }
 }

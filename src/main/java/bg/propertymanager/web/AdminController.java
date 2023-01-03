@@ -1,6 +1,6 @@
 package bg.propertymanager.web;
 
-import bg.propertymanager.model.dto.EditProfileDTO;
+import bg.propertymanager.model.dto.UserEditDTO;
 import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.view.AdminViewUserProfile;
@@ -42,7 +42,7 @@ public class AdminController {
     @GetMapping("/users/edit/{name}")
     public ModelAndView editProfileAsAdmin(@PathVariable("name") String name, Model model) {
         if (!model.containsAttribute("editProfileDTO")) {
-            model.addAttribute("editProfileDTO", new EditProfileDTO());
+            model.addAttribute("editProfileDTO", new UserEditDTO());
         }
         UserEntity userProfileToEdit = userService.findUserByUsername(name);
         ModelAndView mav = new ModelAndView("edit-profile-as-admin");
@@ -52,19 +52,19 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @PostMapping("/users/edit/{name}")
-    public String editUserAsAdminConfirm(@Valid EditProfileDTO editProfileDTO,
+    public String editUserAsAdminConfirm(@Valid UserEditDTO userEditDTO,
                                          BindingResult bindingResult,
                                          RedirectAttributes redirectAttributes,
                                          @PathVariable("name") String name) {
-        editProfileDTO.setId(userService.
+        userEditDTO.setId(userService.
                 findUserByUsername(name)
                 .getId());
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("editProfileDTO", editProfileDTO);
+            redirectAttributes.addFlashAttribute("editProfileDTO", userEditDTO);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.editProfileDTO", bindingResult);
             return "redirect:/admin/users/edit/" + name;
         }
-        userService.updateProfile(editProfileDTO);
+        userService.updateProfile(userEditDTO);
         return "redirect:/admin/users/edit/" + name;
     }
     @PreAuthorize("hasRole('ROLE_ADMIN')")
