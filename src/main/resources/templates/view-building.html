@@ -1,0 +1,141 @@
+<th:block th:include="~{fragment/navbar}"></th:block>
+<section style="background-color: #eee;">
+    <div class="container py-5" th:object="${building}">
+        <div class="row">
+            <div class="col-lg-4" >
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <img th:src="*{imageUrl}"
+                             alt="avatar"
+                             class="img-fluid mx-auto" style="width: 150px;">
+                        <h5 class="my-3" th:text="*{name}"></h5>
+                        <p class="text-muted mb-1"
+                           th:text="*{street} + ', ' + *{city} + ', ' + *{country}">Address</p>
+                        <p class="text-muted">Manager:</p>
+                        <p class="text-muted mb-4"
+                           th:text="*{manager.fullName} + ', ' + *{manager.phoneNumber}"></p>
+                        <div class="d-flex justify-content-center mb-2">
+                            <a class="nav-item active mx-auto"
+                               th:href="@{/admin/buildings/add-apartment}">Add apartment</a>
+                            <a class="nav-item active mx-auto"
+                            th:href="@{/admin/buildings/edit/{id}(id = *{id})}">Edit building</a>
+<!--                            <button type="button" class="btn btn-primary">Add apartment td</button>-->
+<!--                            <button type="button" class="btn btn-outline-primary ms-1">Edit building td</button>-->
+                        </div>
+                    </div>
+                </div>
+                <div class="card mb-4 mb-lg-0">
+                    <div class="card-body p-0 text-center">
+                        <ul class="list-group list-group-flush rounded-3">
+                            <li class="list-group-item align-items-center p-3">
+                                <i class="fas fa-globe fa-lg text-warning"></i>
+                                <p class="mb-0 align-content-center text-center"
+                                th:text="'Building\'s money balance: ' + *{balance} +'lv.'"></p>
+                            </li>
+                            <li class="list-group-item align-items-center p-3">
+                                <i class="fas fa-globe fa-lg text-warning"></i>
+                                <p class="mb-0 align-content-center text-center"
+                                th:text="'Building\'s tax per Person: ' + *{taxPerPerson} +'lv.'"></p>
+                            </li>
+                            <li class="list-group-item align-items-center p-3">
+                                <i class="fas fa-globe fa-lg text-warning"></i>
+                                <p class="mb-0 align-content-center text-center"
+                                th:text="'Building\'s tax per Dog: ' + *{taxPerDog} +'lv.'"></p>
+                            </li>
+                            <li class="list-group-item align-items-center p-3">
+                                <i class="fas fa-globe fa-lg text-warning"></i>
+                                <p class="mb-0 align-content-center text-center"
+                                th:text="'Building\'s per elevator chip: ' + *{TaxPerElevatorChip} +'lv.'"></p>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Floors count:</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0" th:text="*{floors}"> </p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Elevators count</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0" th:text="*{elevators}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Neighbours count</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0" th:text="${building.neighbours.size()}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Date of registration</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <p class="text-muted mb-0" th:text="*{registrationDate}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-11">
+                        <div class="card mb-4 mb-md-0">
+                            <div class="card-body">
+                                <p class="mb-4"><span class="text-primary font-italic me-1"
+                                th:text="'List of apartments - ' + ${building.apartments.size()}"></span>
+                                </p>
+                                <table class="table project-list-table table-nowrap align-middle table-borderless">
+                                    <thead>
+                                    <tr >
+                                        <th scope="col" style="width: 3px">Id</th>
+                                        <th scope="col">Apartment №</th>
+                                        <th scope="col">Floor</th>
+                                        <th scope="col">Apartment area</th>
+                                        <th scope="col">Taxes per month</th>
+                                        <th scope="col">Owner</th>
+                                        <th scope="col" style="width: 60px;">Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="apartment: ${building.apartments}" th:object="${apartment}">
+                                        <td th:text="*{id}"></td>
+                                        <td th:text="*{apartmentNumber}"></td>
+                                        <td th:text="*{floor}"></td>
+                                        <td th:text="*{area}"></td>
+                                        <td th:text="*{periodicTax}"></td>
+                                        <td th:text="*{owner.fullName}"></td>
+                                        <td>
+                                            <ul class="list-inline mb-0">
+                                                <li class="list-inline-item">
+                                                    <a th:href="@{/admin/buildings/view/{id}(id = *{id})}"
+                                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"
+                                                       class="px-2 text-primary">Edittd<i class="bx bx-pencil font-size-22"></i></a>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

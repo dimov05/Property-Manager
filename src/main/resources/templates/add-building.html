@@ -1,0 +1,149 @@
+<th:block th:include="~{fragment/navbar}"></th:block>
+<section style="background-color: #eee;">
+    <div class="container py-5">
+        <div class="row">
+            <form class="card-body" th:object="${buildingAddDTO}"
+                  th:action="@{/admin/buildings/add}"
+                  th:method="POST">
+                <div class="col-lg-5">
+                    <div class="card mb-4">
+
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Building's name</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="name"
+                                       th:field="*{name}"
+                                       th:placeholder="*{name}">
+                                <p th:errors="*{name}" class="text-danger"
+                                   th:if="${#fields.hasErrors('name')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Count of floors</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="floors"
+                                       th:field="*{floors}"
+                                       th:placeholder="*{floors}">
+                                <p th:errors="*{floors}" class="text-danger"
+                                   th:if="${#fields.hasErrors('floors')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Count of elevators</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="elevators"
+                                       th:field="*{elevators}"
+                                       th:placeholder="*{elevators}">
+                                <p th:errors="*{elevators}" class="text-danger"
+                                   th:if="${#fields.hasErrors('elevators')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Tax per Person</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="taxPerPerson"
+                                       th:field="*{taxPerPerson}"
+                                       th:placeholder="*{taxPerPerson}">
+                                <p th:errors="*{taxPerPerson}" class="text-danger"
+                                   th:if="${#fields.hasErrors('taxPerPerson')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Tax per Dog</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="taxPerDog"
+                                       th:field="*{taxPerDog}"
+                                       th:placeholder="*{taxPerDog}">
+                                <p th:errors="*{taxPerDog}" class="text-danger"
+                                   th:if="${#fields.hasErrors('taxPerDog')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Tax per Elevator chip</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="taxPerElevatorChip"
+                                       th:field="*{taxPerElevatorChip}"
+                                       th:placeholder="*{taxPerElevatorChip}">
+                                <p th:errors="*{taxPerElevatorChip}" class="text-danger"
+                                   th:if="${#fields.hasErrors('taxPerElevatorChip')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Country</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="country"
+                                       th:field="*{country}"
+                                       th:placeholder="*{country}">
+                                <p th:errors="*{country}" class="text-danger"
+                                   th:if="${#fields.hasErrors('country')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">City</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="city"
+                                       th:field="*{city}"
+                                       th:placeholder="*{city}">
+                                <p th:errors="*{city}" class="text-danger"
+                                   th:if="${#fields.hasErrors('city')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Street</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="street"
+                                       th:field="*{street}"
+                                       th:placeholder="*{street}">
+                                <p th:errors="*{street}" class="text-danger"
+                                   th:if="${#fields.hasErrors('street')}"></p>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="form-group form-button align-content-center">
+                                <input type="submit" name="save" id="save" class="form-submit"
+                                       value="Save building"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    </div>
+    </div>
+</section>
