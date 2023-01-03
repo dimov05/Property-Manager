@@ -3,6 +3,7 @@ package bg.propertymanager.model.entity;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -21,6 +22,7 @@ public class BuildingEntity {
     private String country;
     private String city;
     private String street;
+    private LocalDate registrationDate;
     private Set<UserEntity> neighbours;
     private Set<ApartmentEntity> apartments;
     private Set<TaxEntity> taxes;
@@ -150,6 +152,16 @@ public class BuildingEntity {
         return this;
     }
 
+    @Column(name = "registration_date",columnDefinition = "DATE", nullable = false)
+    public LocalDate getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public BuildingEntity setRegistrationDate(LocalDate registrationDate) {
+        this.registrationDate = registrationDate;
+        return this;
+    }
+
     @ManyToOne(fetch = FetchType.EAGER)
     public UserEntity getManager() {
         return manager;
@@ -171,7 +183,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "building",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "building", fetch = FetchType.EAGER)
     public Set<TaxEntity> getTaxes() {
         return taxes;
     }
@@ -181,7 +193,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "building",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "building", fetch = FetchType.EAGER)
     public Set<MessageEntity> getMessages() {
         return messages;
     }
@@ -191,7 +203,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "building",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "building", fetch = FetchType.EAGER)
     public Set<ApartmentEntity> getApartments() {
         return apartments;
     }
