@@ -1,0 +1,20 @@
+<th:block th:include="~{fragment/navbar}"></th:block>
+<div>
+    <!--    <div class="form-check">-->
+    <!--        <input type="radio" class="form-check-input" id="user" name="user" value="user"-->
+    <!--               th:checked="${user.getRoles().contains()}"-->
+    <!--        >User-->
+    <!--        <label class="form-check-label" for="user"></label>-->
+    <!--    </div>-->
+    <th:block th:each="role : ${roles}">
+        <div class="form-check">
+            <input th:checked="${user.getRoles().contains(role)}" th:type="radio" id="user" name="user" value="user">
+            <label for="user" th:text="${role.getName()}"></label>
+        </div>
+    </th:block>
+    <div class="form-group form-button align-content-center">
+        <input type="submit" name="save" id="save" class="form-submit"
+               value="Save"/>
+    </div>
+</div>
+</div>
