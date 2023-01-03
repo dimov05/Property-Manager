@@ -1,12 +1,10 @@
 package bg.propertymanager.model.dto;
 
-import org.hibernate.validator.constraints.Length;
-
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 
-public class EditProfileDTO {
+public class UserEditDTO {
     private Long id;
     private String username;
     private String email;
@@ -20,14 +18,14 @@ public class EditProfileDTO {
 
     private String street;
 
-    public EditProfileDTO() {
+    public UserEditDTO() {
     }
 
     public Long getId() {
         return id;
     }
 
-    public EditProfileDTO setId(Long id) {
+    public UserEditDTO setId(Long id) {
         this.id = id;
         return this;
     }
@@ -36,7 +34,7 @@ public class EditProfileDTO {
         return username;
     }
 
-    public EditProfileDTO setUsername(String username) {
+    public UserEditDTO setUsername(String username) {
         this.username = username;
         return this;
     }
@@ -47,7 +45,7 @@ public class EditProfileDTO {
         return email;
     }
 
-    public EditProfileDTO setEmail(String email) {
+    public UserEditDTO setEmail(String email) {
         this.email = email;
         return this;
     }
@@ -58,7 +56,7 @@ public class EditProfileDTO {
         return phoneNumber;
     }
 
-    public EditProfileDTO setPhoneNumber(String phoneNumber) {
+    public UserEditDTO setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
         return this;
     }
@@ -67,7 +65,7 @@ public class EditProfileDTO {
         return fullName;
     }
 
-    public EditProfileDTO setFullName(String fullName) {
+    public UserEditDTO setFullName(String fullName) {
         this.fullName = fullName;
         return this;
     }
@@ -77,7 +75,7 @@ public class EditProfileDTO {
         return country;
     }
 
-    public EditProfileDTO setCountry(String country) {
+    public UserEditDTO setCountry(String country) {
         this.country = country;
         return this;
     }
@@ -87,7 +85,7 @@ public class EditProfileDTO {
         return city;
     }
 
-    public EditProfileDTO setCity(String city) {
+    public UserEditDTO setCity(String city) {
         this.city = city;
         return this;
     }
@@ -97,7 +95,7 @@ public class EditProfileDTO {
         return street;
     }
 
-    public EditProfileDTO setStreet(String street) {
+    public UserEditDTO setStreet(String street) {
         this.street = street;
         return this;
     }
