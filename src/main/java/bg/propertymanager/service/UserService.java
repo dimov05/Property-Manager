@@ -1,13 +1,14 @@
 package bg.propertymanager.service;
 
-import bg.propertymanager.model.dto.PasswordChangeDTO;
-import bg.propertymanager.model.dto.UserEditDTO;
-import bg.propertymanager.model.dto.UserRegisterDTO;
+import bg.propertymanager.model.dto.user.PasswordChangeDTO;
+import bg.propertymanager.model.dto.user.UserEditDTO;
+import bg.propertymanager.model.dto.user.UserRegisterDTO;
+import bg.propertymanager.model.entity.ApartmentEntity;
+import bg.propertymanager.model.entity.BuildingEntity;
 import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.UserRolesEnum;
 import bg.propertymanager.model.view.AdminViewUserProfile;
-import bg.propertymanager.model.view.UserProfileView;
 import bg.propertymanager.repository.RoleRepository;
 import bg.propertymanager.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -21,7 +22,6 @@ import javax.transaction.Transactional;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -32,19 +32,21 @@ public class UserService {
     private final UserDetailsService appUserDetailsService;
     private final ModelMapper modelMapper;
     private final String adminPass;
+    private final BuildingService buildingService;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
                        PasswordEncoder passwordEncoder,
                        UserDetailsService appUserDetailsService,
-                       ModelMapper modelMapper, @Value("${app.default.admin.password}") String adminPass) {
+                       ModelMapper modelMapper, @Value("${app.default.admin.password}") String adminPass, BuildingService buildingService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.appUserDetailsService = appUserDetailsService;
         this.modelMapper = modelMapper;
         this.adminPass = adminPass;
+        this.buildingService = buildingService;
     }
 
     public UserEntity register(UserRegisterDTO userRegisterDTO) {
@@ -151,5 +153,20 @@ public class UserService {
     public UserEntity findById(long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new NullPointerException("No such user with this Id"));
+    }
+
+
+    public void addApartmentAndBuildingToUser(UserEntity ownerToAdd, Long buildingId, ApartmentEntity newApartment) {
+        ownerToAdd.getOwnerInBuildings().add(getBuildingEntity(buildingId));
+        ownerToAdd.getApartments().add(newApartment);
+        updateUser(ownerToAdd);
+    }
+
+    private void updateUser(UserEntity userToUpdate) {
+        userRepository.save(userToUpdate);
+    }
+
+    private BuildingEntity getBuildingEntity(Long buildingId) {
+        return buildingService.findEntityById(buildingId);
     }
 }

@@ -1,10 +1,9 @@
 package bg.propertymanager.web;
 
-import bg.propertymanager.model.dto.BuildingAddDTO;
-import bg.propertymanager.model.dto.BuildingEditDTO;
-import bg.propertymanager.model.dto.BuildingViewDTO;
+import bg.propertymanager.model.dto.building.BuildingAddDTO;
+import bg.propertymanager.model.dto.building.BuildingEditDTO;
+import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
-import bg.propertymanager.repository.BuildingRepository;
 import bg.propertymanager.service.BuildingService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -61,8 +60,7 @@ public class BuildingController {
         return "redirect:/admin/buildings";
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') " +
-            "or buildingService.findById(id).manager.username == principal.username")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/buildings/view/{id}")
     public ModelAndView viewBuilding(@PathVariable("id") Long id) {
         BuildingViewDTO buildingViewDTO = buildingService.findById(id);
@@ -71,8 +69,7 @@ public class BuildingController {
         return mav;
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN') " +
-            "or buildingService.findById(id).manager.username == principal.username")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/buildings/edit/{id}")
     public ModelAndView editBuilding(@PathVariable("id") Long id, Model model) {
         if (!model.containsAttribute("buildingEditDTO")) {
@@ -82,5 +79,21 @@ public class BuildingController {
         ModelAndView mav = new ModelAndView("edit-building");
         mav.addObject("building", buildingEdit);
         return mav;
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/admin/buildings/edit/{id}")
+    public String editBuildingConfirm(@Valid BuildingEditDTO buildingEditDTO,
+                                      BindingResult bindingResult,
+                                      RedirectAttributes redirectAttributes,
+                                      @PathVariable("id") Long id) {
+        buildingEditDTO.setId(id);
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("buildingEditDTO", buildingEditDTO);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.buildingEditDTO", bindingResult);
+            return "redirect:/admin/buildings/edit/" + id;
+        }
+        buildingService.updateBuilding(buildingEditDTO);
+        return "redirect:/admin/buildings/view/" + id;
     }
 }

@@ -1,7 +1,7 @@
 package bg.propertymanager.web;
 
-import bg.propertymanager.model.dto.PasswordChangeDTO;
-import bg.propertymanager.model.dto.UserEditDTO;
+import bg.propertymanager.model.dto.user.PasswordChangeDTO;
+import bg.propertymanager.model.dto.user.UserEditDTO;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.service.UserService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,8 +40,8 @@ public class UserController {
     @PreAuthorize("#name == principal.username")
     @GetMapping("/profile/edit/{name}")
     public ModelAndView editProfile(@PathVariable("name") String name, Model model) {
-        if (!model.containsAttribute("editProfileDTO")) {
-            model.addAttribute("editProfileDTO", new UserEditDTO());
+        if (!model.containsAttribute("userEditDTO")) {
+            model.addAttribute("userEditDTO", new UserEditDTO());
         }
         UserEntity userProfileView = userService.findUserByUsername(name);
         ModelAndView mav = new ModelAndView("edit-profile");
@@ -60,8 +60,8 @@ public class UserController {
                 findUserByUsername(principal.getName())
                 .getId());
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("editProfileDTO", userEditDTO);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.editProfileDTO", bindingResult);
+            redirectAttributes.addFlashAttribute("userEditDTO", userEditDTO);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userEditDTO", bindingResult);
             return "redirect:/users/profile/edit/" + principal.getName();
         }
         userService.updateProfile(userEditDTO);
@@ -81,7 +81,7 @@ public class UserController {
         return mav;
     }
 
-    @PreAuthorize("#name == principal.name")
+    @PreAuthorize("#name == principal.username")
     @PostMapping("/profile/change-password/{name}")
     public String changePasswordConfirm(@Valid PasswordChangeDTO passwordChangeDTO,
                                         BindingResult bindingResult,

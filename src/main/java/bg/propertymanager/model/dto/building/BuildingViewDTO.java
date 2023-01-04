@@ -1,4 +1,4 @@
-package bg.propertymanager.model.dto;
+package bg.propertymanager.model.dto.building;
 
 import bg.propertymanager.model.entity.ApartmentEntity;
 import bg.propertymanager.model.entity.MessageEntity;
@@ -8,7 +8,7 @@ import bg.propertymanager.model.entity.UserEntity;
 import java.math.BigDecimal;
 import java.util.Set;
 
-public class BuildingEditDTO {
+public class BuildingViewDTO {
     private Long id;
     private String name;
     private int floors;
@@ -22,19 +22,20 @@ public class BuildingEditDTO {
     private String country;
     private String city;
     private String street;
+    private String registrationDate;
     private Set<UserEntity> neighbours;
     private Set<ApartmentEntity> apartments;
     private Set<TaxEntity> taxes;
     private Set<MessageEntity> messages;
 
-    public BuildingEditDTO() {
+    public BuildingViewDTO() {
     }
 
     public Long getId() {
         return id;
     }
 
-    public BuildingEditDTO setId(Long id) {
+    public BuildingViewDTO setId(Long id) {
         this.id = id;
         return this;
     }
@@ -43,7 +44,7 @@ public class BuildingEditDTO {
         return name;
     }
 
-    public BuildingEditDTO setName(String name) {
+    public BuildingViewDTO setName(String name) {
         this.name = name;
         return this;
     }
@@ -52,7 +53,7 @@ public class BuildingEditDTO {
         return floors;
     }
 
-    public BuildingEditDTO setFloors(int floors) {
+    public BuildingViewDTO setFloors(int floors) {
         this.floors = floors;
         return this;
     }
@@ -61,7 +62,7 @@ public class BuildingEditDTO {
         return elevators;
     }
 
-    public BuildingEditDTO setElevators(int elevators) {
+    public BuildingViewDTO setElevators(int elevators) {
         this.elevators = elevators;
         return this;
     }
@@ -70,7 +71,7 @@ public class BuildingEditDTO {
         return imageUrl;
     }
 
-    public BuildingEditDTO setImageUrl(String imageUrl) {
+    public BuildingViewDTO setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
         return this;
     }
@@ -79,7 +80,7 @@ public class BuildingEditDTO {
         return balance;
     }
 
-    public BuildingEditDTO setBalance(BigDecimal balance) {
+    public BuildingViewDTO setBalance(BigDecimal balance) {
         this.balance = balance;
         return this;
     }
@@ -88,7 +89,7 @@ public class BuildingEditDTO {
         return taxPerPerson;
     }
 
-    public BuildingEditDTO setTaxPerPerson(BigDecimal taxPerPerson) {
+    public BuildingViewDTO setTaxPerPerson(BigDecimal taxPerPerson) {
         this.taxPerPerson = taxPerPerson;
         return this;
     }
@@ -97,7 +98,7 @@ public class BuildingEditDTO {
         return taxPerDog;
     }
 
-    public BuildingEditDTO setTaxPerDog(BigDecimal taxPerDog) {
+    public BuildingViewDTO setTaxPerDog(BigDecimal taxPerDog) {
         this.taxPerDog = taxPerDog;
         return this;
     }
@@ -106,8 +107,17 @@ public class BuildingEditDTO {
         return taxPerElevatorChip;
     }
 
-    public BuildingEditDTO setTaxPerElevatorChip(BigDecimal taxPerElevatorChip) {
+    public BuildingViewDTO setTaxPerElevatorChip(BigDecimal taxPerElevatorChip) {
         this.taxPerElevatorChip = taxPerElevatorChip;
+        return this;
+    }
+
+    public String getRegistrationDate() {
+        return registrationDate;
+    }
+
+    public BuildingViewDTO setRegistrationDate(String registrationDate) {
+        this.registrationDate = registrationDate;
         return this;
     }
 
@@ -115,7 +125,7 @@ public class BuildingEditDTO {
         return manager;
     }
 
-    public BuildingEditDTO setManager(UserEntity manager) {
+    public BuildingViewDTO setManager(UserEntity manager) {
         this.manager = manager;
         return this;
     }
@@ -124,7 +134,7 @@ public class BuildingEditDTO {
         return country;
     }
 
-    public BuildingEditDTO setCountry(String country) {
+    public BuildingViewDTO setCountry(String country) {
         this.country = country;
         return this;
     }
@@ -133,7 +143,7 @@ public class BuildingEditDTO {
         return city;
     }
 
-    public BuildingEditDTO setCity(String city) {
+    public BuildingViewDTO setCity(String city) {
         this.city = city;
         return this;
     }
@@ -142,7 +152,7 @@ public class BuildingEditDTO {
         return street;
     }
 
-    public BuildingEditDTO setStreet(String street) {
+    public BuildingViewDTO setStreet(String street) {
         this.street = street;
         return this;
     }
@@ -151,7 +161,7 @@ public class BuildingEditDTO {
         return neighbours;
     }
 
-    public BuildingEditDTO setNeighbours(Set<UserEntity> neighbours) {
+    public BuildingViewDTO setNeighbours(Set<UserEntity> neighbours) {
         this.neighbours = neighbours;
         return this;
     }
@@ -160,7 +170,7 @@ public class BuildingEditDTO {
         return apartments;
     }
 
-    public BuildingEditDTO setApartments(Set<ApartmentEntity> apartments) {
+    public BuildingViewDTO setApartments(Set<ApartmentEntity> apartments) {
         this.apartments = apartments;
         return this;
     }
@@ -169,7 +179,7 @@ public class BuildingEditDTO {
         return taxes;
     }
 
-    public BuildingEditDTO setTaxes(Set<TaxEntity> taxes) {
+    public BuildingViewDTO setTaxes(Set<TaxEntity> taxes) {
         this.taxes = taxes;
         return this;
     }
@@ -178,7 +188,7 @@ public class BuildingEditDTO {
         return messages;
     }
 
-    public BuildingEditDTO setMessages(Set<MessageEntity> messages) {
+    public BuildingViewDTO setMessages(Set<MessageEntity> messages) {
         this.messages = messages;
         return this;
     }

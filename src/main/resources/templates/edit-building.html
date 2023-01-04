@@ -18,7 +18,7 @@
             <div class="col-lg-8">
                 <div class="card mb-4">
                     <form class="card-body" th:object="${buildingEditDTO}"
-                          th:action="@{/admin/buildings/edit/{id}(id = *{id})}"
+                          th:action="@{/admin/buildings/edit/{id}(id = ${building.id})}"
                           th:method="POST">
                         <div class="row">
                             <div class="col-sm-3">
@@ -120,7 +120,7 @@
                         <hr>
                         <div class="row">
                             <div class="col-sm-3">
-                                <p class="mb-0">Balance</p>
+                                <p class="mb-0">Manager Id</p>
                             </div>
                             <div class="col-sm-9">
                                 <input type="text"
@@ -173,10 +173,15 @@
                                    th:if="${#fields.hasErrors('street')}"></p>
                             </div>
                         </div>
-                        <div class="text-center">
-                            <div class="form-group form-button align-content-center">
+                        <div class="text-center row align-content-center">
+                            <div class="col form-group form-button ">
                                 <input type="submit" name="save" id="save" class="form-submit"
                                        value="Save"/>
+                            </div>
+                            <div class="col form-group form-button ">
+                                <input type="submit" name="back" id="back"
+                                       th:href="@{/admin/buildings/view/{id}(id = ${building.id})}" class="form-submit"
+                                       value="Back"/>
                             </div>
                         </div>
                     </form>

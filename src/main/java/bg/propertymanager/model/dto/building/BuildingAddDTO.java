@@ -1,4 +1,4 @@
-package bg.propertymanager.model.dto;
+package bg.propertymanager.model.dto.building;
 
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotEmpty;

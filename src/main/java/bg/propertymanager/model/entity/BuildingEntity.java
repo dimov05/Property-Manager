@@ -152,7 +152,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @Column(name = "registration_date",columnDefinition = "DATE", nullable = false)
+    @Column(name = "registration_date", columnDefinition = "DATE", nullable = false)
     public LocalDate getRegistrationDate() {
         return registrationDate;
     }
@@ -203,7 +203,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "building", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "building", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     public Set<ApartmentEntity> getApartments() {
         return apartments;
     }

@@ -2,7 +2,7 @@
 <section style="background-color: #eee;">
     <div class="container py-5" th:object="${building}">
         <div class="row">
-            <div class="col-lg-4" >
+            <div class="col-lg-4">
                 <div class="card mb-4">
                     <div class="card-body text-center">
                         <img th:src="*{imageUrl}"
@@ -16,11 +16,9 @@
                            th:text="*{manager.fullName} + ', ' + *{manager.phoneNumber}"></p>
                         <div class="d-flex justify-content-center mb-2">
                             <a class="nav-item active mx-auto"
-                               th:href="@{/admin/buildings/add-apartment}">Add apartment</a>
+                               th:href="@{/admin/buildings/{id}/add-apartment(id = *{id})}">Add apartment</a>
                             <a class="nav-item active mx-auto"
-                            th:href="@{/admin/buildings/edit/{id}(id = *{id})}">Edit building</a>
-<!--                            <button type="button" class="btn btn-primary">Add apartment td</button>-->
-<!--                            <button type="button" class="btn btn-outline-primary ms-1">Edit building td</button>-->
+                               th:href="@{/admin/buildings/edit/{id}(id = *{id})}">Edit building</a>
                         </div>
                     </div>
                 </div>
@@ -30,22 +28,22 @@
                             <li class="list-group-item align-items-center p-3">
                                 <i class="fas fa-globe fa-lg text-warning"></i>
                                 <p class="mb-0 align-content-center text-center"
-                                th:text="'Building\'s money balance: ' + *{balance} +'lv.'"></p>
+                                   th:text="'Building\'s money balance: ' + *{balance} +'lv.'"></p>
                             </li>
                             <li class="list-group-item align-items-center p-3">
                                 <i class="fas fa-globe fa-lg text-warning"></i>
                                 <p class="mb-0 align-content-center text-center"
-                                th:text="'Building\'s tax per Person: ' + *{taxPerPerson} +'lv.'"></p>
+                                   th:text="'Building\'s tax per Person: ' + *{taxPerPerson} +'lv.'"></p>
                             </li>
                             <li class="list-group-item align-items-center p-3">
                                 <i class="fas fa-globe fa-lg text-warning"></i>
                                 <p class="mb-0 align-content-center text-center"
-                                th:text="'Building\'s tax per Dog: ' + *{taxPerDog} +'lv.'"></p>
+                                   th:text="'Building\'s tax per Dog: ' + *{taxPerDog} +'lv.'"></p>
                             </li>
                             <li class="list-group-item align-items-center p-3">
                                 <i class="fas fa-globe fa-lg text-warning"></i>
                                 <p class="mb-0 align-content-center text-center"
-                                th:text="'Building\'s per elevator chip: ' + *{TaxPerElevatorChip} +'lv.'"></p>
+                                   th:text="'Building\'s per elevator chip: ' + *{TaxPerElevatorChip} +'lv.'"></p>
                             </li>
 
                         </ul>
@@ -60,7 +58,7 @@
                                 <p class="mb-0">Floors count:</p>
                             </div>
                             <div class="col-sm-9">
-                                <p class="text-muted mb-0" th:text="*{floors}"> </p>
+                                <p class="text-muted mb-0" th:text="*{floors}"></p>
                             </div>
                         </div>
                         <hr>
@@ -93,44 +91,48 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-11">
-                        <div class="card mb-4 mb-md-0">
+                    <div class="col-md-12">
+                        <div class="card mb-4 ">
                             <div class="card-body">
                                 <p class="mb-4"><span class="text-primary font-italic me-1"
-                                th:text="'List of apartments - ' + ${building.apartments.size()}"></span>
+                                                      th:text="'List of apartments - ' + ${building.apartments.size()}"></span>
                                 </p>
-                                <table class="table project-list-table table-nowrap align-middle table-borderless">
-                                    <thead>
-                                    <tr >
-                                        <th scope="col" style="width: 3px">Id</th>
-                                        <th scope="col">Apartment №</th>
-                                        <th scope="col">Floor</th>
-                                        <th scope="col">Apartment area</th>
-                                        <th scope="col">Taxes per month</th>
-                                        <th scope="col">Owner</th>
-                                        <th scope="col" style="width: 60px;">Action</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr th:each="apartment: ${building.apartments}" th:object="${apartment}">
-                                        <td th:text="*{id}"></td>
-                                        <td th:text="*{apartmentNumber}"></td>
-                                        <td th:text="*{floor}"></td>
-                                        <td th:text="*{area}"></td>
-                                        <td th:text="*{periodicTax}"></td>
-                                        <td th:text="*{owner.fullName}"></td>
-                                        <td>
-                                            <ul class="list-inline mb-0">
-                                                <li class="list-inline-item">
-                                                    <a th:href="@{/admin/buildings/view/{id}(id = *{id})}"
-                                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"
-                                                       class="px-2 text-primary">Edittd<i class="bx bx-pencil font-size-22"></i></a>
-                                                </li>
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                    </tbody>
-                                </table>
+                                <div class="table-responsive">
+                                    <table class="table project-list-table table-nowrap align-middle table-borderless">
+                                        <thead>
+                                        <tr>
+                                            <th scope="col">Apartment №</th>
+                                            <th scope="col">Floor</th>
+                                            <th scope="col">Apartment area</th>
+                                            <th scope="col">Taxes per month</th>
+                                            <th scope="col">Money owed</th>
+                                            <th scope="col">Owner</th>
+                                            <th scope="col" style="width: 60px;">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="apartment: ${building.apartments}" th:object="${apartment}">
+                                            <td th:text="*{apartmentNumber}"></td>
+                                            <td th:text="*{floor}"></td>
+                                            <td th:text="*{area} + 'm2'"></td>
+                                            <td th:text="*{periodicTax} + 'lv.'"></td>
+                                            <td th:text="*{moneyOwed} + 'lv.'"></td>
+                                            <td th:text="*{owner.fullName}"></td>
+                                            <td>
+                                                <ul class="list-inline mb-0">
+                                                    <li class="list-inline-item">
+                                                        <a th:href="@{/admin/buildings/{buildingId}/apartment/{apartmentId}
+                                                        (buildingId = ${building.id},apartmentId = *{id})}"
+                                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"
+                                                           class="px-2 text-primary">Edit<i
+                                                                class="bx bx-pencil font-size-22"></i></a>
+                                                    </li>
+                                                </ul>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>

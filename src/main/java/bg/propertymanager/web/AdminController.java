@@ -1,6 +1,6 @@
 package bg.propertymanager.web;
 
-import bg.propertymanager.model.dto.UserEditDTO;
+import bg.propertymanager.model.dto.user.UserEditDTO;
 import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.view.AdminViewUserProfile;
@@ -41,8 +41,8 @@ public class AdminController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/users/edit/{name}")
     public ModelAndView editProfileAsAdmin(@PathVariable("name") String name, Model model) {
-        if (!model.containsAttribute("editProfileDTO")) {
-            model.addAttribute("editProfileDTO", new UserEditDTO());
+        if (!model.containsAttribute("userEditDTO")) {
+            model.addAttribute("userEditDTO", new UserEditDTO());
         }
         UserEntity userProfileToEdit = userService.findUserByUsername(name);
         ModelAndView mav = new ModelAndView("edit-profile-as-admin");
@@ -60,8 +60,8 @@ public class AdminController {
                 findUserByUsername(name)
                 .getId());
         if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("editProfileDTO", userEditDTO);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.editProfileDTO", bindingResult);
+            redirectAttributes.addFlashAttribute("userEditDTO", userEditDTO);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.userEditDTO", bindingResult);
             return "redirect:/admin/users/edit/" + name;
         }
         userService.updateProfile(userEditDTO);

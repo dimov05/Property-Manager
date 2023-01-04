@@ -1,6 +1,6 @@
 package bg.propertymanager.web;
 
-import bg.propertymanager.model.dto.UserRegisterDTO;
+import bg.propertymanager.model.dto.user.UserRegisterDTO;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
