@@ -1,4 +1,4 @@
-package bg.propertymanager.model.dto;
+package bg.propertymanager.model.dto.user;
 
 import org.hibernate.validator.constraints.Length;
 

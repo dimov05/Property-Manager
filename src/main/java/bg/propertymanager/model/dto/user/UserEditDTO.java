@@ -1,4 +1,4 @@
-package bg.propertymanager.model.dto;
+package bg.propertymanager.model.dto.user;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;

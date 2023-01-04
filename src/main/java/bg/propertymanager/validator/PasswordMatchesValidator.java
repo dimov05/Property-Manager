@@ -1,6 +1,6 @@
 package bg.propertymanager.validator;
 
-import bg.propertymanager.model.dto.UserRegisterDTO;
+import bg.propertymanager.model.dto.user.UserRegisterDTO;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
