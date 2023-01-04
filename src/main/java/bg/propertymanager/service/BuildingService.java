@@ -110,9 +110,14 @@ public class BuildingService {
                 .orElseThrow(() -> new NullPointerException("There is no such a building"));
     }
 
-    public void addNeighbour(ApartmentAddDTO apartmentAddDTO, Long buildingId) {
+    public void addNeighbour(UserEntity owner, Long buildingId) {
         BuildingEntity buildingToEdit = findEntityById(buildingId);
-        buildingToEdit.getNeighbours().add(apartmentAddDTO.getOwner());
+        buildingToEdit.getNeighbours().add(owner);
+        buildingRepository.save(buildingToEdit);
+    }
+    public void removeNeighbour(UserEntity owner, Long buildingId) {
+        BuildingEntity buildingToEdit = findEntityById(buildingId);
+        buildingToEdit.getNeighbours().add(owner);
         buildingRepository.save(buildingToEdit);
     }
 }

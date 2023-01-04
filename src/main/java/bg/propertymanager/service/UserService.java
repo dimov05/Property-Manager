@@ -97,7 +97,8 @@ public class UserService {
                 .setPhoneNumber("+359878123456")
                 .setCountry("Bulgaria")
                 .setCity("Plovdiv")
-                .setStreet("Vasil Levski 37");
+                .setStreet("Vasil Levski 37")
+                .setRegistrationDate(LocalDate.now());
         userRepository.save(user);
     }
 
@@ -112,7 +113,8 @@ public class UserService {
                 .setPhoneNumber("+359877779292")
                 .setCountry("Bulgaria")
                 .setCity("Plovdiv")
-                .setStreet("Vasil Levski 34");
+                .setStreet("Vasil Levski 34")
+                .setRegistrationDate(LocalDate.now());
         userRepository.save(admin);
     }
 
