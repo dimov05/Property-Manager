@@ -1,5 +1,6 @@
 package bg.propertymanager.service;
 
+import bg.propertymanager.model.dto.apartment.ApartmentEditDTO;
 import bg.propertymanager.model.dto.user.PasswordChangeDTO;
 import bg.propertymanager.model.dto.user.UserEditDTO;
 import bg.propertymanager.model.dto.user.UserRegisterDTO;
@@ -9,6 +10,7 @@ import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.UserRolesEnum;
 import bg.propertymanager.model.view.AdminViewUserProfile;
+import bg.propertymanager.repository.ApartmentRepository;
 import bg.propertymanager.repository.RoleRepository;
 import bg.propertymanager.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -33,13 +35,15 @@ public class UserService {
     private final ModelMapper modelMapper;
     private final String adminPass;
     private final BuildingService buildingService;
+    private final ApartmentRepository apartmentRepository;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
                        PasswordEncoder passwordEncoder,
                        UserDetailsService appUserDetailsService,
-                       ModelMapper modelMapper, @Value("${app.default.admin.password}") String adminPass, BuildingService buildingService) {
+                       ModelMapper modelMapper, @Value("${app.default.admin.password}") String adminPass, BuildingService buildingService,
+                       ApartmentRepository apartmentRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -47,6 +51,7 @@ public class UserService {
         this.modelMapper = modelMapper;
         this.adminPass = adminPass;
         this.buildingService = buildingService;
+        this.apartmentRepository = apartmentRepository;
     }
 
     public UserEntity register(UserRegisterDTO userRegisterDTO) {
@@ -155,18 +160,23 @@ public class UserService {
                 .orElseThrow(() -> new NullPointerException("No such user with this Id"));
     }
 
-
-    public void addApartmentAndBuildingToUser(UserEntity ownerToAdd, Long buildingId, ApartmentEntity newApartment) {
-        ownerToAdd.getOwnerInBuildings().add(getBuildingEntity(buildingId));
-        ownerToAdd.getApartments().add(newApartment);
-        updateUser(ownerToAdd);
-    }
-
     private void updateUser(UserEntity userToUpdate) {
         userRepository.save(userToUpdate);
     }
 
     private BuildingEntity getBuildingEntity(Long buildingId) {
         return buildingService.findEntityById(buildingId);
+    }
+
+    public void removeApartmentFromUser(ApartmentEntity apartment, UserEntity ownerToRemove) {
+        UserEntity userToUpdate = findById(ownerToRemove.getId());
+        userToUpdate.getApartments().remove(apartment);
+        updateUser(userToUpdate);
+    }
+
+    public void addApartmentToUser(ApartmentEntity apartment, UserEntity ownerToAdd) {
+        UserEntity userToUpdate = findById(ownerToAdd.getId());
+        userToUpdate.getApartments().add(apartment);
+        updateUser(userToUpdate);
     }
 }

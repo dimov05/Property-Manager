@@ -158,7 +158,7 @@ public class UserEntity {
         return this;
     }
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "owners_buildings",
             joinColumns = {@JoinColumn(name = "owner_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "building_id", referencedColumnName = "id")}

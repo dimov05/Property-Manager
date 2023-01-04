@@ -128,7 +128,7 @@ public class ApartmentEntity {
         return this;
     }
 
-    @ManyToOne(fetch = FetchType.EAGER,cascade = CascadeType.ALL)
+    @ManyToOne()
     public BuildingEntity getBuilding() {
         return building;
     }
@@ -138,7 +138,7 @@ public class ApartmentEntity {
         return this;
     }
 
-    @ManyToOne
+    @ManyToOne()
     public UserEntity getOwner() {
         return owner;
     }

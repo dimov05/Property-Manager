@@ -152,7 +152,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @Column(name = "registration_date", columnDefinition = "DATE", nullable = false)
+    @Column(name = "registration_date",columnDefinition = "DATE", nullable = false)
     public LocalDate getRegistrationDate() {
         return registrationDate;
     }
@@ -162,7 +162,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne()
     public UserEntity getManager() {
         return manager;
     }
@@ -172,7 +172,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL)
     public Set<UserEntity> getNeighbours() {
         return neighbours;
     }
@@ -183,7 +183,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "building", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "building")
     public Set<TaxEntity> getTaxes() {
         return taxes;
     }
@@ -203,7 +203,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "building", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "building")
     public Set<ApartmentEntity> getApartments() {
         return apartments;
     }

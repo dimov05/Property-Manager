@@ -43,9 +43,10 @@ public class ApartmentService {
                 .setMoneyOwed(BigDecimal.valueOf(0));
         buildingService.addNeighbour(apartmentAddDTO, buildingId);
         UserEntity ownerToAdd = userService.findById(apartmentAddDTO.getOwner().getId());
-        userService.addApartmentAndBuildingToUser(ownerToAdd, buildingId, newApartment);
+//        userService.addApartmentAndBuildingToUser(ownerToAdd,buildingId,newApartment);
         apartmentRepository.save(newApartment);
     }
+
 
 
     private BigDecimal calculatePeriodicTax(ApartmentAddDTO apartmentAddDTO, Long buildingId) {
@@ -78,11 +79,12 @@ public class ApartmentService {
                 .setElevatorChipsCount(apartmentEditDTO.getElevatorChipsCount())
                 .setDogsCount(apartmentEditDTO.getDogsCount())
                 .setOwner(ownerToAdd);
-        buildingService.addAndRemoveNeighbour(apartmentEditDTO, apartmentEditDTO.getBuilding().getId());
-        userService.removeApartmentFromUser(apartmentEditDTO, ownerToRemove);
-        userService.addApartmentAndBuildingToUser(ownerToAdd,
-                apartmentToUpdate.getBuilding().getId(),
-                apartmentToUpdate);
+//        buildingService.addAndRemoveNeighbour(apartmentAddDTO, apartmentEditDTO.getBuilding().getId());
+        userService.removeApartmentFromUser(apartmentToUpdate,ownerToRemove);
+        userService.addApartmentToUser(apartmentToUpdate,ownerToAdd);
+
+        apartmentRepository.save(apartmentToUpdate);
+
 
 
     }

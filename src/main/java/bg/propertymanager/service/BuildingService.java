@@ -1,7 +1,6 @@
 package bg.propertymanager.service;
 
 import bg.propertymanager.model.dto.apartment.ApartmentAddDTO;
-import bg.propertymanager.model.dto.apartment.ApartmentEditDTO;
 import bg.propertymanager.model.dto.building.BuildingAddDTO;
 import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
@@ -10,6 +9,7 @@ import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
 import bg.propertymanager.repository.BuildingRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -26,7 +26,7 @@ public class BuildingService {
     private final ModelMapper modelMapper;
     private final UserService userService;
 
-    public BuildingService(BuildingRepository buildingRepository, ModelMapper modelMapper, UserService userService) {
+    public BuildingService(BuildingRepository buildingRepository, ModelMapper modelMapper, @Lazy UserService userService) {
         this.buildingRepository = buildingRepository;
         this.modelMapper = modelMapper;
         this.userService = userService;
@@ -114,9 +114,5 @@ public class BuildingService {
         BuildingEntity buildingToEdit = findEntityById(buildingId);
         buildingToEdit.getNeighbours().add(apartmentAddDTO.getOwner());
         buildingRepository.save(buildingToEdit);
-    }
-
-    public void addAndRemoveNeighbour(ApartmentEditDTO apartmentEditDTO, Long id) {
-
     }
 }
