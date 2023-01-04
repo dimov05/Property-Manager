@@ -1,0 +1,134 @@
+<th:block th:include="~{fragment/navbar}"></th:block>
+<section style="background-color: #eee;">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="card-body text-center" th:object="${building}">
+                    <img th:src="*{imageUrl}"
+                         alt="avatar"
+                         class="img-fluid mx-auto" style="width: 150px;">
+                    <h5 class="my-3" th:text="*{name}"></h5>
+                    <p class="text-muted mb-1"
+                       th:text="*{street} + ', ' + *{city} + ', ' + *{country}">Address</p>
+                    <p class="text-muted">Manager:</p>
+                    <p class="text-muted mb-4"
+                       th:text="*{manager.fullName} + ', ' + *{manager.phoneNumber}"></p>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card mb-4">
+                    <form class="card-body" th:object="${apartmentEditDTO}"
+                          th:action="@{/admin/buildings/{buildingId}/apartment/{apartmentId}
+                                                        (buildingId = ${building.id},apartmentId = ${apartment.id})}"
+                          th:method="POST">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Apartment's number</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="apartmentNumber"
+                                       th:field="${apartment.apartmentNumber}"
+                                       th:placeholder="*{apartmentNumber}">
+                                <p th:errors="*{apartmentNumber}" class="text-danger"
+                                   th:if="${#fields.hasErrors('apartmentNumber')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Apartment's floor</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="floor"
+                                       th:field="${apartment.floor}"
+                                       th:placeholder="${apartmentEditDTO.floor}">
+                                <p th:errors="*{floor}" class="text-danger"
+                                   th:if="${#fields.hasErrors('floor')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Apartment's area</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="area"
+                                       th:field="${apartment.area}"
+                                       th:placeholder="*{area}">
+                                <p th:errors="*{area}" class="text-danger"
+                                   th:if="${#fields.hasErrors('area')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Roommates count</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="roommateCount"
+                                       th:field="${apartment.roommateCount}"
+                                       th:placeholder="*{roommateCount}">
+                                <p th:errors="*{roommateCount}" class="text-danger"
+                                   th:if="${#fields.hasErrors('roommateCount')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Elevator chips count</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="elevatorChipsCount"
+                                       th:field="${apartment.elevatorChipsCount}"
+                                       th:placeholder="*{elevatorChipsCount}">
+                                <p th:errors="*{elevatorChipsCount}" class="text-danger"
+                                   th:if="${#fields.hasErrors('elevatorChipsCount')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Dogs count</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="dogsCount"
+                                       th:field="${apartment.dogsCount}"
+                                       th:placeholder="*{dogsCount}">
+                                <p th:errors="*{dogsCount}" class="text-danger"
+                                   th:if="${#fields.hasErrors('dogsCount')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Owner's ID</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="ownerId"
+                                       th:field="${apartment.owner.id}"
+                                       th:placeholder="${building.manager.id}">
+                                <p th:errors="*{owner.id}" class="text-danger"
+                                   th:if="${#fields.hasErrors('owner.id')}"></p>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="form-group form-button align-content-center">
+                                <input type="submit" name="save" id="save" class="form-submit"
+                                       value="Add apartment"/>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+    </div>
+    </div>
+</section>
