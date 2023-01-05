@@ -36,8 +36,9 @@
                         <p class="text-muted mb-1"
                            th:text="${building.street} + ', ' + ${building.city} + ', ' + ${building.country}">Address</p>
                         <p class="text-muted">Manager:</p>
-                        <p class="text-muted mb-4"
+                        <p class="text-muted mb-1"
                            th:text="${building.manager.fullName} + ', ' + ${building.manager.phoneNumber}"></p>
+                        <p class="text-uppercase">Log as Manager</p>
                         <div class="d-flex justify-content-center mb-2">
                             <a class="nav-item active mx-auto"
                                th:href="@{/admin/buildings/view/{id}(id = ${building.id})}">Manage Building</a>
@@ -55,8 +56,9 @@
                         <p class="text-muted mb-1"
                            th:text="${building.street} + ', ' + ${building.city} + ', ' + ${building.country}">Address</p>
                         <p class="text-muted">Manager:</p>
-                        <p class="text-muted mb-4"
+                        <p class="text-muted mb-1"
                            th:text="${building.manager.fullName} + ', ' + ${building.manager.phoneNumber}"></p>
+                        <p class="text-uppercase">Log as neighbour</p>
                         <div class="d-flex justify-content-center mb-2">
                             <a class="nav-item active mx-auto"
                                th:href="@{/admin/buildings/view/{id}/add-apartment(id = ${building.id})}">Visit Building</a>
