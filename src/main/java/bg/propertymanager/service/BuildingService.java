@@ -32,21 +32,13 @@ public class BuildingService {
         this.userService = userService;
     }
 
-    public List<BuildingViewDTO> findAll() {
-        return buildingRepository.findAll()
-                .stream()
-                .map(building ->
-                        modelMapper.map(building, BuildingViewDTO.class))
-                .collect(Collectors.toList());
-    }
-
     public void register(BuildingAddDTO buildingAddDTO) {
         BuildingEntity newBuilding =
                 new BuildingEntity()
                         .setName(buildingAddDTO.getName())
                         .setFloors(buildingAddDTO.getFloors())
                         .setElevators(buildingAddDTO.getElevators())
-                        .setImageUrl(getImageUrlBySize(buildingAddDTO))
+                        .setImageUrl(getImageUrlBySize(buildingAddDTO.getFloors()))
                         .setTaxPerPerson(buildingAddDTO.getTaxPerPerson())
                         .setTaxPerDog(buildingAddDTO.getTaxPerDog())
                         .setTaxPerElevatorChip(buildingAddDTO.getTaxPerElevatorChip())
@@ -61,25 +53,6 @@ public class BuildingService {
                         .setMessages(Collections.emptySet())
                         .setManager(userService.findById(1L));
         buildingRepository.save(newBuilding);
-    }
-
-    private String getImageUrlBySize(BuildingAddDTO buildingAddDTO) {
-        String imageUrl;
-        if (buildingAddDTO.getFloors() <= 3) {
-            imageUrl = ImagesOfBuildings.SMALL_BUILDING.url;
-        } else if (buildingAddDTO.getFloors() <= 8) {
-            imageUrl = ImagesOfBuildings.MEDIUM_BUILDING.url;
-        } else {
-            imageUrl = ImagesOfBuildings.LARGE_BUILDING.url;
-        }
-        return imageUrl;
-    }
-
-    public BuildingViewDTO findById(Long id) {
-        return buildingRepository
-                .findById(id)
-                .map(building -> modelMapper.map(building, BuildingViewDTO.class))
-                .orElseThrow(() -> new NullPointerException("No building with this Id."));
     }
 
     public void updateBuilding(BuildingEditDTO buildingEditDTO) {
@@ -98,6 +71,7 @@ public class BuildingService {
                 .setName(buildingEditDTO.getName())
                 .setFloors(buildingEditDTO.getFloors())
                 .setElevators(buildingEditDTO.getElevators())
+                .setImageUrl(getImageUrlBySize(buildingEditDTO.getFloors()))
                 .setBalance(buildingEditDTO.getBalance())
                 .setTaxPerPerson(buildingEditDTO.getTaxPerPerson())
                 .setTaxPerDog(buildingEditDTO.getTaxPerDog())
@@ -108,15 +82,25 @@ public class BuildingService {
         buildingRepository.save(buildingToSave);
     }
 
-    private UserEntity getManagerToSet(BuildingEditDTO buildingEditDTO) {
-        return userService
-                .findById(buildingEditDTO.getManager().getId());
+    public List<BuildingViewDTO> findAll() {
+        return buildingRepository.findAll()
+                .stream()
+                .map(building ->
+                        modelMapper.map(building, BuildingViewDTO.class))
+                .collect(Collectors.toList());
     }
 
     public BuildingEntity findEntityById(Long id) {
         return buildingRepository
                 .findById(id)
                 .orElseThrow(() -> new NullPointerException("There is no such a building"));
+    }
+
+    public BuildingViewDTO findById(Long id) {
+        return buildingRepository
+                .findById(id)
+                .map(building -> modelMapper.map(building, BuildingViewDTO.class))
+                .orElseThrow(() -> new NullPointerException("No building with this Id."));
     }
 
     public void addNeighbour(UserEntity owner, BuildingEntity building) {
@@ -127,5 +111,22 @@ public class BuildingService {
     public void removeNeighbour(UserEntity owner, BuildingEntity building) {
         building.getNeighbours().remove(owner);
         buildingRepository.save(building);
+    }
+
+    private String getImageUrlBySize(int buildingFloors) {
+        String imageUrl;
+        if (buildingFloors <= 3) {
+            imageUrl = ImagesOfBuildings.SMALL_BUILDING.url;
+        } else if (buildingFloors <= 8) {
+            imageUrl = ImagesOfBuildings.MEDIUM_BUILDING.url;
+        } else {
+            imageUrl = ImagesOfBuildings.LARGE_BUILDING.url;
+        }
+        return imageUrl;
+    }
+
+    private UserEntity getManagerToSet(BuildingEditDTO buildingEditDTO) {
+        return userService
+                .findById(buildingEditDTO.getManager().getId());
     }
 }
