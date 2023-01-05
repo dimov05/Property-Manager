@@ -1,26 +1,65 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+
+    <link rel="stylesheet" href="/css/material-design-iconic-font.min.css">
+    <link rel="stylesheet" href="/css/reset.css"/>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/css/style.css"/>
+    <link rel="stylesheet" href="/css/manage-users.css"/>
+    <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+    <script src="/js/jquery-3.3.1.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+
+    <title>Property Manager</title>
+</head>
 <th:block th:include="~{fragment/navbar}"></th:block>
 <body>
 <section style="background-color: #eee;">
     <div class="container py-5" >
         <div class="row">
-            <div class="col-lg-4">
-                <div class="card mb-4" th:each="building : ${buildings}" th:object="${building}"
-                th:if="${building.apartments.contains(currentUser)}">
-                    <div class="card-body text-center" >
-                        <img th:src="*{imageUrl}"
+            <div class="col-lg-4"  th:each="building : ${buildings}"
+            th:if="${building.manager.id == currentUser.id}">
+                <div class="card mb-4" >
+                    <div class="card-body text-center">
+                        <img th:src="${building.imageUrl}"
                              alt="avatar"
-                             class="img-fluid mx-auto" style="width: 150px;">
-                        <h5 class="my-3" th:text="*{name}"></h5>
+                             class="img-fluid mx-auto" style="width: 150px; height: 160px">
+                        <h5 class="my-3" th:text="${building.name}"></h5>
                         <p class="text-muted mb-1"
-                           th:text="*{street} + ', ' + *{city} + ', ' + *{country}">Address</p>
+                           th:text="${building.street} + ', ' + ${building.city} + ', ' + ${building.country}">Address</p>
                         <p class="text-muted">Manager:</p>
                         <p class="text-muted mb-4"
-                           th:text="*{manager.fullName} + ', ' + *{manager.phoneNumber}"></p>
+                           th:text="${building.manager.fullName} + ', ' + ${building.manager.phoneNumber}"></p>
                         <div class="d-flex justify-content-center mb-2">
                             <a class="nav-item active mx-auto"
-                               th:href="@{/admin/buildings/{id}/add-apartment(id = *{id})}">Add apartment</a>
+                               th:href="@{/admin/buildings/view/{id}(id = ${building.id})}">Manage Building</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4" sec:authorize="!hasRole('ADMIN')" th:each="building : ${currentUser.ownerInBuildings}">
+                <div class="card mb-4" >
+                    <div class="card-body text-center">
+                        <img th:src="${building.imageUrl}"
+                             alt="avatar"
+                             class="img-fluid mx-auto" style="width: 150px; height: 160px">
+                        <h5 class="my-3" th:text="${building.name}"></h5>
+                        <p class="text-muted mb-1"
+                           th:text="${building.street} + ', ' + ${building.city} + ', ' + ${building.country}">Address</p>
+                        <p class="text-muted">Manager:</p>
+                        <p class="text-muted mb-4"
+                           th:text="${building.manager.fullName} + ', ' + ${building.manager.phoneNumber}"></p>
+                        <div class="d-flex justify-content-center mb-2">
                             <a class="nav-item active mx-auto"
-                               th:href="@{/admin/buildings/edit/{id}(id = *{id})}">Edit building</a>
+                               th:href="@{/admin/buildings/view/{id}/add-apartment(id = ${building.id})}">Visit Building</a>
                         </div>
                     </div>
                 </div>
