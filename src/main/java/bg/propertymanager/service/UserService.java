@@ -1,6 +1,5 @@
 package bg.propertymanager.service;
 
-import bg.propertymanager.model.dto.apartment.ApartmentEditDTO;
 import bg.propertymanager.model.dto.user.PasswordChangeDTO;
 import bg.propertymanager.model.dto.user.UserEditDTO;
 import bg.propertymanager.model.dto.user.UserRegisterDTO;
@@ -11,19 +10,21 @@ import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.UserRolesEnum;
 import bg.propertymanager.model.view.AdminViewUserProfile;
 import bg.propertymanager.repository.ApartmentRepository;
+import bg.propertymanager.repository.BuildingRepository;
 import bg.propertymanager.repository.RoleRepository;
 import bg.propertymanager.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.security.Principal;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -31,27 +32,25 @@ public class UserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserDetailsService appUserDetailsService;
     private final ModelMapper modelMapper;
     private final String adminPass;
-    private final BuildingService buildingService;
     private final ApartmentRepository apartmentRepository;
+    private final BuildingRepository buildingRepository;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
                        PasswordEncoder passwordEncoder,
-                       UserDetailsService appUserDetailsService,
-                       ModelMapper modelMapper, @Value("${app.default.admin.password}") String adminPass, BuildingService buildingService,
-                       ApartmentRepository apartmentRepository) {
+                       ModelMapper modelMapper, @Value("${app.default.admin.password}") String adminPass,
+                       ApartmentRepository apartmentRepository,
+                       BuildingRepository buildingRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
-        this.appUserDetailsService = appUserDetailsService;
         this.modelMapper = modelMapper;
         this.adminPass = adminPass;
-        this.buildingService = buildingService;
         this.apartmentRepository = apartmentRepository;
+        this.buildingRepository = buildingRepository;
     }
 
     public UserEntity register(UserRegisterDTO userRegisterDTO) {
@@ -66,7 +65,12 @@ public class UserService {
                         .setCountry(userRegisterDTO.getCountry())
                         .setCity(userRegisterDTO.getCity())
                         .setStreet(userRegisterDTO.getStreet())
-                        .setRegistrationDate(LocalDate.now());
+                        .setRegistrationDate(LocalDate.now())
+                        .setManagerInBuildings(Collections.emptySet())
+                        .setOwnerInBuildings(Collections.emptySet())
+                        .setApartments(Collections.emptySet())
+                        .setTaxes(Collections.emptySet())
+                        .setMessages(Collections.emptySet());
 
         userRepository.save(newUser);
 
@@ -98,6 +102,11 @@ public class UserService {
                 .setCountry("Bulgaria")
                 .setCity("Plovdiv")
                 .setStreet("Vasil Levski 37")
+                .setManagerInBuildings(Collections.emptySet())
+                .setOwnerInBuildings(Collections.emptySet())
+                .setApartments(Collections.emptySet())
+                .setTaxes(Collections.emptySet())
+                .setMessages(Collections.emptySet())
                 .setRegistrationDate(LocalDate.now());
         userRepository.save(user);
     }
@@ -114,6 +123,11 @@ public class UserService {
                 .setCountry("Bulgaria")
                 .setCity("Plovdiv")
                 .setStreet("Vasil Levski 34")
+                .setManagerInBuildings(Collections.emptySet())
+                .setOwnerInBuildings(Collections.emptySet())
+                .setApartments(Collections.emptySet())
+                .setTaxes(Collections.emptySet())
+                .setMessages(Collections.emptySet())
                 .setRegistrationDate(LocalDate.now());
         userRepository.save(admin);
     }
@@ -166,10 +180,6 @@ public class UserService {
         userRepository.save(userToUpdate);
     }
 
-    private BuildingEntity getBuildingEntity(Long buildingId) {
-        return buildingService.findEntityById(buildingId);
-    }
-
     public void removeApartmentFromUser(ApartmentEntity apartment, UserEntity ownerToRemove) {
         UserEntity userToUpdate = findById(ownerToRemove.getId());
         userToUpdate.getApartments().remove(apartment);
@@ -179,6 +189,36 @@ public class UserService {
     public void addApartmentToUser(ApartmentEntity apartment, UserEntity ownerToAdd) {
         UserEntity userToUpdate = findById(ownerToAdd.getId());
         userToUpdate.getApartments().add(apartment);
+        updateUser(userToUpdate);
+    }
+
+    public void removeManagerRightsInBuilding(UserEntity currentManager, BuildingEntity building) {
+        UserEntity userToUpdate = findById(currentManager.getId());
+        userToUpdate.getManagerInBuildings().remove(building);
+        updateUser(userToUpdate);
+    }
+
+    public void addManagerRightsInBuilding(UserEntity managerToSet, BuildingEntity buildingToSave) {
+        UserEntity userToUpdate = findById(managerToSet.getId());
+        userToUpdate.getManagerInBuildings().add(buildingToSave);
+        updateUser(userToUpdate);
+    }
+
+    public void addBuildingToUser(UserEntity ownerToAdd, BuildingEntity building) {
+        UserEntity userToUpdate = findById(ownerToAdd.getId());
+        userToUpdate.getOwnerInBuildings().add(building);
+        updateUser(userToUpdate);
+    }
+
+    public void removeBuildingFromUser(UserEntity ownerToRemove, BuildingEntity building) {
+        UserEntity userToUpdate = findById(ownerToRemove.getId());
+        for (ApartmentEntity apartment : building.getApartments()) {
+            if (apartment.getOwner().equals(ownerToRemove)) {
+                updateUser(userToUpdate);
+                break;
+            }
+        }
+        userToUpdate.getOwnerInBuildings().remove(building);
         updateUser(userToUpdate);
     }
 }

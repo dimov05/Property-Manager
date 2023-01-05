@@ -26,7 +26,7 @@ public class BuildingService {
     private final ModelMapper modelMapper;
     private final UserService userService;
 
-    public BuildingService(BuildingRepository buildingRepository, ModelMapper modelMapper, @Lazy UserService userService) {
+    public BuildingService(BuildingRepository buildingRepository, ModelMapper modelMapper, UserService userService) {
         this.buildingRepository = buildingRepository;
         this.modelMapper = modelMapper;
         this.userService = userService;
@@ -56,6 +56,9 @@ public class BuildingService {
                         .setBalance(BigDecimal.valueOf(0))
                         .setRegistrationDate(LocalDate.now())
                         .setNeighbours(Collections.emptySet())
+                        .setApartments(Collections.emptySet())
+                        .setTaxes(Collections.emptySet())
+                        .setMessages(Collections.emptySet())
                         .setManager(userService.findById(1L));
         buildingRepository.save(newBuilding);
     }
@@ -83,7 +86,14 @@ public class BuildingService {
         BuildingEntity buildingToSave = buildingRepository
                 .findById(buildingEditDTO.getId())
                 .orElseThrow(() -> new NullPointerException("The building you are searching is missing"));
+
         UserEntity managerToSet = getManagerToSet(buildingEditDTO);
+        UserEntity currentManager = buildingToSave.getManager();
+        if (currentManager != userService.findById(1L) || currentManager != managerToSet) {
+            userService.removeManagerRightsInBuilding(currentManager, buildingToSave);
+            userService.addManagerRightsInBuilding(managerToSet, buildingToSave);
+            buildingToSave.setManager(managerToSet);
+        }
         buildingToSave
                 .setName(buildingEditDTO.getName())
                 .setFloors(buildingEditDTO.getFloors())
@@ -92,7 +102,6 @@ public class BuildingService {
                 .setTaxPerPerson(buildingEditDTO.getTaxPerPerson())
                 .setTaxPerDog(buildingEditDTO.getTaxPerDog())
                 .setTaxPerElevatorChip(buildingEditDTO.getTaxPerElevatorChip())
-                .setManager(managerToSet)
                 .setCountry(buildingEditDTO.getCountry())
                 .setCity(buildingEditDTO.getCity())
                 .setStreet(buildingEditDTO.getStreet());
@@ -110,14 +119,13 @@ public class BuildingService {
                 .orElseThrow(() -> new NullPointerException("There is no such a building"));
     }
 
-    public void addNeighbour(UserEntity owner, Long buildingId) {
-        BuildingEntity buildingToEdit = findEntityById(buildingId);
-        buildingToEdit.getNeighbours().add(owner);
-        buildingRepository.save(buildingToEdit);
+    public void addNeighbour(UserEntity owner, BuildingEntity building) {
+        building.getNeighbours().add(owner);
+        buildingRepository.save(building);
     }
-    public void removeNeighbour(UserEntity owner, Long buildingId) {
-        BuildingEntity buildingToEdit = findEntityById(buildingId);
-        buildingToEdit.getNeighbours().add(owner);
-        buildingRepository.save(buildingToEdit);
+
+    public void removeNeighbour(UserEntity owner, BuildingEntity building) {
+        building.getNeighbours().remove(owner);
+        buildingRepository.save(building);
     }
 }
