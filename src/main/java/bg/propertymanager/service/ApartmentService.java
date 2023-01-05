@@ -47,21 +47,6 @@ public class ApartmentService {
         apartmentRepository.save(newApartment);
     }
 
-
-    private BigDecimal calculatePeriodicTax(ApartmentAddDTO apartmentAddDTO, Long buildingId) {
-        BuildingEntity currentBuilding = buildingService
-                .findEntityById(buildingId);
-//TODO: Make it cleaner / Refactor
-        return currentBuilding.getTaxPerPerson().multiply(BigDecimal.valueOf(apartmentAddDTO.getRoommateCount()))
-                .add(currentBuilding.getTaxPerDog().multiply(BigDecimal.valueOf(apartmentAddDTO.getDogsCount())))
-                .add(currentBuilding.getTaxPerElevatorChip().multiply(BigDecimal.valueOf(apartmentAddDTO.getElevatorChipsCount())));
-    }
-
-    private UserEntity getOwnerEntity(ApartmentAddDTO apartmentAddDTO) {
-        return userService
-                .findById(apartmentAddDTO.getOwner().getId());
-    }
-
     public void updateApartment(ApartmentEditDTO apartmentEditDTO) {
         //TODO
         ApartmentEntity apartmentToUpdate =
@@ -77,7 +62,9 @@ public class ApartmentService {
                 .setRoommateCount(apartmentEditDTO.getRoommateCount())
                 .setElevatorChipsCount(apartmentEditDTO.getElevatorChipsCount())
                 .setDogsCount(apartmentEditDTO.getDogsCount())
-                .setOwner(ownerToAdd);
+                .setOwner(ownerToAdd)
+                .setPeriodicTax(calculatePeriodicTax(apartmentEditDTO, apartmentToUpdate.getBuilding().getId()));
+
         buildingService.removeNeighbour(ownerToRemove, apartmentToUpdate.getBuilding().getId());
         buildingService.addNeighbour(ownerToAdd, apartmentToUpdate.getBuilding().getId());
         userService.removeApartmentFromUser(apartmentToUpdate, ownerToRemove);
@@ -89,6 +76,11 @@ public class ApartmentService {
 
     }
 
+    private UserEntity getOwnerEntity(ApartmentAddDTO apartmentAddDTO) {
+        return userService
+                .findById(apartmentAddDTO.getOwner().getId());
+    }
+
     private ApartmentEntity findById(Long id) {
         return apartmentRepository.findById(id)
                 .orElseThrow(() -> new NullPointerException("There is no apartment with this Id"));
@@ -98,5 +90,23 @@ public class ApartmentService {
         return apartmentRepository.findById(apartmentId)
                 .map(a -> modelMapper.map(a, ApartmentViewDTO.class))
                 .orElseThrow(() -> new NullPointerException("No such apartment is existing"));
+    }
+
+    private BigDecimal calculatePeriodicTax(ApartmentEditDTO apartmentEditDTO, Long buildingId) {
+        BuildingEntity currentBuilding = buildingService
+                .findEntityById(buildingId);
+//TODO: Make it cleaner / Refactor
+        return currentBuilding.getTaxPerPerson().multiply(BigDecimal.valueOf(apartmentEditDTO.getRoommateCount()))
+                .add(currentBuilding.getTaxPerDog().multiply(BigDecimal.valueOf(apartmentEditDTO.getDogsCount())))
+                .add(currentBuilding.getTaxPerElevatorChip().multiply(BigDecimal.valueOf(apartmentEditDTO.getElevatorChipsCount())));
+    }
+
+    private BigDecimal calculatePeriodicTax(ApartmentAddDTO apartmentAddDTO, Long buildingId) {
+        BuildingEntity currentBuilding = buildingService
+                .findEntityById(buildingId);
+//TODO: Make it cleaner / Refactor
+        return currentBuilding.getTaxPerPerson().multiply(BigDecimal.valueOf(apartmentAddDTO.getRoommateCount()))
+                .add(currentBuilding.getTaxPerDog().multiply(BigDecimal.valueOf(apartmentAddDTO.getDogsCount())))
+                .add(currentBuilding.getTaxPerElevatorChip().multiply(BigDecimal.valueOf(apartmentAddDTO.getElevatorChipsCount())));
     }
 }
