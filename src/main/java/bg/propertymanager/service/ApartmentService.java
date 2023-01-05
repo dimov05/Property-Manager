@@ -29,6 +29,8 @@ public class ApartmentService {
     }
 
     public void registerApartment(ApartmentAddDTO apartmentAddDTO, Long buildingId) {
+        UserEntity ownerToAdd = getOwnerEntity(apartmentAddDTO);
+        BuildingEntity building = buildingService.findEntityById(buildingId);
         ApartmentEntity newApartment = new ApartmentEntity()
                 .setApartmentNumber(apartmentAddDTO.getApartmentNumber())
                 .setFloor(apartmentAddDTO.getFloor())
@@ -36,25 +38,22 @@ public class ApartmentService {
                 .setRoommateCount(apartmentAddDTO.getRoommateCount())
                 .setElevatorChipsCount(apartmentAddDTO.getElevatorChipsCount())
                 .setDogsCount(apartmentAddDTO.getDogsCount())
-                .setOwner(getOwnerEntity(apartmentAddDTO))
+                .setOwner(ownerToAdd)
                 .setBuilding(buildingService.findEntityById(buildingId))
                 .setPeriodicTax(calculatePeriodicTax(apartmentAddDTO, buildingId))
                 .setTotalMoneyPaid(BigDecimal.valueOf(0))
                 .setMoneyOwed(BigDecimal.valueOf(0));
-        buildingService.addNeighbour(newApartment.getOwner(), buildingId);
-        UserEntity ownerToAdd = userService.findById(apartmentAddDTO.getOwner().getId());
+        buildingService.addNeighbour(ownerToAdd, building);
         userService.addApartmentToUser(newApartment, ownerToAdd);
         apartmentRepository.save(newApartment);
     }
 
     public void updateApartment(ApartmentEditDTO apartmentEditDTO) {
         //TODO
-        ApartmentEntity apartmentToUpdate =
-                findById(apartmentEditDTO.getId());
-        UserEntity ownerToRemove = userService
-                .findById(findById(apartmentEditDTO.getId()).getOwner().getId());
-        UserEntity ownerToAdd = userService
-                .findById(apartmentEditDTO.getOwner().getId());
+        ApartmentEntity apartmentToUpdate = findById(apartmentEditDTO.getId());
+        UserEntity ownerToRemove = apartmentToUpdate.getOwner();
+        UserEntity ownerToAdd = userService.findById(apartmentEditDTO.getOwner().getId());
+        BuildingEntity building = apartmentToUpdate.getBuilding();
         apartmentToUpdate
                 .setApartmentNumber(apartmentEditDTO.getApartmentNumber())
                 .setFloor(apartmentEditDTO.getFloor())
@@ -65,11 +64,14 @@ public class ApartmentService {
                 .setOwner(ownerToAdd)
                 .setPeriodicTax(calculatePeriodicTax(apartmentEditDTO, apartmentToUpdate.getBuilding().getId()));
 
-        buildingService.removeNeighbour(ownerToRemove, apartmentToUpdate.getBuilding().getId());
-        buildingService.addNeighbour(ownerToAdd, apartmentToUpdate.getBuilding().getId());
+        buildingService.removeNeighbour(ownerToRemove, building);
+        buildingService.addNeighbour(ownerToAdd, building);
+
         userService.removeApartmentFromUser(apartmentToUpdate, ownerToRemove);
         userService.addApartmentToUser(apartmentToUpdate, ownerToAdd);
 
+        userService.removeBuildingFromUser(ownerToRemove, building);
+        userService.addBuildingToUser(ownerToAdd, building);
 
         apartmentRepository.save(apartmentToUpdate);
 
