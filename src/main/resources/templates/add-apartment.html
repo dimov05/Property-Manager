@@ -106,6 +106,7 @@
                                 <input type="text"
                                        id="ownerId"
                                        th:field="${apartmentAddDTO.owner.id}">
+
                                 <p th:errors="*{owner.id}" class="text-danger"
                                    th:if="${#fields.hasErrors('owner.id')}"></p>
                             </div>
