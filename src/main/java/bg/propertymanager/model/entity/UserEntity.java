@@ -4,6 +4,7 @@ import javax.persistence.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -148,7 +149,7 @@ public class UserEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "manager")
+    @OneToMany(mappedBy = "manager",fetch = FetchType.EAGER)
     public Set<BuildingEntity> getManagerInBuildings() {
         return managerInBuildings;
     }
@@ -158,11 +159,11 @@ public class UserEntity {
         return this;
     }
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "owners_buildings",
-            joinColumns = {@JoinColumn(name = "owner_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "building_id", referencedColumnName = "id")}
-    )
+    @ManyToMany(mappedBy = "neighbours",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+//    @JoinTable(name = "owners_buildings",
+//            joinColumns = {@JoinColumn(name = "owner_id", referencedColumnName = "id")},
+//            inverseJoinColumns = {@JoinColumn(name = "building_id", referencedColumnName = "id")}
+//    )
     public Set<BuildingEntity> getOwnerInBuildings() {
         return ownerInBuildings;
     }
@@ -172,7 +173,7 @@ public class UserEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner",fetch = FetchType.EAGER)
     public Set<ApartmentEntity> getApartments() {
         return apartments;
     }
@@ -182,7 +183,7 @@ public class UserEntity {
         return this;
     }
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinColumn(name = "selected_building_id", referencedColumnName = "id")
     public BuildingEntity getSelectedBuilding() {
         return selectedBuilding;
@@ -194,7 +195,7 @@ public class UserEntity {
     }
 
 
-    @OneToMany(mappedBy = "author")
+    @OneToMany(mappedBy = "author",fetch = FetchType.EAGER)
     public Set<MessageEntity> getMessages() {
         return messages;
     }
@@ -205,7 +206,7 @@ public class UserEntity {
     }
 
 
-    @OneToMany(mappedBy = "owner")
+    @OneToMany(mappedBy = "owner",fetch = FetchType.EAGER)
     public Set<TaxEntity> getTaxes() {
         return taxes;
     }
@@ -214,6 +215,5 @@ public class UserEntity {
         this.taxes = taxes;
         return this;
     }
-
 
 }
