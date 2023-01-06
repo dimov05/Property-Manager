@@ -96,4 +96,12 @@ public class BuildingController {
         buildingService.updateBuilding(buildingEditDTO);
         return "redirect:/admin/buildings/view/" + id;
     }
+    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId)")
+    @GetMapping("/manager/buildings/view/{buildingId}")
+    public ModelAndView viewBuildingAsManager(@PathVariable("buildingId") Long buildingId) {
+        BuildingViewDTO buildingViewDTO = buildingService.findById(buildingId);
+        ModelAndView mav = new ModelAndView("view-building-as-manager");
+        mav.addObject("building", buildingViewDTO);
+        return mav;
+    }
 }
