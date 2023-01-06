@@ -19,21 +19,24 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String index(){
-        return "index";
-    }
-    @GetMapping("/home")
-    public String home(Model model, Principal principal){
-        model.addAttribute("buildings",buildingService.findAll());
-        model.addAttribute("currentUser",userService.findUserByUsername(principal.getName()));
+    public String home(Model model, Principal principal) {
+        model.addAttribute("buildings", buildingService.findAll());
+        if (principal != null) {
+            model.addAttribute("currentUser", userService.findUserByUsername(principal.getName()));
+            model.addAttribute("loggedUser", true);
+        } else {
+            model.addAttribute("loggedUser", false);
+        }
         return "home";
     }
+
     @GetMapping("/contact-us")
-    public String contactUs(){
+    public String contactUs() {
         return "coming-soon";
     }
+
     @GetMapping("/pricing-and-plans")
-    public String pricingAndPlan(){
+    public String pricingAndPlan() {
         return "coming-soon";
     }
 

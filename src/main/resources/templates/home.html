@@ -23,45 +23,50 @@
 <th:block th:include="~{fragment/navbar}"></th:block>
 <body>
 <section style="background-color: #eee;">
-    <div class="container py-5" >
+    <div class="container py-5" th:if="${loggedUser}==true">
         <div class="row">
-            <div class="col-lg-4"  th:each="building : ${buildings}"
-            th:if="${building.manager.id == currentUser.id}">
-                <div class="card mb-4" >
+            <div class="col-lg-4" th:each="building : ${buildings}"
+                 th:if="${building.manager.id == currentUser.id}">
+                <div class="card mb-4">
                     <div class="card-body text-center">
                         <img th:src="${building.imageUrl}"
                              alt="avatar"
                              class="img-fluid mx-auto" style="width: 150px; height: 160px">
                         <h5 class="my-3" th:text="${building.name}"></h5>
                         <p class="text-muted mb-1"
-                           th:text="${building.street} + ', ' + ${building.city} + ', ' + ${building.country}">Address</p>
+                           th:text="${building.street} + ', ' + ${building.city} + ', ' + ${building.country}">
+                            Address</p>
                         <p class="text-muted">Manager:</p>
                         <p class="text-muted mb-1"
                            th:text="${building.manager.fullName} + ', ' + ${building.manager.phoneNumber}"></p>
                         <p class="text-uppercase">Log as Manager</p>
                         <div class="d-flex justify-content-center mb-2">
                             <a class="nav-item active mx-auto"
-                               th:href="@{/admin/buildings/view/{id}(id = ${building.id})}">Manage Building</a>
+                               th:href="@{/manager/buildings/view/{buildingId}(buildingId = ${building.id})}">Manage
+                                Building</a>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4" sec:authorize="!hasRole('ADMIN')" th:each="building : ${currentUser.ownerInBuildings}">
-                <div class="card mb-4" >
+            <div class="col-lg-4" sec:authorize="!hasRole('ADMIN')"
+                 th:each="building : ${currentUser.ownerInBuildings}">
+                <div class="card mb-4">
                     <div class="card-body text-center">
                         <img th:src="${building.imageUrl}"
                              alt="avatar"
                              class="img-fluid mx-auto" style="width: 150px; height: 160px">
                         <h5 class="my-3" th:text="${building.name}"></h5>
                         <p class="text-muted mb-1"
-                           th:text="${building.street} + ', ' + ${building.city} + ', ' + ${building.country}">Address</p>
+                           th:text="${building.street} + ', ' + ${building.city} + ', ' + ${building.country}">
+                            Address</p>
                         <p class="text-muted">Manager:</p>
                         <p class="text-muted mb-1"
                            th:text="${building.manager.fullName} + ', ' + ${building.manager.phoneNumber}"></p>
                         <p class="text-uppercase">Log as neighbour</p>
                         <div class="d-flex justify-content-center mb-2">
                             <a class="nav-item active mx-auto"
-                               th:href="@{/admin/buildings/view/{id}/add-apartment(id = ${building.id})}">Visit Building</a>
+                               th:href="@{/admin/buildings/view/{id}/add-apartment(id = ${building.id})}">Visit
+                                Building</a>
                         </div>
                     </div>
                 </div>
