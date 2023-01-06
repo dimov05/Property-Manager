@@ -96,7 +96,7 @@ public class BuildingController {
         buildingService.updateBuilding(buildingEditDTO);
         return "redirect:/admin/buildings/view/" + id;
     }
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId)")
+    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/view/{buildingId}")
     public ModelAndView viewBuildingAsManager(@PathVariable("buildingId") Long buildingId) {
         BuildingViewDTO buildingViewDTO = buildingService.findById(buildingId);

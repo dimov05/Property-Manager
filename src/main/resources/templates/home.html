@@ -24,10 +24,10 @@
 <body>
 <section style="background-color: #eee;">
     <div class="container py-5" th:if="${loggedUser}==true">
-        <div class="row">
+        <div class="row" >
             <div class="col-lg-4" th:each="building : ${buildings}"
                  th:if="${building.manager.id == currentUser.id}">
-                <div class="card mb-4">
+                <div class="card mb-4" >
                     <div class="card-body text-center">
                         <img th:src="${building.imageUrl}"
                              alt="avatar"
