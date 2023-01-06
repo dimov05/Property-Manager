@@ -7,6 +7,7 @@ import org.springframework.web.context.annotation.SessionScope;
 import java.util.List;
 import java.util.Set;
 
+// Used for thymeleaf engine ( get information about user )
 @Component
 @SessionScope
 public class userViewEntity {

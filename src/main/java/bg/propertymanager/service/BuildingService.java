@@ -129,4 +129,9 @@ public class BuildingService {
         return userService
                 .findById(buildingEditDTO.getManager().getId());
     }
+
+    public String findManagerUsername(Long buildingId) {
+        BuildingEntity building = findEntityById(buildingId);
+        return building.getManager().getUsername();
+    }
 }
