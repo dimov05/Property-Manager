@@ -1,0 +1,99 @@
+<th:block>
+    <!doctype html>
+    <html lang="en"
+          xmlns:th="http://www.thymeleaf.org"
+          xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Bootstrap CSS -->
+
+        <link rel="stylesheet" href="/css/material-design-iconic-font.min.css">
+        <link rel="stylesheet" href="/css/reset.css"/>
+        <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+        <link rel="stylesheet" href="/css/style.css"/>
+        <link rel="stylesheet" href="/css/manage-users.css"/>
+        <link rel="stylesheet" type="text/css" href="/css/style.css"/>
+        <script src="/js/jquery-3.3.1.min.js"></script>
+        <script src="/js/bootstrap.min.js"></script>
+
+        <title>Property Manager</title>
+    </head>
+    <div class="banner">
+        <p><img class="banner-img" src="/images/header.jpg" alt=""></p>
+    </div>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-xxl navbar-light bg-light" >
+        <!-- Container wrapper -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="container">
+            <!-- Collapsible wrapper -->
+            <div class="collapse navbar-collapse" id="navbarSupportedContent" th:object="${building}">
+                <!-- Left links -->
+                <ul class="navbar-nav mr-auto col-12 justify-content-between">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/" >Home</a>
+                    </li>
+                    <li class="nav-item" >
+                        <a class="nav-link active"
+                           th:href="@{/manager/buildings/view/{id}(id = *{id})}">Edit building</a>
+                    </li>
+                    <li class="nav-item" >
+                        <a class="nav-link active"
+                           th:href="@{/manager/buildings/{id}/dashboard(id = *{id})}">Dashboard</a>
+                    </li>
+                    <li class="nav-item" >
+                        <a class="nav-link active"
+                           th:href="@{/manager/buildings/{id}/expenses(id = *{id})}">Expenses</a>
+                    </li>
+                    <li class="nav-item" >
+                        <a class="nav-link active"
+                           th:href="@{/manager/buildings/{id}/neighbours(id = *{id})}">Neighbours</a>
+                    </li>
+                    <li class="nav-item" >
+                        <a class="nav-link active"
+                           th:href="@{/manager/buildings/{id}/messages(id = *{id})}">Messages</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link active"
+                           th:href="@{/admin/buildings}">Buildings</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link active" th:href="@{/admin/users}">Manage
+                            users</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link active"
+                           href="/users/login">Login</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link active"
+                           href="/users/register">Register</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()"
+                        th:object="${@userViewEntity}">
+                        <a class="nav-link active"
+                           th:href="@{/users/profile/{name}(name = ${#authentication.getName()})}">Profile</a>
+                    </li>
+                    <li sec:authorize="isAuthenticated()">
+                        <form th:action="@{/users/logout}" th:method="post">
+                            <input type="submit" value="Logout">
+                        </form>
+                    </li>
+                </ul>
+                <!-- Left links -->
+
+
+            </div>
+            <!-- Collapsible wrapper -->
+        </div>
+        <!-- Container wrapper -->
+    </nav>
+    <!-- Navbar -->
+    </html>
+</th:block>
