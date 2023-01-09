@@ -1,17 +1,15 @@
 package bg.propertymanager.service;
 
-import bg.propertymanager.model.dto.apartment.ApartmentAddDTO;
 import bg.propertymanager.model.dto.building.BuildingAddDTO;
+import bg.propertymanager.model.dto.building.BuildingChangeTaxesDTO;
 import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.entity.ApartmentEntity;
 import bg.propertymanager.model.entity.BuildingEntity;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
-import bg.propertymanager.repository.ApartmentRepository;
 import bg.propertymanager.repository.BuildingRepository;
 import org.modelmapper.ModelMapper;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -27,14 +25,13 @@ public class BuildingService {
     private final BuildingRepository buildingRepository;
     private final ModelMapper modelMapper;
     private final UserService userService;
-    private final ApartmentRepository apartmentRepository;
+    private final ApartmentService apartmentService;
 
-    public BuildingService(BuildingRepository buildingRepository, ModelMapper modelMapper, UserService userService,
-                           ApartmentRepository apartmentRepository) {
+    public BuildingService(BuildingRepository buildingRepository, ModelMapper modelMapper, UserService userService, ApartmentService apartmentService) {
         this.buildingRepository = buildingRepository;
         this.modelMapper = modelMapper;
         this.userService = userService;
-        this.apartmentRepository = apartmentRepository;
+        this.apartmentService = apartmentService;
     }
 
     public void register(BuildingAddDTO buildingAddDTO) {
@@ -84,6 +81,18 @@ public class BuildingService {
                 .setCountry(buildingEditDTO.getCountry())
                 .setCity(buildingEditDTO.getCity())
                 .setStreet(buildingEditDTO.getStreet());
+        apartmentService.updatePeriodicTax(buildingToSave);
+        buildingRepository.save(buildingToSave);
+    }
+
+    public void updateBuildingsTaxes(BuildingChangeTaxesDTO buildingChangeTaxesDTO) {
+        BuildingEntity buildingToSave = buildingRepository
+                .findById(buildingChangeTaxesDTO.getId())
+                .orElseThrow(() -> new NullPointerException("The building you are searching is missing"));
+        buildingToSave.setTaxPerDog(buildingChangeTaxesDTO.getTaxPerDog())
+                        .setTaxPerPerson(buildingChangeTaxesDTO.getTaxPerPerson())
+                                .setTaxPerElevatorChip(buildingChangeTaxesDTO.getTaxPerElevatorChip());
+        apartmentService.updatePeriodicTax(buildingToSave);
         buildingRepository.save(buildingToSave);
     }
 

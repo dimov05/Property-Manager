@@ -1,6 +1,7 @@
 package bg.propertymanager.web;
 
 import bg.propertymanager.model.dto.building.BuildingAddDTO;
+import bg.propertymanager.model.dto.building.BuildingChangeTaxesDTO;
 import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
@@ -96,6 +97,7 @@ public class BuildingController {
         buildingService.updateBuilding(buildingEditDTO);
         return "redirect:/admin/buildings/view/" + id;
     }
+
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/view/{buildingId}")
     public ModelAndView viewBuildingAsManager(@PathVariable("buildingId") Long buildingId) {
@@ -103,5 +105,33 @@ public class BuildingController {
         ModelAndView mav = new ModelAndView("view-building-as-manager");
         mav.addObject("building", buildingViewDTO);
         return mav;
+    }
+
+    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @GetMapping("/manager/buildings/change-taxes/{buildingId}")
+    public ModelAndView changeTaxes(@PathVariable("buildingId") Long buildingId, Model model) {
+        if (!model.containsAttribute("buildingChangeTaxesDTO")) {
+            model.addAttribute("buildingChangeTaxesDTO", new BuildingChangeTaxesDTO());
+        }
+        BuildingViewDTO buildingEdit = buildingService.findById(buildingId);
+        ModelAndView mav = new ModelAndView("change-taxes");
+        mav.addObject("building", buildingEdit);
+        return mav;
+    }
+
+    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PostMapping("/manager/buildings/change-taxes/{buildingId}")
+    public String changeTaxesConfirm(@Valid BuildingChangeTaxesDTO buildingChangeTaxesDTO,
+                                     BindingResult bindingResult,
+                                     RedirectAttributes redirectAttributes,
+                                     @PathVariable("buildingId") Long buildingId) {
+        buildingChangeTaxesDTO.setId(buildingId);
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("buildingChangeTaxesDTO", buildingChangeTaxesDTO);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.buildingChangeTaxesDTO", bindingResult);
+            return "redirect:/manager/buildings/view/" + buildingId;
+        }
+        buildingService.updateBuildingsTaxes(buildingChangeTaxesDTO);
+        return "redirect:/manager/buildings/view/" + buildingId;
     }
 }
