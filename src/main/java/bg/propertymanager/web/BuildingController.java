@@ -5,6 +5,7 @@ import bg.propertymanager.model.dto.building.BuildingChangeTaxesDTO;
 import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
+import bg.propertymanager.repository.BuildingRepository;
 import bg.propertymanager.service.BuildingService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -22,9 +23,12 @@ import java.util.List;
 @Controller
 public class BuildingController {
     private final BuildingService buildingService;
+    private final BuildingRepository buildingRepository;
 
-    public BuildingController(BuildingService buildingService) {
+    public BuildingController(BuildingService buildingService,
+                              BuildingRepository buildingRepository) {
         this.buildingService = buildingService;
+        this.buildingRepository = buildingRepository;
     }
 
 
@@ -133,5 +137,15 @@ public class BuildingController {
         }
         buildingService.updateBuildingsTaxes(buildingChangeTaxesDTO);
         return "redirect:/manager/buildings/view/" + buildingId;
+    }
+
+    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @GetMapping("/manager/buildings/{buildingId}/neighbours")
+    public ModelAndView viewNeighboursAsManager(@PathVariable("buildingId") Long buildingId,
+                                                Model model) {
+        ModelAndView mav = new ModelAndView("view-neighbours-as-manager");
+        BuildingViewDTO building = buildingService.findById(buildingId);
+        mav.addObject("building", building);
+        return mav;
     }
 }

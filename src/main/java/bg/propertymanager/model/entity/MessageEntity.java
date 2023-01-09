@@ -10,6 +10,7 @@ public class MessageEntity {
     private Long id;
     private UserEntity author;
     private LocalDateTime createdDate;
+    private String title;
     private String content;
     private BuildingEntity building;
 
@@ -53,6 +54,15 @@ public class MessageEntity {
 
     public MessageEntity setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
+        return this;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public MessageEntity setTitle(String title) {
+        this.title = title;
         return this;
     }
 
