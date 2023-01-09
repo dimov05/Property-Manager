@@ -16,9 +16,9 @@
                            th:text="*{manager.fullName} + ', ' + *{manager.phoneNumber}"></p>
                         <div class="d-flex justify-content-center mb-2">
                             <a class="nav-item active mx-auto"
-                               th:href="@{/admin/buildings/{id}/add-apartment(id = *{id})}">Add apartment</a>
+                               th:href="@{/manager/buildings/{id}/add-apartment(id = *{id})}">Add apartment</a>
                             <a class="nav-item active mx-auto"
-                               th:href="@{/admin/buildings/edit/{id}(id = *{id})}">Edit building</a>
+                               th:href="@{/manager/buildings/{id}/change-taxes(id = *{id})}">Change taxes</a>
                         </div>
                     </div>
                 </div>
@@ -121,7 +121,7 @@
                                             <td>
                                                 <ul class="list-inline mb-0">
                                                     <li class="list-inline-item">
-                                                        <a th:href="@{/admin/buildings/{buildingId}/apartment/{apartmentId}
+                                                        <a th:href="@{/manager/buildings/{buildingId}/apartment/{apartmentId}
                                                         (buildingId = ${building.id},apartmentId = *{id})}"
                                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"
                                                            class="px-2 text-primary">Edit<i

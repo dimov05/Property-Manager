@@ -124,9 +124,21 @@
                                        value="Edit apartment"/>
                             </div>
                         </div>
+                    </form>
+                    <div class="text-center">
+                        <div class="form-group form-button align-content-center">
+                            <form th:action="@{/admin/buildings/{buildingId}/delete-apartment/{apartmentId}
+                                                        (buildingId = ${building.id},apartmentId = ${apartment.id})}"
+                                  th:method="delete">
+                                <input
+                                        type="submit" name="delete" id="delete" class="form-submit"
+                                        value="Delete apartment"/></form>
+
+                        </div>
+                    </div>
                 </div>
             </div>
-            </form>
+
         </div>
     </div>
     </div>
