@@ -78,6 +78,20 @@ public class ApartmentService {
 
     }
 
+    public void deleteApartmentWithId(Long apartmentId, Long buildingId) {
+        ApartmentEntity apartmentToRemove = findById(apartmentId);
+        UserEntity ownerToRemove = apartmentToRemove.getOwner();
+        BuildingEntity building = buildingService.findEntityById(buildingId);
+
+        buildingService.removeNeighbour(ownerToRemove, building);
+        buildingService.removeApartment(apartmentToRemove, building);
+
+        userService.removeApartmentFromUser(apartmentToRemove, ownerToRemove);
+        userService.removeBuildingFromUser(ownerToRemove, building);
+
+        apartmentRepository.delete(apartmentToRemove);
+    }
+
     private UserEntity getOwnerEntity(ApartmentAddDTO apartmentAddDTO) {
         return userService
                 .findById(apartmentAddDTO.getOwner().getId());
