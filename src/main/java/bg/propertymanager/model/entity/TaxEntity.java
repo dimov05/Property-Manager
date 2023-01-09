@@ -1,5 +1,6 @@
 package bg.propertymanager.model.entity;
 
+import bg.propertymanager.model.enums.TaxStatusEnum;
 import bg.propertymanager.model.enums.TaxTypeEnum;
 
 import javax.persistence.*;
@@ -14,7 +15,7 @@ public class TaxEntity {
     private Long id;
     private TaxTypeEnum taxType;
     private BigDecimal amount;
-    private boolean isPaid;
+    private TaxStatusEnum taxStatus;
     private String description;
     private LocalDateTime startDate;
     private LocalDateTime dueDate;
@@ -56,14 +57,13 @@ public class TaxEntity {
         this.amount = amount;
         return this;
     }
-
-    @Column(name = "is_paid", nullable = false)
-    public boolean isPaid() {
-        return isPaid;
+    @Enumerated(EnumType.STRING)
+    public TaxStatusEnum getTaxStatus() {
+        return taxStatus;
     }
 
-    public TaxEntity setPaid(boolean paid) {
-        isPaid = paid;
+    public TaxEntity setTaxStatus(TaxStatusEnum taxStatus) {
+        this.taxStatus = taxStatus;
         return this;
     }
 
