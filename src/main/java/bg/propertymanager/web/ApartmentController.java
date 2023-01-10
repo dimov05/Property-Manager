@@ -51,7 +51,7 @@ public class ApartmentController {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.apartmentAddDTO", bindingResult);
             return String.format("redirect:/admin/buildings/%d/add-apartment", buildingId);
         }
-        apartmentService.registerApartment(apartmentAddDTO, buildingId);
+        apartmentService.addApartment(apartmentAddDTO, buildingId);
         return "redirect:/admin/buildings/view/" + buildingId;
     }
 
@@ -110,7 +110,7 @@ public class ApartmentController {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.apartmentAddDTO", bindingResult);
             return String.format("redirect:/manager/buildings/%d/add-apartment", buildingId);
         }
-        apartmentService.registerApartment(apartmentAddDTO, buildingId);
+        apartmentService.addApartment(apartmentAddDTO, buildingId);
         return "redirect:/manager/buildings/view/" + buildingId;
     }
 

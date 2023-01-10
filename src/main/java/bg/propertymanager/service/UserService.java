@@ -3,10 +3,7 @@ package bg.propertymanager.service;
 import bg.propertymanager.model.dto.user.PasswordChangeDTO;
 import bg.propertymanager.model.dto.user.UserEditDTO;
 import bg.propertymanager.model.dto.user.UserRegisterDTO;
-import bg.propertymanager.model.entity.ApartmentEntity;
-import bg.propertymanager.model.entity.BuildingEntity;
-import bg.propertymanager.model.entity.RoleEntity;
-import bg.propertymanager.model.entity.UserEntity;
+import bg.propertymanager.model.entity.*;
 import bg.propertymanager.model.enums.UserRolesEnum;
 import bg.propertymanager.model.view.AdminViewUserProfile;
 import bg.propertymanager.repository.ApartmentRepository;
@@ -212,13 +209,26 @@ public class UserService {
 
     public void removeBuildingFromUser(UserEntity ownerToRemove, BuildingEntity building) {
         UserEntity userToUpdate = findById(ownerToRemove.getId());
+        boolean ownerHaveMoreApartmentsInThisBuilding = false;
         for (ApartmentEntity apartment : building.getApartments()) {
             if (apartment.getOwner().equals(ownerToRemove)) {
-                updateUser(userToUpdate);
+                ownerHaveMoreApartmentsInThisBuilding = true;
                 break;
             }
         }
-        userToUpdate.getOwnerInBuildings().remove(building);
-        updateUser(userToUpdate);
+        if (!ownerHaveMoreApartmentsInThisBuilding) {
+            userToUpdate.getOwnerInBuildings().remove(building);
+            updateUser(userToUpdate);
+        }
+    }
+
+    public void addMessageToUser(MessageEntity newMessage, UserEntity author) {
+        author.getMessages().add(newMessage);
+        updateUser(author);
+    }
+
+    public void removeMessageFromUser(MessageEntity messageToRemove, UserEntity author) {
+        author.getMessages().remove(messageToRemove);
+        userRepository.save(author);
     }
 }
