@@ -6,6 +6,7 @@ import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.entity.ApartmentEntity;
 import bg.propertymanager.model.entity.BuildingEntity;
+import bg.propertymanager.model.entity.MessageEntity;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
 import bg.propertymanager.repository.BuildingRepository;
@@ -90,8 +91,8 @@ public class BuildingService {
                 .findById(buildingChangeTaxesDTO.getId())
                 .orElseThrow(() -> new NullPointerException("The building you are searching is missing"));
         buildingToSave.setTaxPerDog(buildingChangeTaxesDTO.getTaxPerDog())
-                        .setTaxPerPerson(buildingChangeTaxesDTO.getTaxPerPerson())
-                                .setTaxPerElevatorChip(buildingChangeTaxesDTO.getTaxPerElevatorChip());
+                .setTaxPerPerson(buildingChangeTaxesDTO.getTaxPerPerson())
+                .setTaxPerElevatorChip(buildingChangeTaxesDTO.getTaxPerElevatorChip());
         apartmentService.updatePeriodicTax(buildingToSave);
         buildingRepository.save(buildingToSave);
     }
@@ -127,18 +128,6 @@ public class BuildingService {
         buildingRepository.save(building);
     }
 
-    private String getImageUrlBySize(int buildingFloors) {
-        String imageUrl;
-        if (buildingFloors <= 3) {
-            imageUrl = ImagesOfBuildings.SMALL_BUILDING.url;
-        } else if (buildingFloors <= 8) {
-            imageUrl = ImagesOfBuildings.MEDIUM_BUILDING.url;
-        } else {
-            imageUrl = ImagesOfBuildings.LARGE_BUILDING.url;
-        }
-        return imageUrl;
-    }
-
     private UserEntity getManagerToSet(BuildingEditDTO buildingEditDTO) {
         return userService
                 .findById(buildingEditDTO.getManager().getId());
@@ -151,6 +140,28 @@ public class BuildingService {
 
     public void removeApartment(ApartmentEntity apartmentToRemove, BuildingEntity building) {
         building.getApartments().remove(apartmentToRemove);
+        buildingRepository.save(building);
+    }
+
+    public void addMessage(MessageEntity newMessage, BuildingEntity building) {
+        building.getMessages().add(newMessage);
+        buildingRepository.save(building);
+    }
+
+    private String getImageUrlBySize(int buildingFloors) {
+        String imageUrl;
+        if (buildingFloors <= 3) {
+            imageUrl = ImagesOfBuildings.SMALL_BUILDING.url;
+        } else if (buildingFloors <= 8) {
+            imageUrl = ImagesOfBuildings.MEDIUM_BUILDING.url;
+        } else {
+            imageUrl = ImagesOfBuildings.LARGE_BUILDING.url;
+        }
+        return imageUrl;
+    }
+
+    public void removeMessageFromBuilding(MessageEntity messageToRemove, BuildingEntity building) {
+        building.getMessages().remove(messageToRemove);
         buildingRepository.save(building);
     }
 }
