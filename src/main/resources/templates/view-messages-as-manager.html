@@ -24,6 +24,12 @@
                                th:href="@{/manager/buildings/{buildingId}/add-message(buildingId = ${building.id})}">Add
                                 message</a>
                         </div>
+                        <div class="d-flex justify-content-center mb-2">
+                            <a class="nav-item active mx-auto"
+                               th:href="@{/manager/buildings/{buildingId}/my-messages/{authorName}
+                               (buildingId = ${building.id}, authorName = ${#authentication.name})}">My
+                                messages</a>
+                        </div>
                     </div>
                 </div>
                 <div class="card mb-4 mb-lg-0">
@@ -62,14 +68,9 @@
                             <h4 class="card-title" th:text="*{title}"></h4>
                             <p class="card-text" th:text="*{content}"></p>
                             <p class="card-text"
-                               th:text="*{author.fullName} + ' - ' + *{author.phoneNumber}"></p>
-                            <p class="card-text"
                                th:text="*{createdDate.dayOfMonth} + ' ' + *{createdDate.month} + ' ' + *{createdDate.year}"></p>
-                            <div class="d-flex justify-content-center">
-                                <a class="nav-item active mx-auto"
-                                   th:href="@{/manager/buildings/{buildingId}/messages/{messageId}(buildingId = ${building.id}, messageId = *{id})}"
-                                >Edit message</a>
-                            </div>
+                            <p class="card-text"
+                               th:text="*{author.fullName} + ' - ' + *{author.phoneNumber}"></p>
                         </div>
                     </div>
                 </div>
@@ -82,14 +83,9 @@
                             <h4 class="card-title" th:text="*{title}"></h4>
                             <p class="card-text" th:text="*{content}"></p>
                             <p class="card-text"
-                               th:text="*{author.fullName} + ' - ' + *{author.phoneNumber}"></p>
-                            <p class="card-text"
                                th:text="*{createdDate.dayOfMonth} + ' ' + *{createdDate.month} + ' ' + *{createdDate.year}"></p>
-                            <div class="d-flex justify-content-center">
-                                <a class="nav-item active mx-auto"
-                                   th:href="@{/manager/buildings/{buildingId}/messages/{messageId}(buildingId = ${building.id}, messageId = *{id})}"
-                                >Edit message</a>
-                            </div>
+                            <p class="card-text"
+                               th:text="*{author.fullName} + ' - ' + *{author.phoneNumber}"></p>
                         </div>
                     </div>
                 </div>

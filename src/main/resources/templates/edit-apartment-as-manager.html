@@ -2,7 +2,7 @@
 <html lang="en"
       xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-<th:block th:include="~{fragment/navbar}"></th:block>
+<th:block th:include="~{fragment/navbar-manager-building}"></th:block>
 <body>
 <section style="background-color: #eee;">
     <div class="container py-5">
@@ -129,17 +129,16 @@
                                        value="Edit apartment"/>
                             </div>
                         </div>
+                    </form>
                 </div>
-                </form>
                 <div class="text-center">
                     <div class="form-group form-button align-content-center">
                         <form th:action="@{/manager/buildings/{buildingId}/delete-apartment/{apartmentId}
                                                         (buildingId = ${building.id},apartmentId = ${apartment.id})}"
-                        th:method="delete">
+                              th:method="delete">
                             <input
                                     type="submit" name="delete" id="delete" class="form-submit"
                                     value="Delete apartment"/></form>
-
                     </div>
                 </div>
             </div>
