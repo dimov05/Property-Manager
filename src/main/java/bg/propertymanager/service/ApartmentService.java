@@ -30,7 +30,7 @@ public class ApartmentService {
         this.modelMapper = modelMapper;
     }
 
-    public void registerApartment(ApartmentAddDTO apartmentAddDTO, Long buildingId) {
+    public void addApartment(ApartmentAddDTO apartmentAddDTO, Long buildingId) {
         UserEntity ownerToAdd = getOwnerEntity(apartmentAddDTO);
         BuildingEntity building = buildingService.findEntityById(buildingId);
         ApartmentEntity newApartment = new ApartmentEntity()
