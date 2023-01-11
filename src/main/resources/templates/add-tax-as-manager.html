@@ -21,29 +21,105 @@
                        th:text="*{manager.fullName} + ', ' + *{manager.phoneNumber}"></p>
                 </div>
             </div>
-            <div class="col-lg-7">
+            <div class="col-lg-9">
                 <div class="card mb-4">
                     <form class="card-body" th:object="${taxAddDTO}"
                           th:action="@{/manager/buildings/{id}/add-tax(id = ${building.id})}"
                           th:method="POST">
                         <div class="row align-content-center">
                             <div class="col-sm-3">
-                                <p class="mb-0">Tax type</p>
+                                <p class="mb-0">Tax amount</p>
                             </div>
                             <div class="col-sm-9">
-                                <input type="text"
-                                       id="taxType"
-                                       th:field="*{taxType}">
-                                <p th:errors="*{taxType}" class="text-danger"
-                                   th:if="${#fields.hasErrors('taxType')}"></p>
+                                <select
+                                        id="taxType"
+                                        name="taxType"
+                                        th:errorclass="is-invalid"
+                                        class="form-control">
+                                    <option value="">- Select tax type -</option>
+                                    <option th:each="taxType : ${taxTypes}"
+                                            th:value="${taxType}"
+                                            th:text="${taxType}"
+                                            th:selected="${taxType} == *{taxType}"></option>
+                                    <p th:errors="*{taxType}" class="text-danger"
+                                       th:if="${#fields.hasErrors('taxType')}"></p>
+                                </select>
                             </div>
                         </div>
                         <hr>
+                        <div class="row align-content-center">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Tax amount</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="amount"
+                                       th:field="*{amount}">
+                                <p th:errors="*{amount}" class="text-danger"
+                                   th:if="${#fields.hasErrors('amount')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row align-content-center">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Description</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="description"
+                                       th:field="*{description}">
+                                <p th:errors="*{description}" class="text-danger"
+                                   th:if="${#fields.hasErrors('description')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row align-content-center">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Start date</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input th:field="*{startDate}"  id="startDate" name="startDate"
+                                       type="datetime-local"
+                                       class="form-control col-xl-9 col-lg-8 col-md-8 col-sm-7"
+                                       data-large-mode="true"/>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row align-content-center">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Due date</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input th:field="*{dueDate}" id="dueDate" name="dueDate"
+                                       type="datetime-local"
+                                       class="form-control col-xl-9 col-lg-8 col-md-8 col-sm-7"
+                                       data-large-mode="true"/>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row align-content-center">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Split tax for apartments</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="form-check form-check-inline" th:each="apartment : ${building.apartments}">
+                                    <input type="checkbox"
+                                           style="display: inline-block;"
+                                           th:name="${apartment.apartmentNumber}"
+                                           th:field="*{selectedApartments}"
+                                           th:id="${apartment.apartmentNumber}"
+                                           th:value="${apartment.apartmentNumber}"
+                                           th:text="${apartment.apartmentNumber}"
+                                           th:checked="${1 == 1}">
+                                </div>
+
+                            </div>
+                        </div>
 
                         <div class="text-center">
                             <div class="form-group form-button align-content-center">
                                 <input type="submit" name="save" id="save" class="form-submit"
-                                       value="Add message"/>
+                                       value="Add tax"/>
                             </div>
                         </div>
                 </div>
