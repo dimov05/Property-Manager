@@ -16,6 +16,8 @@ spring:
     hiddenmethod:
       filter:
         enabled: true
+  thymeleaf:
+    render-hidden-markers-before-checkboxes: true
 app:
   default:
     admin:

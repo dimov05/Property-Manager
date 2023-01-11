@@ -3,6 +3,7 @@ package bg.propertymanager.web;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.dto.expense.TaxAddDTO;
 import bg.propertymanager.model.dto.expense.TaxViewDTO;
+import bg.propertymanager.model.enums.TaxTypeEnum;
 import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.TaxService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -30,7 +32,7 @@ public class TaxController {
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/taxes")
     public String viewTaxesAsManager(@PathVariable("buildingId") Long buildingId,
-                                        Model model) {
+                                     Model model) {
         BuildingViewDTO building = buildingService.findById(buildingId);
         List<TaxViewDTO> allTaxes = taxService.findAllTaxes(building);
         model.addAttribute("building", building);
@@ -42,8 +44,9 @@ public class TaxController {
     @GetMapping("/manager/buildings/{buildingId}/add-tax")
     public String addTaxAsManager(@PathVariable("buildingId") Long buildingId, Model model) {
         if (!model.containsAttribute("taxAddDTO")) {
-            model.addAttribute("taxAddDTO", new TaxAddDTO());
+            model.addAttribute("taxAddDTO", new TaxAddDTO().setSelectedApartments(new ArrayList<>()));
         }
+        model.addAttribute("taxTypes", TaxTypeEnum.values());
         model.addAttribute("building", buildingService.findById(buildingId));
         return "add-tax-as-manager";
     }
