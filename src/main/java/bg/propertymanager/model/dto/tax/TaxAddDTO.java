@@ -1,13 +1,12 @@
-package bg.propertymanager.model.dto.expense;
+package bg.propertymanager.model.dto.tax;
 
-import bg.propertymanager.model.entity.ApartmentEntity;
-import bg.propertymanager.model.entity.BuildingEntity;
-import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.TaxStatusEnum;
 import bg.propertymanager.model.enums.TaxTypeEnum;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,10 +20,6 @@ public class TaxAddDTO {
     private LocalDateTime startDate;
     private LocalDateTime dueDate;
     private List<String> selectedApartments;
-    private BuildingEntity building;
-    private UserEntity owner;
-    private ApartmentEntity apartment;
-    private UserEntity manager;
 
     public TaxAddDTO() {
     }
@@ -90,7 +85,6 @@ public class TaxAddDTO {
     }
     @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     @NotNull
-    @FutureOrPresent(message = "Due date must not be in the past")
     public LocalDateTime getDueDate() {
         return dueDate;
     }
@@ -106,42 +100,6 @@ public class TaxAddDTO {
 
     public TaxAddDTO setSelectedApartments(List<String> selectedApartments) {
         this.selectedApartments = selectedApartments;
-        return this;
-    }
-
-    public BuildingEntity getBuilding() {
-        return building;
-    }
-
-    public TaxAddDTO setBuilding(BuildingEntity building) {
-        this.building = building;
-        return this;
-    }
-
-    public UserEntity getOwner() {
-        return owner;
-    }
-
-    public TaxAddDTO setOwner(UserEntity owner) {
-        this.owner = owner;
-        return this;
-    }
-
-    public ApartmentEntity getApartment() {
-        return apartment;
-    }
-
-    public TaxAddDTO setApartment(ApartmentEntity apartment) {
-        this.apartment = apartment;
-        return this;
-    }
-
-    public UserEntity getManager() {
-        return manager;
-    }
-
-    public TaxAddDTO setManager(UserEntity manager) {
-        this.manager = manager;
         return this;
     }
 }

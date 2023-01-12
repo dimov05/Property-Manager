@@ -1,4 +1,4 @@
-package bg.propertymanager.model.dto.expense;
+package bg.propertymanager.model.dto.tax;
 
 import bg.propertymanager.model.entity.ApartmentEntity;
 import bg.propertymanager.model.entity.BuildingEntity;
