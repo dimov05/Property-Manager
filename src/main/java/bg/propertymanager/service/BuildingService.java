@@ -4,10 +4,7 @@ import bg.propertymanager.model.dto.building.BuildingAddDTO;
 import bg.propertymanager.model.dto.building.BuildingChangeTaxesDTO;
 import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
-import bg.propertymanager.model.entity.ApartmentEntity;
-import bg.propertymanager.model.entity.BuildingEntity;
-import bg.propertymanager.model.entity.MessageEntity;
-import bg.propertymanager.model.entity.UserEntity;
+import bg.propertymanager.model.entity.*;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
 import bg.propertymanager.repository.BuildingRepository;
 import org.modelmapper.ModelMapper;
@@ -163,5 +160,10 @@ public class BuildingService {
     public void removeMessageFromBuilding(MessageEntity messageToRemove, BuildingEntity building) {
         building.getMessages().remove(messageToRemove);
         buildingRepository.save(building);
+    }
+
+    public void addNewTaxToBuilding(BuildingEntity buildingToAddTax, TaxEntity taxToAdd) {
+        buildingToAddTax.getTaxes().add(taxToAdd);
+        buildingRepository.save(buildingToAddTax);
     }
 }

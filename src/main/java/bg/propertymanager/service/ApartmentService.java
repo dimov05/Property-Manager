@@ -5,6 +5,7 @@ import bg.propertymanager.model.dto.apartment.ApartmentEditDTO;
 import bg.propertymanager.model.dto.apartment.ApartmentViewDTO;
 import bg.propertymanager.model.entity.ApartmentEntity;
 import bg.propertymanager.model.entity.BuildingEntity;
+import bg.propertymanager.model.entity.TaxEntity;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.repository.ApartmentRepository;
 import org.modelmapper.ModelMapper;
@@ -115,6 +116,7 @@ public class ApartmentService {
                 .add(building.getTaxPerDog().multiply(BigDecimal.valueOf(apartmentAddDTO.getDogsCount())))
                 .add(building.getTaxPerElevatorChip().multiply(BigDecimal.valueOf(apartmentAddDTO.getElevatorChipsCount())));
     }
+
     private BigDecimal calculatePeriodicTax(ApartmentEntity apartment, BuildingEntity building) {
         return building.getTaxPerPerson().multiply(BigDecimal.valueOf(apartment.getRoommateCount()))
                 .add(building.getTaxPerDog().multiply(BigDecimal.valueOf(apartment.getDogsCount())))
@@ -124,8 +126,20 @@ public class ApartmentService {
     public void updatePeriodicTax(BuildingEntity buildingToSave) {
         Set<ApartmentEntity> apartments = apartmentRepository.findAllByBuildingId(buildingToSave.getId());
         for (ApartmentEntity apartment : apartments) {
-            apartment.setPeriodicTax(calculatePeriodicTax(apartment,buildingToSave));
+            apartment.setPeriodicTax(calculatePeriodicTax(apartment, buildingToSave));
             apartmentRepository.save(apartment);
         }
+    }
+
+    public ApartmentEntity getApartmentByApartmentNumber(String apartmentNumber) {
+        return apartmentRepository
+                .findByApartmentNumber(apartmentNumber)
+                .orElseThrow(() -> new NullPointerException("No apartment with this apartmentNumber " + apartmentNumber));
+    }
+
+    public void addNewTaxToApartment(ApartmentEntity apartmentToAddTax, TaxEntity taxToAdd) {
+        apartmentToAddTax.getTaxes().add(taxToAdd);
+        apartmentToAddTax.setMoneyOwed(apartmentToAddTax.getMoneyOwed().add(taxToAdd.getAmount()));
+        apartmentRepository.save(apartmentToAddTax);
     }
 }
