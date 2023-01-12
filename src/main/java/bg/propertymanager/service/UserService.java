@@ -6,8 +6,6 @@ import bg.propertymanager.model.dto.user.UserRegisterDTO;
 import bg.propertymanager.model.entity.*;
 import bg.propertymanager.model.enums.UserRolesEnum;
 import bg.propertymanager.model.view.AdminViewUserProfile;
-import bg.propertymanager.repository.ApartmentRepository;
-import bg.propertymanager.repository.BuildingRepository;
 import bg.propertymanager.repository.RoleRepository;
 import bg.propertymanager.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -21,7 +19,6 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -31,23 +28,17 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
     private final String adminPass;
-    private final ApartmentRepository apartmentRepository;
-    private final BuildingRepository buildingRepository;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
                        PasswordEncoder passwordEncoder,
-                       ModelMapper modelMapper, @Value("${app.default.admin.password}") String adminPass,
-                       ApartmentRepository apartmentRepository,
-                       BuildingRepository buildingRepository) {
+                       ModelMapper modelMapper, @Value("${app.default.admin.password}") String adminPass) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
         this.adminPass = adminPass;
-        this.apartmentRepository = apartmentRepository;
-        this.buildingRepository = buildingRepository;
     }
 
     public UserEntity register(UserRegisterDTO userRegisterDTO) {
@@ -66,7 +57,6 @@ public class UserService {
                         .setManagerInBuildings(Collections.emptySet())
                         .setOwnerInBuildings(Collections.emptySet())
                         .setApartments(Collections.emptySet())
-                        .setTaxes(Collections.emptySet())
                         .setMessages(Collections.emptySet());
 
         userRepository.save(newUser);
@@ -102,7 +92,6 @@ public class UserService {
                 .setManagerInBuildings(Collections.emptySet())
                 .setOwnerInBuildings(Collections.emptySet())
                 .setApartments(Collections.emptySet())
-                .setTaxes(Collections.emptySet())
                 .setMessages(Collections.emptySet())
                 .setRegistrationDate(LocalDate.now());
         userRepository.save(user);
@@ -123,7 +112,6 @@ public class UserService {
                 .setManagerInBuildings(Collections.emptySet())
                 .setOwnerInBuildings(Collections.emptySet())
                 .setApartments(Collections.emptySet())
-                .setTaxes(Collections.emptySet())
                 .setMessages(Collections.emptySet())
                 .setRegistrationDate(LocalDate.now());
         userRepository.save(admin);
@@ -173,38 +161,34 @@ public class UserService {
                 .orElseThrow(() -> new NullPointerException("No such user with this Id"));
     }
 
-    private void updateUser(UserEntity userToUpdate) {
-        userRepository.save(userToUpdate);
-    }
-
     public void removeApartmentFromUser(ApartmentEntity apartment, UserEntity ownerToRemove) {
         UserEntity userToUpdate = findById(ownerToRemove.getId());
         userToUpdate.getApartments().remove(apartment);
-        updateUser(userToUpdate);
+        userRepository.save(userToUpdate);
     }
 
     public void addApartmentToUser(ApartmentEntity apartment, UserEntity ownerToAdd) {
         UserEntity userToUpdate = findById(ownerToAdd.getId());
         userToUpdate.getApartments().add(apartment);
-        updateUser(userToUpdate);
+        userRepository.save(userToUpdate);
     }
 
     public void removeManagerRightsInBuilding(UserEntity currentManager, BuildingEntity building) {
         UserEntity userToUpdate = findById(currentManager.getId());
         userToUpdate.getManagerInBuildings().remove(building);
-        updateUser(userToUpdate);
+        userRepository.save(userToUpdate);
     }
 
     public void addManagerRightsInBuilding(UserEntity managerToSet, BuildingEntity buildingToSave) {
         UserEntity userToUpdate = findById(managerToSet.getId());
         userToUpdate.getManagerInBuildings().add(buildingToSave);
-        updateUser(userToUpdate);
+        userRepository.save(userToUpdate);
     }
 
     public void addBuildingToUser(UserEntity ownerToAdd, BuildingEntity building) {
         UserEntity userToUpdate = findById(ownerToAdd.getId());
         userToUpdate.getOwnerInBuildings().add(building);
-        updateUser(userToUpdate);
+        userRepository.save(userToUpdate);
     }
 
     public void removeBuildingFromUser(UserEntity ownerToRemove, BuildingEntity building) {
@@ -218,13 +202,13 @@ public class UserService {
         }
         if (!ownerHaveMoreApartmentsInThisBuilding) {
             userToUpdate.getOwnerInBuildings().remove(building);
-            updateUser(userToUpdate);
+            userRepository.save(userToUpdate);
         }
     }
 
     public void addMessageToUser(MessageEntity newMessage, UserEntity author) {
         author.getMessages().add(newMessage);
-        updateUser(author);
+        userRepository.save(author);
     }
 
     public void removeMessageFromUser(MessageEntity messageToRemove, UserEntity author) {
