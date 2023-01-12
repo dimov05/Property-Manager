@@ -24,9 +24,7 @@ public class UserEntity {
     private Set<BuildingEntity> managerInBuildings;
     private Set<BuildingEntity> ownerInBuildings;
     private Set<ApartmentEntity> apartments;
-    private BuildingEntity selectedBuilding;
     private Set<MessageEntity> messages;
-    private Set<TaxEntity> taxes;
 
     public UserEntity() {
     }
@@ -125,7 +123,7 @@ public class UserEntity {
         return this;
     }
 
-    @Column(name = "registration_date",columnDefinition = "DATE", nullable = false)
+    @Column(name = "registration_date", columnDefinition = "DATE", nullable = false)
     public LocalDate getRegistrationDate() {
         return registrationDate;
     }
@@ -149,7 +147,7 @@ public class UserEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "manager",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "manager", fetch = FetchType.EAGER)
     public Set<BuildingEntity> getManagerInBuildings() {
         return managerInBuildings;
     }
@@ -159,7 +157,7 @@ public class UserEntity {
         return this;
     }
 
-    @ManyToMany(mappedBy = "neighbours",cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "neighbours", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 //    @JoinTable(name = "owners_buildings",
 //            joinColumns = {@JoinColumn(name = "owner_id", referencedColumnName = "id")},
 //            inverseJoinColumns = {@JoinColumn(name = "building_id", referencedColumnName = "id")}
@@ -173,7 +171,7 @@ public class UserEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "owner",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
     public Set<ApartmentEntity> getApartments() {
         return apartments;
     }
@@ -183,19 +181,7 @@ public class UserEntity {
         return this;
     }
 
-    @OneToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinColumn(name = "selected_building_id", referencedColumnName = "id")
-    public BuildingEntity getSelectedBuilding() {
-        return selectedBuilding;
-    }
-
-    public UserEntity setSelectedBuilding(BuildingEntity selectedBuilding) {
-        this.selectedBuilding = selectedBuilding;
-        return this;
-    }
-
-
-    @OneToMany(mappedBy = "author",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "author", fetch = FetchType.EAGER)
     public Set<MessageEntity> getMessages() {
         return messages;
     }
@@ -204,16 +190,4 @@ public class UserEntity {
         this.messages = messages;
         return this;
     }
-
-
-    @OneToMany(mappedBy = "owner",fetch = FetchType.EAGER)
-    public Set<TaxEntity> getTaxes() {
-        return taxes;
-    }
-
-    public UserEntity setTaxes(Set<TaxEntity> taxes) {
-        this.taxes = taxes;
-        return this;
-    }
-
 }

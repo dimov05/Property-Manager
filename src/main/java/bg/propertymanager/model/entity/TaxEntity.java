@@ -20,7 +20,6 @@ public class TaxEntity {
     private LocalDateTime startDate;
     private LocalDateTime dueDate;
     private BuildingEntity building;
-    private UserEntity owner;
     private ApartmentEntity apartment;
     private UserEntity manager;
 
@@ -104,16 +103,6 @@ public class TaxEntity {
 
     public TaxEntity setBuilding(BuildingEntity building) {
         this.building = building;
-        return this;
-    }
-
-    @ManyToOne
-    public UserEntity getOwner() {
-        return owner;
-    }
-
-    public TaxEntity setOwner(UserEntity owner) {
-        this.owner = owner;
         return this;
     }
 
