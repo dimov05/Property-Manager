@@ -21,7 +21,6 @@ public class UserViewDTO {
     private Set<ApartmentEntity> apartments;
     private BuildingEntity selectedBuilding;
     private Set<MessageEntity> messages;
-    private Set<TaxEntity> taxes;
 
     public UserViewDTO() {
     }
@@ -158,15 +157,6 @@ public class UserViewDTO {
 
     public UserViewDTO setMessages(Set<MessageEntity> messages) {
         this.messages = messages;
-        return this;
-    }
-
-    public Set<TaxEntity> getTaxes() {
-        return taxes;
-    }
-
-    public UserViewDTO setTaxes(Set<TaxEntity> taxes) {
-        this.taxes = taxes;
         return this;
     }
 }

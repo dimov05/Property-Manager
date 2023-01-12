@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:include="~{fragment/navbar-manager-building}"></th:block>
+<body>
+<section style="background-color: #eee;">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="card-body text-center" th:object="${building}">
+                    <img th:src="*{imageUrl}"
+                         alt="avatar"
+                         class="img-fluid mx-auto" style="width: 150px;">
+                    <h5 class="my-3" th:text="*{name}"></h5>
+                    <p class="text-muted mb-1"
+                       th:text="*{street} + ', ' + *{city} + ', ' + *{country}">Address</p>
+                    <p class="text-muted">Manager:</p>
+                    <p class="text-muted mb-4"
+                       th:text="*{manager.fullName} + ', ' + *{manager.phoneNumber}"></p>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card mb-4">
+                    <form class="card-body" th:object="${taxEditDTO}"
+                          th:action="@{/manager/buildings/{buildingId}/tax/{taxId}
+                                                        (buildingId = ${building.id},taxId = ${tax.id})}"
+                          th:method="POST">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Tax amount</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="amount"
+                                       th:field="${tax.amount}"
+                                       th:placeholder="*{amount}">
+                                <p th:errors="*{amount}" class="text-danger"
+                                   th:if="${#fields.hasErrors('amount')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row align-content-center">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Tax status</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <select
+                                        id="taxStatus"
+                                        name="taxStatus"
+                                        th:errorclass="is-invalid"
+                                        class="form-control">
+                                    <option value="">- Select tax type -</option>
+                                    <option th:each="taxStatus : ${taxStatus}"
+                                            th:field="${tax.taxStatus}"
+                                            th:value="${taxStatus}"
+                                            th:text="${taxStatus}"
+                                            th:selected="${taxStatus} == *{taxStatus}"></option>
+                                    <p th:errors="*{taxStatus}" class="text-danger"
+                                       th:if="${#fields.hasErrors('taxStatus')}"></p>
+                                </select>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row align-content-center">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Start date</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input th:field="*{startDate}"
+                                       th:text="${tax.startDate}"
+                                       id="startDate" name="startDate"
+                                       type="datetime-local"
+                                       class="form-control col-xl-9 col-lg-8 col-md-8 col-sm-7"
+                                       data-large-mode="true"/>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row align-content-center">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Due date</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input th:field="*{dueDate}"
+                                       th:text="${tax.dueDate}"
+                                       id="dueDate" name="dueDate"
+                                       type="datetime-local"
+                                       class="form-control col-xl-9 col-lg-8 col-md-8 col-sm-7"
+                                       data-large-mode="true"/>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="form-group form-button align-content-center">
+                                <input type="submit" name="save" id="save" class="form-submit"
+                                       value="Edit apartment"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="text-center">
+                    <div class="form-group form-button align-content-center">
+                        <form th:action="@{/manager/buildings/{buildingId}/delete-tax/{taxId}
+                                                        (buildingId = ${building.id},taxId = ${tax.id})}"
+                              th:method="delete">
+                            <input
+                                    type="submit" name="delete" id="delete" class="form-submit"
+                                    value="Delete apartment"/></form>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </div>
+    </div>
+</section>
+</body>
+</html>
