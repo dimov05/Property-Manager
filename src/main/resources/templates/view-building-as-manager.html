@@ -23,7 +23,7 @@
                             <a class="nav-item active mx-auto"
                                th:href="@{/manager/buildings/{id}/add-apartment(id = *{id})}">Add apartment</a>
                             <a class="nav-item active mx-auto"
-                               th:href="@{/manager/buildings/change-taxes/{id}(id = *{id})}">Change taxes</a>
+                               th:href="@{/manager/buildings/change-taxes/{id}(id = *{id})}">Change per taxes</a>
                         </div>
                     </div>
                 </div>
@@ -121,7 +121,7 @@
                                             <td th:text="*{floor}"></td>
                                             <td th:text="*{area} + 'm2'"></td>
                                             <td th:text="*{periodicTax} + 'lv.'"></td>
-                                            <td th:text="*{moneyOwed} + 'lv.'"></td>
+                                            <td th:text="${@taxService.findOwedMoney(apartment.id)} + 'lv.'"></td>
                                             <td th:text="*{owner.fullName}"></td>
                                             <td>
                                                 <ul class="list-inline mb-0">

@@ -25,6 +25,11 @@
                     <p class="text-muted">Manager:</p>
                     <p class="text-muted mb-4"
                        th:text="${building.manager.fullName} + ', ' + ${building.manager.phoneNumber}"></p>
+                    <div class="d-flex justify-content-center mb-2">
+                        <a class="nav-item active mx-auto"
+                           th:href="@{/manager/buildings/{buildingId}/add-expense(buildingId = ${building.id})}">Add
+                            expense</a>
+                    </div>
                 </div>
             </div>
             <div class="card mb-4 mb-lg-0">
@@ -61,28 +66,28 @@
                     <table class="table project-list-table align-middle table-borderless">
                         <thead>
                         <tr>
-                            <th scope="col">Apart. №</th>
-                            <th scope="col">Owner</th>
-                            <th scope="col">Amount</th>
                             <th scope="col">Tax type</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Amount</th>
+                            <th scope="col">Start date</th>
                             <th scope="col">Due date</th>
-                            <th scope="col">Tax status:</th>
+                            <th scope="col">Tax status</th>
                             <th scope="col" style="width: 60px;">Action</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="tax: ${taxes}">
-                            <td th:text="${tax.apartment.apartmentNumber}"></td>
-                            <td th:text="${tax.owner.fullName}"></td>
-                            <td th:text="${tax.amount} + 'lv.'"></td>
-                            <td th:text="${tax.taxType.name()}"></td>
-                            <td th:text="${tax.dueDate.dayOfMonth} + ' ' + ${tax.dueDate.month} + ' ' + ${tax.dueDate.year}"></td>
-                            <td th:text="${tax.taxStatus.name()}"></td>
+                        <tr th:each="expense: ${expenses}">
+                            <td th:text="${expense.taxType.name()}"></td>
+                            <td th:text="${expense.description}"></td>
+                            <td th:text="${expense.amount} + 'lv.'"></td>
+                            <td th:text="${expense.startDate.dayOfMonth} + ' ' + ${expense.startDate.month} + ' ' + ${expense.startDate.year}"></td>
+                            <td th:text="${expense.dueDate.dayOfMonth} + ' ' + ${expense.dueDate.month} + ' ' + ${expense.dueDate.year}"></td>
+                            <td th:text="${expense.taxStatus.name()}"></td>
                             <td>
                                 <ul class="list-inline mb-0">
                                     <li class="list-inline-item">
-                                        <a th:href="@{/manager/buildings/{buildingId}/tax/{taxId}
-                                        (buildingId = ${building.id}, taxId = ${tax.id})}"
+                                        <a th:href="@{/manager/buildings/{buildingId}/expense/{expenseId}
+                                        (buildingId = ${building.id}, expenseId = ${expense.id})}"
                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"
                                            class="px-2 text-primary">Edit</a>
                                     </li>

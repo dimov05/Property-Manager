@@ -1,17 +1,17 @@
-package bg.propertymanager.model.entity;
+package bg.propertymanager.model.dto.expense;
 
+import bg.propertymanager.model.entity.ApartmentEntity;
+import bg.propertymanager.model.entity.BuildingEntity;
+import bg.propertymanager.model.entity.TaxEntity;
+import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.TaxStatusEnum;
 import bg.propertymanager.model.enums.TaxTypeEnum;
 
-import javax.persistence.*;
-
 import java.math.BigDecimal;
-
 import java.time.LocalDateTime;
+import java.util.Set;
 
-@Entity
-@Table(name = "taxes")
-public class TaxEntity {
+public class ExpenseViewDTO {
     private Long id;
     private TaxTypeEnum taxType;
     private BigDecimal amount;
@@ -20,121 +20,99 @@ public class TaxEntity {
     private LocalDateTime startDate;
     private LocalDateTime dueDate;
     private BuildingEntity building;
-    private ApartmentEntity apartment;
-    private ExpenseEntity expense;
     private UserEntity manager;
+    private Set<TaxEntity> taxes;
 
-    public TaxEntity() {
+    public ExpenseViewDTO() {
     }
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long getId() {
         return id;
     }
 
-    public TaxEntity setId(Long id) {
+    public ExpenseViewDTO setId(Long id) {
         this.id = id;
         return this;
     }
 
-    @Enumerated(EnumType.STRING)
     public TaxTypeEnum getTaxType() {
         return taxType;
     }
 
-    public TaxEntity setTaxType(TaxTypeEnum taxType) {
+    public ExpenseViewDTO setTaxType(TaxTypeEnum taxType) {
         this.taxType = taxType;
         return this;
     }
 
-    @Column(name = "amount", nullable = false)
     public BigDecimal getAmount() {
         return amount;
     }
 
-    public TaxEntity setAmount(BigDecimal amount) {
+    public ExpenseViewDTO setAmount(BigDecimal amount) {
         this.amount = amount;
         return this;
     }
 
-    @Enumerated(EnumType.STRING)
     public TaxStatusEnum getTaxStatus() {
         return taxStatus;
     }
 
-    public TaxEntity setTaxStatus(TaxStatusEnum taxStatus) {
+    public ExpenseViewDTO setTaxStatus(TaxStatusEnum taxStatus) {
         this.taxStatus = taxStatus;
         return this;
     }
 
-    @Column(name = "description", nullable = false)
     public String getDescription() {
         return description;
     }
 
-    public TaxEntity setDescription(String description) {
+    public ExpenseViewDTO setDescription(String description) {
         this.description = description;
         return this;
     }
 
-    @Column(name = "start_date", nullable = false)
     public LocalDateTime getStartDate() {
         return startDate;
     }
 
-    public TaxEntity setStartDate(LocalDateTime startDate) {
+    public ExpenseViewDTO setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
         return this;
     }
 
-    @Column(name = "due_date", nullable = false)
     public LocalDateTime getDueDate() {
         return dueDate;
     }
 
-    public TaxEntity setDueDate(LocalDateTime dueDate) {
+    public ExpenseViewDTO setDueDate(LocalDateTime dueDate) {
         this.dueDate = dueDate;
         return this;
     }
 
-    @ManyToOne
     public BuildingEntity getBuilding() {
         return building;
     }
 
-    public TaxEntity setBuilding(BuildingEntity building) {
+    public ExpenseViewDTO setBuilding(BuildingEntity building) {
         this.building = building;
         return this;
     }
 
-    @ManyToOne
-    public ApartmentEntity getApartment() {
-        return apartment;
-    }
-
-    public TaxEntity setApartment(ApartmentEntity apartment) {
-        this.apartment = apartment;
-        return this;
-    }
-
-    @ManyToOne
-    public ExpenseEntity getExpense() {
-        return expense;
-    }
-
-    public TaxEntity setExpense(ExpenseEntity expense) {
-        this.expense = expense;
-        return this;
-    }
-
-    @ManyToOne
     public UserEntity getManager() {
         return manager;
     }
 
-    public TaxEntity setManager(UserEntity manager) {
+    public ExpenseViewDTO setManager(UserEntity manager) {
         this.manager = manager;
+        return this;
+    }
+
+    public Set<TaxEntity> getTaxes() {
+        return taxes;
+    }
+
+    public ExpenseViewDTO setTaxes(Set<TaxEntity> taxes) {
+        this.taxes = taxes;
         return this;
     }
 }

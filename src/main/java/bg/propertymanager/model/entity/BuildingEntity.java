@@ -25,6 +25,7 @@ public class BuildingEntity {
     private Set<UserEntity> neighbours;
     private Set<ApartmentEntity> apartments;
     private Set<TaxEntity> taxes;
+    private Set<ExpenseEntity> expenses;
     private Set<MessageEntity> messages;
 
     public BuildingEntity() {
@@ -110,6 +111,7 @@ public class BuildingEntity {
         this.imageUrl = imageUrl;
         return this;
     }
+
     @Column(name = "tax_per_person", nullable = false)
     public BigDecimal getTaxPerPerson() {
         return taxPerPerson;
@@ -140,7 +142,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @Column(name = "registration_date",columnDefinition = "DATE", nullable = false)
+    @Column(name = "registration_date", columnDefinition = "DATE", nullable = false)
     public LocalDate getRegistrationDate() {
         return registrationDate;
     }
@@ -178,6 +180,16 @@ public class BuildingEntity {
 
     public BuildingEntity setTaxes(Set<TaxEntity> taxes) {
         this.taxes = taxes;
+        return this;
+    }
+
+    @OneToMany(mappedBy = "building")
+    public Set<ExpenseEntity> getExpenses() {
+        return expenses;
+    }
+
+    public BuildingEntity setExpenses(Set<ExpenseEntity> expenses) {
+        this.expenses = expenses;
         return this;
     }
 

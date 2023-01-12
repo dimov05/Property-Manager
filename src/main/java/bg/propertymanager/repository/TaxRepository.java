@@ -16,4 +16,7 @@ public interface TaxRepository extends JpaRepository<TaxEntity, Long> {
 
     @Query("SELECT SUM(t.amount)  FROM TaxEntity as t WHERE t.building.id = :buildingId AND t.taxStatus = 'PAID'")
     BigDecimal findBalanceByBuildingId(@Param("buildingId") Long buildingId);
+
+    @Query("SELECT SUM(t.amount) FROM TaxEntity  as t WHERE t.apartment.id = :apartmentId AND t.taxStatus = 'UNPAID'")
+    BigDecimal findOwedMoneyByApartmentId(@Param("apartmentId") Long apartmentId);
 }

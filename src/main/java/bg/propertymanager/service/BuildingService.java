@@ -11,7 +11,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -49,6 +48,7 @@ public class BuildingService {
                         .setNeighbours(Collections.emptySet())
                         .setApartments(Collections.emptySet())
                         .setTaxes(Collections.emptySet())
+                        .setExpenses(Collections.emptySet())
                         .setMessages(Collections.emptySet())
                         .setManager(userService.findById(1L));
         buildingRepository.save(newBuilding);
@@ -81,7 +81,7 @@ public class BuildingService {
         buildingRepository.save(buildingToSave);
     }
 
-    public void updateBuildingsTaxes(BuildingChangeTaxesDTO buildingChangeTaxesDTO) {
+    public void updateBuildingsPerTaxes(BuildingChangeTaxesDTO buildingChangeTaxesDTO) {
         BuildingEntity buildingToSave = buildingRepository
                 .findById(buildingChangeTaxesDTO.getId())
                 .orElseThrow(() -> new NullPointerException("The building you are searching is missing"));

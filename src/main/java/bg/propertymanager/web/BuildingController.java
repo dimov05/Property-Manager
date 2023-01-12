@@ -137,7 +137,7 @@ public class BuildingController {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.buildingChangeTaxesDTO", bindingResult);
             return "redirect:/manager/buildings/view/" + buildingId;
         }
-        buildingService.updateBuildingsTaxes(buildingChangeTaxesDTO);
+        buildingService.updateBuildingsPerTaxes(buildingChangeTaxesDTO);
         return "redirect:/manager/buildings/view/" + buildingId;
     }
 

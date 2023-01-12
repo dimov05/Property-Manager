@@ -45,32 +45,32 @@ public class TaxController {
         return "view-taxes-as-manager";
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
-    @GetMapping("/manager/buildings/{buildingId}/add-tax")
-    public String addTaxAsManager(@PathVariable("buildingId") Long buildingId, Model model) {
-        if (!model.containsAttribute("taxAddDTO")) {
-            model.addAttribute("taxAddDTO", new TaxAddDTO().setSelectedApartments(new ArrayList<>()));
-        }
-        model.addAttribute("taxTypes", TaxTypeEnum.values());
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        model.addAttribute("building", buildingService.findById(buildingId));
-        return "add-tax-as-manager";
-    }
-
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
-    @PostMapping("/manager/buildings/{buildingId}/add-tax")
-    public String addTaxAsManagerConfirm(@Valid TaxAddDTO taxAddDTO,
-                                         BindingResult bindingResult,
-                                         RedirectAttributes redirectAttributes,
-                                         @PathVariable("buildingId") Long buildingId) {
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("taxAddDTO", taxAddDTO);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.taxAddDTO", bindingResult);
-            return String.format("redirect:/manager/buildings/%d/add-tax", buildingId);
-        }
-        taxService.addTax(taxAddDTO, buildingId);
-        return String.format("redirect:/manager/buildings/%d/taxes", buildingId);
-    }
+//    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+//    @GetMapping("/manager/buildings/{buildingId}/add-tax")
+//    public String addTaxAsManager(@PathVariable("buildingId") Long buildingId, Model model) {
+//        if (!model.containsAttribute("taxAddDTO")) {
+//            model.addAttribute("taxAddDTO", new TaxAddDTO().setSelectedApartments(new ArrayList<>()));
+//        }
+//        model.addAttribute("taxTypes", TaxTypeEnum.values());
+//        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+//        model.addAttribute("building", buildingService.findById(buildingId));
+//        return "add-tax-as-manager";
+//    }
+//
+//    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+//    @PostMapping("/manager/buildings/{buildingId}/add-tax")
+//    public String addTaxAsManagerConfirm(@Valid TaxAddDTO taxAddDTO,
+//                                         BindingResult bindingResult,
+//                                         RedirectAttributes redirectAttributes,
+//                                         @PathVariable("buildingId") Long buildingId) {
+//        if (bindingResult.hasErrors()) {
+//            redirectAttributes.addFlashAttribute("taxAddDTO", taxAddDTO);
+//            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.taxAddDTO", bindingResult);
+//            return String.format("redirect:/manager/buildings/%d/add-tax", buildingId);
+//        }
+//        taxService.addTax(taxAddDTO, buildingId);
+//        return String.format("redirect:/manager/buildings/%d/taxes", buildingId);
+//    }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/tax/{taxId}")

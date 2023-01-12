@@ -121,7 +121,7 @@
                                             <td th:text="*{floor}"></td>
                                             <td th:text="*{area} + 'm2'"></td>
                                             <td th:text="*{periodicTax} + 'lv.'"></td>
-                                            <td th:text="*{moneyOwed} + 'lv.'"></td>
+                                            <td th:text="${@taxService.findOwedMoney(apartment.id)} + 'lv.'"></td>
                                             <td th:text="*{owner.fullName}"></td>
                                             <td>
                                                 <ul class="list-inline mb-0">

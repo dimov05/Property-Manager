@@ -1,4 +1,4 @@
-package bg.propertymanager.model.dto.tax;
+package bg.propertymanager.model.dto.expense;
 
 import bg.propertymanager.model.enums.TaxStatusEnum;
 import bg.propertymanager.model.enums.TaxTypeEnum;
@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class TaxAddDTO {
+public class ExpenseAddDTO {
     private Long id;
     private TaxTypeEnum taxType;
     private BigDecimal amount;
@@ -20,14 +20,14 @@ public class TaxAddDTO {
     private LocalDateTime dueDate;
     private List<String> selectedApartments;
 
-    public TaxAddDTO() {
+    public ExpenseAddDTO() {
     }
 
     public Long getId() {
         return id;
     }
 
-    public TaxAddDTO setId(Long id) {
+    public ExpenseAddDTO setId(Long id) {
         this.id = id;
         return this;
     }
@@ -37,7 +37,7 @@ public class TaxAddDTO {
         return taxType;
     }
 
-    public TaxAddDTO setTaxType(TaxTypeEnum taxType) {
+    public ExpenseAddDTO setTaxType(TaxTypeEnum taxType) {
         this.taxType = taxType;
         return this;
     }
@@ -48,7 +48,7 @@ public class TaxAddDTO {
         return amount;
     }
 
-    public TaxAddDTO setAmount(BigDecimal amount) {
+    public ExpenseAddDTO setAmount(BigDecimal amount) {
         this.amount = amount;
         return this;
     }
@@ -58,7 +58,7 @@ public class TaxAddDTO {
         return description;
     }
 
-    public TaxAddDTO setDescription(String description) {
+    public ExpenseAddDTO setDescription(String description) {
         this.description = description;
         return this;
     }
@@ -69,7 +69,7 @@ public class TaxAddDTO {
         return startDate;
     }
 
-    public TaxAddDTO setStartDate(LocalDateTime startDate) {
+    public ExpenseAddDTO setStartDate(LocalDateTime startDate) {
         this.startDate = startDate;
         return this;
     }
@@ -79,7 +79,7 @@ public class TaxAddDTO {
         return dueDate;
     }
 
-    public TaxAddDTO setDueDate(LocalDateTime dueDate) {
+    public ExpenseAddDTO setDueDate(LocalDateTime dueDate) {
         this.dueDate = dueDate;
         return this;
     }
@@ -88,7 +88,7 @@ public class TaxAddDTO {
         return selectedApartments;
     }
 
-    public TaxAddDTO setSelectedApartments(List<String> selectedApartments) {
+    public ExpenseAddDTO setSelectedApartments(List<String> selectedApartments) {
         this.selectedApartments = selectedApartments;
         return this;
     }

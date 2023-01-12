@@ -1,11 +1,13 @@
 package bg.propertymanager.service;
 
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
+import bg.propertymanager.model.dto.expense.ExpenseAddDTO;
 import bg.propertymanager.model.dto.tax.TaxAddDTO;
 import bg.propertymanager.model.dto.tax.TaxEditDTO;
 import bg.propertymanager.model.dto.tax.TaxViewDTO;
 import bg.propertymanager.model.entity.ApartmentEntity;
 import bg.propertymanager.model.entity.BuildingEntity;
+import bg.propertymanager.model.entity.ExpenseEntity;
 import bg.propertymanager.model.entity.TaxEntity;
 import bg.propertymanager.model.enums.TaxStatusEnum;
 import bg.propertymanager.repository.TaxRepository;
@@ -15,7 +17,9 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,30 +44,6 @@ public class TaxService {
                 .map(tax -> modelMapper.map(tax, TaxViewDTO.class))
                 .collect(Collectors.toList());
 
-    }
-
-    public void addTax(TaxAddDTO taxAddDTO, Long buildingId) {
-        BigDecimal taxForEachApartment = taxAddDTO.getAmount()
-                .divide(BigDecimal.valueOf(taxAddDTO.getSelectedApartments().size()), RoundingMode.HALF_EVEN);
-        for (String apartmentNumber : taxAddDTO.getSelectedApartments()) {
-            ApartmentEntity apartmentToAddTax = apartmentService.getApartmentByApartmentNumber(apartmentNumber);
-            BuildingEntity buildingToAddTax = apartmentToAddTax.getBuilding();
-
-            TaxEntity taxToAdd = new TaxEntity()
-                    .setTaxType(taxAddDTO.getTaxType())
-                    .setAmount(taxForEachApartment)
-                    .setTaxStatus(TaxStatusEnum.UNPAID)
-                    .setDescription(taxAddDTO.getDescription())
-                    .setStartDate(taxAddDTO.getStartDate())
-                    .setDueDate(taxAddDTO.getDueDate())
-                    .setBuilding(buildingToAddTax)
-                    .setManager(buildingToAddTax.getManager())
-                    .setApartment(apartmentToAddTax);
-
-            buildingService.addNewTaxToBuilding(buildingToAddTax, taxToAdd);
-            apartmentService.addNewTaxToApartment(apartmentToAddTax, taxToAdd);
-            taxRepository.save(taxToAdd);
-        }
     }
 
     public TaxViewDTO findViewById(Long taxId) {
@@ -100,11 +80,54 @@ public class TaxService {
 
     public BigDecimal calculateBuildingBalance(Long buildingId) {
         BigDecimal paidTaxes = taxRepository.findBalanceByBuildingId(buildingId);
-        if(paidTaxes == null){
+        if (paidTaxes == null) {
             paidTaxes = new BigDecimal("0");
         }
         BigDecimal balance = new BigDecimal("0").add(paidTaxes);
 
         return balance;
+    }
+
+    public BigDecimal findOwedMoney(Long apartmentId) {
+        BigDecimal owedMoney = taxRepository.findOwedMoneyByApartmentId(apartmentId);
+        if (owedMoney == null) {
+            owedMoney = new BigDecimal("0");
+        }
+        return owedMoney;
+    }
+
+    public void save(TaxEntity newTaxToAdd) {
+        taxRepository.save(newTaxToAdd);
+    }
+
+    public Set<TaxEntity> addTaxForEachApartment(List<String> apartments, BuildingEntity buildingToUpdate,
+                                                 ExpenseEntity expense) {
+        BigDecimal taxForEachApartment = getTaxForEachApartment(expense, apartments.size());
+        Set<TaxEntity> expenseTaxes = new HashSet<>();
+        for (String apartmentNumber : apartments) {
+            ApartmentEntity apartmentToAddTax = apartmentService.getApartmentByApartmentNumber(apartmentNumber);
+
+            TaxEntity newTaxToAdd = new TaxEntity()
+                    .setTaxType(expense.getTaxType())
+                    .setAmount(taxForEachApartment)
+                    .setTaxStatus(TaxStatusEnum.UNPAID)
+                    .setDescription(expense.getDescription())
+                    .setStartDate(expense.getStartDate())
+                    .setDueDate(expense.getDueDate())
+                    .setBuilding(buildingToUpdate)
+                    .setManager(buildingToUpdate.getManager())
+                    .setApartment(apartmentToAddTax)
+                    .setExpense(expense);
+            buildingService.addNewTaxToBuilding(buildingToUpdate, newTaxToAdd);
+            apartmentService.addNewTaxToApartment(apartmentToAddTax, newTaxToAdd);
+            taxRepository.save(newTaxToAdd);
+            expenseTaxes.add(newTaxToAdd);
+        }
+        return expenseTaxes;
+    }
+
+    private static BigDecimal getTaxForEachApartment(ExpenseEntity expense, int apartmentsCount) {
+        return expense.getAmount()
+                .divide(BigDecimal.valueOf(apartmentsCount), RoundingMode.HALF_EVEN);
     }
 }
