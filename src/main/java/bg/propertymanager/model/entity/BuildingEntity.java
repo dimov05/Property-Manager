@@ -14,7 +14,6 @@ public class BuildingEntity {
     private int floors;
     private int elevators;
     private String imageUrl;
-    private BigDecimal balance;
     private BigDecimal taxPerPerson;
     private BigDecimal taxPerDog;
     private BigDecimal taxPerElevatorChip;
@@ -111,17 +110,6 @@ public class BuildingEntity {
         this.imageUrl = imageUrl;
         return this;
     }
-
-    @Column(name = "balance", nullable = false)
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public BuildingEntity setBalance(BigDecimal balance) {
-        this.balance = balance;
-        return this;
-    }
-
     @Column(name = "tax_per_person", nullable = false)
     public BigDecimal getTaxPerPerson() {
         return taxPerPerson;

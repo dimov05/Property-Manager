@@ -6,6 +6,7 @@ import bg.propertymanager.model.dto.apartment.ApartmentViewDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.service.ApartmentService;
 import bg.propertymanager.service.BuildingService;
+import bg.propertymanager.service.TaxService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,10 +24,12 @@ import javax.validation.Valid;
 public class ApartmentController {
     private final ApartmentService apartmentService;
     private final BuildingService buildingService;
+    private final TaxService taxService;
 
-    public ApartmentController(ApartmentService apartmentService, BuildingService buildingService) {
+    public ApartmentController(ApartmentService apartmentService, BuildingService buildingService, TaxService taxService) {
         this.apartmentService = apartmentService;
         this.buildingService = buildingService;
+        this.taxService = taxService;
     }
 
 
@@ -37,6 +40,7 @@ public class ApartmentController {
             model.addAttribute("apartmentAddDTO", new ApartmentAddDTO());
         }
         model.addAttribute("building", buildingService.findById(buildingId));
+        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         return "add-apartment";
     }
 
@@ -67,6 +71,7 @@ public class ApartmentController {
         ApartmentViewDTO apartmentView = apartmentService.findViewById(apartmentId);
         ModelAndView mav = new ModelAndView("edit-apartment");
         mav.addObject("building", buildingEdit);
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         mav.addObject("apartment", apartmentView);
         return mav;
     }
@@ -96,6 +101,7 @@ public class ApartmentController {
             model.addAttribute("apartmentAddDTO", new ApartmentAddDTO());
         }
         model.addAttribute("building", buildingService.findById(buildingId));
+        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         return "add-apartment-as-manager";
     }
 
@@ -126,6 +132,7 @@ public class ApartmentController {
         ApartmentViewDTO apartmentView = apartmentService.findViewById(apartmentId);
         ModelAndView mav = new ModelAndView("edit-apartment-as-manager");
         mav.addObject("building", buildingEdit);
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         mav.addObject("apartment", apartmentView);
         return mav;
     }

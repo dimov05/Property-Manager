@@ -6,6 +6,7 @@ import bg.propertymanager.model.dto.message.MessageEditDTO;
 import bg.propertymanager.model.entity.MessageEntity;
 import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.MessageService;
+import bg.propertymanager.service.TaxService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,10 +26,12 @@ import java.util.Set;
 public class MessageController {
     private final BuildingService buildingService;
     private final MessageService messageService;
+    private final TaxService taxService;
 
-    public MessageController(BuildingService buildingService, MessageService messageService) {
+    public MessageController(BuildingService buildingService, MessageService messageService, TaxService taxService) {
         this.buildingService = buildingService;
         this.messageService = messageService;
+        this.taxService = taxService;
     }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
@@ -38,6 +41,7 @@ public class MessageController {
         ModelAndView mav = new ModelAndView("view-messages-as-manager");
         BuildingViewDTO building = buildingService.findById(buildingId);
         mav.addObject("building", building);
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         Set<MessageEntity> messagesFromNeighbours = messageService.findAllNeighboursMessagesForBuildingSortedFromNewToOld(building);
         Set<MessageEntity> messagesFromManager = messageService.findAllManagersMessagesForBuildingSortedFromNewToOld(building);
         mav.addObject("messagesFromNeighbours", messagesFromNeighbours);
@@ -55,6 +59,7 @@ public class MessageController {
         Set<MessageEntity> myMessages = messageService.findAllManagersMessagesForBuildingSortedFromNewToOld(building);
         mav.addObject("messagesFromManager", myMessages);
         mav.addObject("building", building);
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
 
         return mav;
     }
@@ -66,6 +71,7 @@ public class MessageController {
             model.addAttribute("messageAddDTO", new MessageAddDTO());
         }
         model.addAttribute("building", buildingService.findById(buildingId));
+        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         return "add-message-as-manager";
     }
 
@@ -95,6 +101,7 @@ public class MessageController {
             model.addAttribute("messageEditDTO", new MessageEditDTO());
         }
         model.addAttribute("building", buildingService.findById(buildingId));
+        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         model.addAttribute("message", messageService.findById(messageId));
         return "edit-message-as-manager";
     }

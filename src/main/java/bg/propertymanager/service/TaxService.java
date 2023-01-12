@@ -1,6 +1,5 @@
 package bg.propertymanager.service;
 
-import bg.propertymanager.model.dto.apartment.ApartmentViewDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.dto.tax.TaxAddDTO;
 import bg.propertymanager.model.dto.tax.TaxEditDTO;
@@ -85,8 +84,8 @@ public class TaxService {
                 .setStartDate(taxEditDTO.getStartDate())
                 .setDueDate(taxEditDTO.getDueDate());
         if (taxIsPaid(taxToUpdate)) {
-            buildingService.updateBalanceAfterTaxIsPaid(taxToUpdate);
-            apartmentService.updateMoneyOwedAndPaidAfterTaxIsPaid(taxToUpdate);
+//            buildingService.updateBalanceAfterTaxIsPaid(taxToUpdate);
+//            apartmentService.updateMoneyOwedAndPaidAfterTaxIsPaid(taxToUpdate);
         }
 
     }
@@ -97,5 +96,15 @@ public class TaxService {
 
     private static boolean taxIsPaid(TaxEntity taxToUpdate) {
         return taxToUpdate.getTaxStatus().equals(TaxStatusEnum.PAID);
+    }
+
+    public BigDecimal calculateBuildingBalance(Long buildingId) {
+        BigDecimal paidTaxes = taxRepository.findBalanceByBuildingId(buildingId);
+        if(paidTaxes == null){
+            paidTaxes = new BigDecimal("0");
+        }
+        BigDecimal balance = new BigDecimal("0").add(paidTaxes);
+
+        return balance;
     }
 }

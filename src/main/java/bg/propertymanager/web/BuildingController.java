@@ -5,8 +5,8 @@ import bg.propertymanager.model.dto.building.BuildingChangeTaxesDTO;
 import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
-import bg.propertymanager.repository.BuildingRepository;
 import bg.propertymanager.service.BuildingService;
+import bg.propertymanager.service.TaxService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,14 +23,12 @@ import java.util.List;
 @Controller
 public class BuildingController {
     private final BuildingService buildingService;
-    private final BuildingRepository buildingRepository;
+    private final TaxService taxService;
 
-    public BuildingController(BuildingService buildingService,
-                              BuildingRepository buildingRepository) {
+    public BuildingController(BuildingService buildingService, TaxService taxService) {
         this.buildingService = buildingService;
-        this.buildingRepository = buildingRepository;
+        this.taxService = taxService;
     }
-
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/buildings")
@@ -71,6 +69,7 @@ public class BuildingController {
         BuildingViewDTO buildingViewDTO = buildingService.findById(id);
         ModelAndView mav = new ModelAndView("view-building");
         mav.addObject("building", buildingViewDTO);
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(id));
         return mav;
     }
 
@@ -83,6 +82,7 @@ public class BuildingController {
         BuildingViewDTO buildingEdit = buildingService.findById(id);
         ModelAndView mav = new ModelAndView("edit-building");
         mav.addObject("building", buildingEdit);
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(id));
         return mav;
     }
 
@@ -108,6 +108,7 @@ public class BuildingController {
         BuildingViewDTO buildingViewDTO = buildingService.findById(buildingId);
         ModelAndView mav = new ModelAndView("view-building-as-manager");
         mav.addObject("building", buildingViewDTO);
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         return mav;
     }
 
@@ -120,6 +121,7 @@ public class BuildingController {
         BuildingViewDTO buildingEdit = buildingService.findById(buildingId);
         ModelAndView mav = new ModelAndView("change-taxes");
         mav.addObject("building", buildingEdit);
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         return mav;
     }
 
@@ -141,11 +143,11 @@ public class BuildingController {
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/neighbours")
-    public ModelAndView viewNeighboursAsManager(@PathVariable("buildingId") Long buildingId,
-                                                Model model) {
-        ModelAndView mav = new ModelAndView("view-neighbours-as-manager");
+    public String viewNeighboursAsManager(@PathVariable("buildingId") Long buildingId,
+                                          Model model) {
         BuildingViewDTO building = buildingService.findById(buildingId);
-        mav.addObject("building", building);
-        return mav;
+        model.addAttribute("building", building);
+        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        return "view-neighbours-as-manager";
     }
 }

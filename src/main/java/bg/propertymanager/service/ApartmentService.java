@@ -43,9 +43,7 @@ public class ApartmentService {
                 .setDogsCount(apartmentAddDTO.getDogsCount())
                 .setOwner(ownerToAdd)
                 .setBuilding(buildingService.findEntityById(buildingId))
-                .setPeriodicTax(calculatePeriodicTax(apartmentAddDTO, building))
-                .setTotalMoneyPaid(BigDecimal.valueOf(0))
-                .setMoneyOwed(BigDecimal.valueOf(0));
+                .setPeriodicTax(calculatePeriodicTax(apartmentAddDTO, building));
         buildingService.addNeighbour(ownerToAdd, building);
         userService.addApartmentToUser(newApartment, ownerToAdd);
         apartmentRepository.save(newApartment);
@@ -139,7 +137,6 @@ public class ApartmentService {
 
     public void addNewTaxToApartment(ApartmentEntity apartmentToAddTax, TaxEntity taxToAdd) {
         apartmentToAddTax.getTaxes().add(taxToAdd);
-        apartmentToAddTax.setMoneyOwed(apartmentToAddTax.getMoneyOwed().add(taxToAdd.getAmount()));
         apartmentRepository.save(apartmentToAddTax);
     }
 }

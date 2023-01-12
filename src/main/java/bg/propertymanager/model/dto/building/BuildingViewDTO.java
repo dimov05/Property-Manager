@@ -14,7 +14,6 @@ public class BuildingViewDTO {
     private int floors;
     private int elevators;
     private String imageUrl;
-    private BigDecimal balance;
     private BigDecimal taxPerPerson;
     private BigDecimal taxPerDog;
     private BigDecimal taxPerElevatorChip;
@@ -75,16 +74,6 @@ public class BuildingViewDTO {
         this.imageUrl = imageUrl;
         return this;
     }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public BuildingViewDTO setBalance(BigDecimal balance) {
-        this.balance = balance;
-        return this;
-    }
-
     public BigDecimal getTaxPerPerson() {
         return taxPerPerson;
     }

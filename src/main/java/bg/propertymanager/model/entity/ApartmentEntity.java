@@ -15,8 +15,6 @@ public class ApartmentEntity {
     private int dogsCount;
     private int roommateCount;
     private BigDecimal periodicTax;
-    private BigDecimal moneyOwed;
-    private BigDecimal totalMoneyPaid;
     private BuildingEntity building;
     private UserEntity owner;
     private Set<TaxEntity> taxes;
@@ -102,26 +100,6 @@ public class ApartmentEntity {
 
     public ApartmentEntity setPeriodicTax(BigDecimal periodicTax) {
         this.periodicTax = periodicTax;
-        return this;
-    }
-
-    @Column(name = "money_owed")
-    public BigDecimal getMoneyOwed() {
-        return moneyOwed;
-    }
-
-    public ApartmentEntity setMoneyOwed(BigDecimal moneyOwed) {
-        this.moneyOwed = moneyOwed;
-        return this;
-    }
-
-    @Column(name = "total_paid_money")
-    public BigDecimal getTotalMoneyPaid() {
-        return totalMoneyPaid;
-    }
-
-    public ApartmentEntity setTotalMoneyPaid(BigDecimal totalMoneyPaid) {
-        this.totalMoneyPaid = totalMoneyPaid;
         return this;
     }
 

@@ -16,7 +16,6 @@ public class BuildingEditDTO {
     private int floors;
     private int elevators;
     private String imageUrl;
-    private BigDecimal balance;
     private BigDecimal taxPerPerson;
     private BigDecimal taxPerDog;
     private BigDecimal taxPerElevatorChip;
@@ -74,15 +73,6 @@ public class BuildingEditDTO {
 
     public BuildingEditDTO setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
-        return this;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public BuildingEditDTO setBalance(BigDecimal balance) {
-        this.balance = balance;
         return this;
     }
     @PositiveOrZero(message = "Tax per person must be positive or 0")

@@ -17,8 +17,6 @@ public class ApartmentEditDTO {
     private int dogsCount;
     private int roommateCount;
     private BigDecimal periodicTax;
-    private BigDecimal moneyOwed;
-    private BigDecimal totalMoneyPaid;
     private BuildingEntity building;
     private UserEntity owner;
 
@@ -119,24 +117,6 @@ public class ApartmentEditDTO {
 
     public ApartmentEditDTO setPeriodicTax(BigDecimal periodicTax) {
         this.periodicTax = periodicTax;
-        return this;
-    }
-
-    public BigDecimal getMoneyOwed() {
-        return moneyOwed;
-    }
-
-    public ApartmentEditDTO setMoneyOwed(BigDecimal moneyOwed) {
-        this.moneyOwed = moneyOwed;
-        return this;
-    }
-
-    public BigDecimal getTotalMoneyPaid() {
-        return totalMoneyPaid;
-    }
-
-    public ApartmentEditDTO setTotalMoneyPaid(BigDecimal totalMoneyPaid) {
-        this.totalMoneyPaid = totalMoneyPaid;
         return this;
     }
 }

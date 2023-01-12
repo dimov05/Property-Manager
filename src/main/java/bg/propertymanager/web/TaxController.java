@@ -40,6 +40,7 @@ public class TaxController {
         BuildingViewDTO building = buildingService.findById(buildingId);
         List<TaxViewDTO> allTaxes = taxService.findAllTaxes(building);
         model.addAttribute("building", building);
+        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         model.addAttribute("taxes", allTaxes);
         return "view-taxes-as-manager";
     }
@@ -51,6 +52,7 @@ public class TaxController {
             model.addAttribute("taxAddDTO", new TaxAddDTO().setSelectedApartments(new ArrayList<>()));
         }
         model.addAttribute("taxTypes", TaxTypeEnum.values());
+        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         model.addAttribute("building", buildingService.findById(buildingId));
         return "add-tax-as-manager";
     }
@@ -82,6 +84,7 @@ public class TaxController {
         TaxViewDTO taxView = taxService.findViewById(taxId);
         model.addAttribute("taxStatus", TaxStatusEnum.values());
         model.addAttribute("building", buildingEdit);
+        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         model.addAttribute("tax", taxView);
         return "edit-tax-as-manager";
     }

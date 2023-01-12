@@ -69,20 +69,6 @@
                         <hr>
                         <div class="row">
                             <div class="col-sm-3">
-                                <p class="mb-0">Balance</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <input type="text"
-                                       id="balance"
-                                       th:field="${building.balance}"
-                                       th:placeholder="*{balance}">
-                                <p th:errors="*{balance}" class="text-danger"
-                                   th:if="${#fields.hasErrors('balance')}"></p>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-sm-3">
                                 <p class="mb-0">Tax per Person</p>
                             </div>
                             <div class="col-sm-9">
