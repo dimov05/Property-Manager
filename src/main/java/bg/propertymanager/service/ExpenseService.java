@@ -2,21 +2,21 @@ package bg.propertymanager.service;
 
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.dto.expense.ExpenseAddDTO;
+import bg.propertymanager.model.dto.expense.ExpenseEditDTO;
 import bg.propertymanager.model.dto.expense.ExpenseViewDTO;
-import bg.propertymanager.model.entity.ApartmentEntity;
 import bg.propertymanager.model.entity.BuildingEntity;
 import bg.propertymanager.model.entity.ExpenseEntity;
 import bg.propertymanager.model.entity.TaxEntity;
 import bg.propertymanager.model.enums.TaxStatusEnum;
 import bg.propertymanager.repository.ExpenseRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,7 +30,7 @@ public class ExpenseService {
     private final ApartmentService apartmentService;
     private final TaxService taxService;
 
-    public ExpenseService(ExpenseRepository expenseRepository, ModelMapper modelMapper, BuildingService buildingService, ApartmentService apartmentService, TaxService taxService) {
+    public ExpenseService(ExpenseRepository expenseRepository, ModelMapper modelMapper, BuildingService buildingService, ApartmentService apartmentService,@Lazy TaxService taxService) {
         this.expenseRepository = expenseRepository;
         this.modelMapper = modelMapper;
         this.buildingService = buildingService;
@@ -59,15 +59,50 @@ public class ExpenseService {
                 .setBuilding(buildingToUpdate)
                 .setTaxes(Collections.emptySet());
         expenseRepository.save(newExpenseToAdd);
-        Set<TaxEntity> expenseTaxes = taxService.addTaxForEachApartment(expenseAddDTO.getSelectedApartments(),buildingToUpdate,newExpenseToAdd);
+        Set<TaxEntity> expenseTaxes = taxService.addTaxForEachApartment(expenseAddDTO.getSelectedApartments(), buildingToUpdate, newExpenseToAdd);
 
         newExpenseToAdd.setTaxes(expenseTaxes);
-        
+
         expenseRepository.save(newExpenseToAdd);
     }
 
     private static BigDecimal getTaxForEachApartment(ExpenseAddDTO expenseAddDTO) {
         return expenseAddDTO.getAmount()
                 .divide(BigDecimal.valueOf(expenseAddDTO.getSelectedApartments().size()), RoundingMode.HALF_EVEN);
+    }
+
+    public ExpenseViewDTO findViewById(Long expenseId) {
+        return expenseRepository
+                .findById(expenseId)
+                .map(expense -> modelMapper.map(expense, ExpenseViewDTO.class))
+                .orElseThrow(() -> new NullPointerException("There is no expense with this Id " + expenseId));
+    }
+
+    public void updateExpenseStatus(ExpenseEditDTO expenseEditDTO) {
+        ExpenseEntity expenseToUpdate = expenseRepository
+                .findById(expenseEditDTO.getId())
+                .orElseThrow(() -> new NullPointerException("No expense is existing with id " + expenseEditDTO.getId()));
+
+
+        expenseToUpdate
+                .setTaxStatus(expenseEditDTO.getTaxStatus());
+        expenseRepository.save(expenseToUpdate);
+    }
+
+    public boolean deleteExpenseWithId(Long expenseId) {
+        ExpenseEntity expenseToDelete = findById(expenseId);
+        Boolean existingPaidTaxesToExpense = taxService.findIfPaidTaxesExistToExpenseById(expenseId);
+        if (existingPaidTaxesToExpense) {
+            return false;
+        } else {
+            taxService.deleteAllTaxesAttachedToExpense(expenseToDelete);
+            expenseRepository.delete(expenseToDelete);
+            return true;
+        }
+    }
+
+    public ExpenseEntity findById(Long expenseId) {
+        return expenseRepository.findById(expenseId)
+                .orElseThrow(() -> new NullPointerException("No expense is existing with id " + expenseId));
     }
 }

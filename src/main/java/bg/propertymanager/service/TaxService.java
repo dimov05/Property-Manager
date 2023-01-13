@@ -1,8 +1,6 @@
 package bg.propertymanager.service;
 
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
-import bg.propertymanager.model.dto.expense.ExpenseAddDTO;
-import bg.propertymanager.model.dto.tax.TaxAddDTO;
 import bg.propertymanager.model.dto.tax.TaxEditDTO;
 import bg.propertymanager.model.dto.tax.TaxViewDTO;
 import bg.propertymanager.model.entity.ApartmentEntity;
@@ -10,6 +8,7 @@ import bg.propertymanager.model.entity.BuildingEntity;
 import bg.propertymanager.model.entity.ExpenseEntity;
 import bg.propertymanager.model.entity.TaxEntity;
 import bg.propertymanager.model.enums.TaxStatusEnum;
+import bg.propertymanager.repository.ExpenseRepository;
 import bg.propertymanager.repository.TaxRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -29,12 +28,17 @@ public class TaxService {
     private final ModelMapper modelMapper;
     private final BuildingService buildingService;
     private final ApartmentService apartmentService;
+    private final ExpenseRepository expenseRepository;
+    private final ExpenseService expenseService;
 
-    public TaxService(TaxRepository taxRepository, ModelMapper modelMapper, BuildingService buildingService, ApartmentService apartmentService) {
+    public TaxService(TaxRepository taxRepository, ModelMapper modelMapper, BuildingService buildingService, ApartmentService apartmentService,
+                      ExpenseRepository expenseRepository, ExpenseService expenseService) {
         this.taxRepository = taxRepository;
         this.modelMapper = modelMapper;
         this.buildingService = buildingService;
         this.apartmentService = apartmentService;
+        this.expenseRepository = expenseRepository;
+        this.expenseService = expenseService;
     }
 
     public List<TaxViewDTO> findAllTaxes(BuildingViewDTO building) {
@@ -52,25 +56,18 @@ public class TaxService {
                 .orElseThrow(() -> new NullPointerException("No tax is existing with id " + taxId));
     }
 
-    public void updateTax(TaxEditDTO taxEditDTO) {
+    public void updateTaxStatus(TaxEditDTO taxEditDTO) {
         TaxEntity taxToUpdate = taxRepository
                 .findById(taxEditDTO.getId())
                 .orElseThrow(() -> new NullPointerException("No tax is existing with id " + taxEditDTO.getId()));
 
 
         taxToUpdate
-                .setAmount(taxEditDTO.getAmount())
-                .setTaxStatus(taxEditDTO.getTaxStatus())
-                .setStartDate(taxEditDTO.getStartDate())
-                .setDueDate(taxEditDTO.getDueDate());
-        if (taxIsPaid(taxToUpdate)) {
-//            buildingService.updateBalanceAfterTaxIsPaid(taxToUpdate);
-//            apartmentService.updateMoneyOwedAndPaidAfterTaxIsPaid(taxToUpdate);
-        }
-
+                .setTaxStatus(taxEditDTO.getTaxStatus());
+        taxRepository.save(taxToUpdate);
     }
 
-    public void deleteTaxWithId(Long taxId, Long buildingId) {
+    public void deleteTaxWithId(Long taxId) {
         //TODO: implement logic
     }
 
@@ -79,13 +76,14 @@ public class TaxService {
     }
 
     public BigDecimal calculateBuildingBalance(Long buildingId) {
-        BigDecimal paidTaxes = taxRepository.findBalanceByBuildingId(buildingId);
-        if (paidTaxes == null) {
-            paidTaxes = new BigDecimal("0");
-        }
-        BigDecimal balance = new BigDecimal("0").add(paidTaxes);
+        BigDecimal paidTaxes = taxRepository
+                .findAmountOfPaidTaxesByBuildingId(buildingId)
+                .orElse(BigDecimal.ZERO);
+        BigDecimal paidExpenses = expenseRepository
+                .findAmountOfPaidExpensesByBuildingId(buildingId)
+                .orElse(BigDecimal.ZERO);
 
-        return balance;
+        return paidTaxes.subtract(paidExpenses);
     }
 
     public BigDecimal findOwedMoney(Long apartmentId) {
@@ -129,5 +127,17 @@ public class TaxService {
     private static BigDecimal getTaxForEachApartment(ExpenseEntity expense, int apartmentsCount) {
         return expense.getAmount()
                 .divide(BigDecimal.valueOf(apartmentsCount), RoundingMode.HALF_EVEN);
+    }
+
+    public Boolean findIfPaidTaxesExistToExpenseById(Long expenseId) {
+        return taxRepository.existsByTaxStatusPaidAndExpenseId(expenseId);
+    }
+
+    public void deleteAllTaxesAttachedToExpense(ExpenseEntity expenseToDelete) {
+        for (TaxEntity tax : expenseToDelete.getTaxes()) {
+            apartmentService.deleteTaxFromApartment(tax);
+            buildingService.deleteTaxFromBuilding(tax);
+            taxRepository.delete(tax);
+        }
     }
 }
