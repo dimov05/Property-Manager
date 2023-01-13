@@ -139,4 +139,10 @@ public class ApartmentService {
         apartmentToAddTax.getTaxes().add(taxToAdd);
         apartmentRepository.save(apartmentToAddTax);
     }
+
+    public void deleteTaxFromApartment(TaxEntity tax) {
+        ApartmentEntity apartment = tax.getApartment();
+        apartment.getTaxes().remove(tax);
+        apartmentRepository.save(apartment);
+    }
 }

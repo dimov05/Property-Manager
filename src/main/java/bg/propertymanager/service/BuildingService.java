@@ -7,6 +7,7 @@ import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.entity.*;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
 import bg.propertymanager.repository.BuildingRepository;
+import bg.propertymanager.repository.TaxRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -163,5 +164,11 @@ public class BuildingService {
     public void addNewTaxToBuilding(BuildingEntity buildingToAddTax, TaxEntity taxToAdd) {
         buildingToAddTax.getTaxes().add(taxToAdd);
         buildingRepository.save(buildingToAddTax);
+    }
+
+    public void deleteTaxFromBuilding(TaxEntity tax) {
+        BuildingEntity building = tax.getBuilding();
+        building.getTaxes().remove(tax);
+        buildingRepository.save(building);
     }
 }
