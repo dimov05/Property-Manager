@@ -11,10 +11,7 @@ import java.time.LocalDateTime;
 
 public class TaxEditDTO {
     private Long id;
-    private BigDecimal amount;
     private TaxStatusEnum taxStatus;
-    private LocalDateTime startDate;
-    private LocalDateTime dueDate;
 
     public TaxEditDTO() {
     }
@@ -28,44 +25,12 @@ public class TaxEditDTO {
         return this;
     }
 
-    @DecimalMin("0")
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
-    public TaxEditDTO setAmount(BigDecimal amount) {
-        this.amount = amount;
-        return this;
-    }
-
     public TaxStatusEnum getTaxStatus() {
         return taxStatus;
     }
 
     public TaxEditDTO setTaxStatus(TaxStatusEnum taxStatus) {
         this.taxStatus = taxStatus;
-        return this;
-    }
-
-    @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-    public LocalDateTime getStartDate() {
-        return startDate;
-    }
-
-    public TaxEditDTO setStartDate(LocalDateTime startDate) {
-        this.startDate = startDate;
-        return this;
-    }
-
-    @NotNull
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
-    public LocalDateTime getDueDate() {
-        return dueDate;
-    }
-
-    public TaxEditDTO setDueDate(LocalDateTime dueDate) {
-        this.dueDate = dueDate;
         return this;
     }
 }
