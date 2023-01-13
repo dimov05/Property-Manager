@@ -62,7 +62,7 @@
                         <thead>
                         <tr>
                             <th scope="col">Apart. №</th>
-                            <th scope="col">Owner</th>
+                            <th scope="col">Description</th>
                             <th scope="col">Amount</th>
                             <th scope="col">Tax type</th>
                             <th scope="col">Due date</th>
@@ -73,7 +73,7 @@
                         <tbody>
                         <tr th:each="tax: ${taxes}">
                             <td th:text="${tax.apartment.apartmentNumber}"></td>
-                            <td th:text="${tax.owner.fullName}"></td>
+                            <td th:text="${tax.description}"></td>
                             <td th:text="${tax.amount} + 'lv.'"></td>
                             <td th:text="${tax.taxType.name()}"></td>
                             <td th:text="${tax.dueDate.dayOfMonth} + ' ' + ${tax.dueDate.month} + ' ' + ${tax.dueDate.year}"></td>

@@ -26,20 +26,6 @@
                           th:action="@{/manager/buildings/{buildingId}/tax/{taxId}
                                                         (buildingId = ${building.id},taxId = ${tax.id})}"
                           th:method="POST">
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <p class="mb-0">Tax amount</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <input type="text"
-                                       id="amount"
-                                       th:field="${tax.amount}"
-                                       th:placeholder="*{amount}">
-                                <p th:errors="*{amount}" class="text-danger"
-                                   th:if="${#fields.hasErrors('amount')}"></p>
-                            </div>
-                        </div>
-                        <hr>
                         <div class="row align-content-center">
                             <div class="col-sm-3">
                                 <p class="mb-0">Tax status</p>
@@ -61,34 +47,6 @@
                                 </select>
                             </div>
                         </div>
-                        <hr>
-                        <div class="row align-content-center">
-                            <div class="col-sm-3">
-                                <p class="mb-0">Start date</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <input th:field="*{startDate}"
-                                       th:text="${tax.startDate}"
-                                       id="startDate" name="startDate"
-                                       type="datetime-local"
-                                       class="form-control col-xl-9 col-lg-8 col-md-8 col-sm-7"
-                                       data-large-mode="true"/>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row align-content-center">
-                            <div class="col-sm-3">
-                                <p class="mb-0">Due date</p>
-                            </div>
-                            <div class="col-sm-9">
-                                <input th:field="*{dueDate}"
-                                       th:text="${tax.dueDate}"
-                                       id="dueDate" name="dueDate"
-                                       type="datetime-local"
-                                       class="form-control col-xl-9 col-lg-8 col-md-8 col-sm-7"
-                                       data-large-mode="true"/>
-                            </div>
-                        </div>
                         <div class="text-center">
                             <div class="form-group form-button align-content-center">
                                 <input type="submit" name="save" id="save" class="form-submit"
@@ -97,21 +55,8 @@
                         </div>
                     </form>
                 </div>
-                <div class="text-center">
-                    <div class="form-group form-button align-content-center">
-                        <form th:action="@{/manager/buildings/{buildingId}/delete-tax/{taxId}
-                                                        (buildingId = ${building.id},taxId = ${tax.id})}"
-                              th:method="delete">
-                            <input
-                                    type="submit" name="delete" id="delete" class="form-submit"
-                                    value="Delete apartment"/></form>
-                    </div>
-                </div>
             </div>
-
         </div>
-    </div>
-    </div>
     </div>
 </section>
 </body>
