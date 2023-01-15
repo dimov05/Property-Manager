@@ -121,6 +121,7 @@ public class BuildingService {
 
     public void removeNeighbour(UserEntity owner, BuildingEntity building) {
         building.getNeighbours().remove(owner);
+        //TODO: check if neighbour has another apartment
         buildingRepository.save(building);
     }
 

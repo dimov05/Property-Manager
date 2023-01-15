@@ -23,12 +23,14 @@ public class ApartmentService {
     private final UserService userService;
     private final BuildingService buildingService;
     private final ModelMapper modelMapper;
+    private final TaxService taxService;
 
-    public ApartmentService(ApartmentRepository apartmentRepository, UserService userService, @Lazy BuildingService buildingService, ModelMapper modelMapper) {
+    public ApartmentService(ApartmentRepository apartmentRepository, UserService userService, @Lazy BuildingService buildingService, ModelMapper modelMapper, @Lazy TaxService taxService) {
         this.apartmentRepository = apartmentRepository;
         this.userService = userService;
         this.buildingService = buildingService;
         this.modelMapper = modelMapper;
+        this.taxService = taxService;
     }
 
     public void addApartment(ApartmentAddDTO apartmentAddDTO, Long buildingId) {
@@ -50,7 +52,6 @@ public class ApartmentService {
     }
 
     public void updateApartment(ApartmentEditDTO apartmentEditDTO) {
-        //TODO
         ApartmentEntity apartmentToUpdate = findById(apartmentEditDTO.getId());
         UserEntity ownerToRemove = apartmentToUpdate.getOwner();
         UserEntity ownerToAdd = userService.findById(apartmentEditDTO.getOwner().getId());
@@ -89,6 +90,8 @@ public class ApartmentService {
 
         userService.removeApartmentFromUser(apartmentToRemove, ownerToRemove);
         userService.removeBuildingFromUser(ownerToRemove, building);
+
+        taxService.setApartmentToNullWhenDeleting(apartmentToRemove);
 
         apartmentRepository.delete(apartmentToRemove);
     }

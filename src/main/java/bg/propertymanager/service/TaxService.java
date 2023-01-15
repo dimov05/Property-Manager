@@ -67,10 +67,6 @@ public class TaxService {
         taxRepository.save(taxToUpdate);
     }
 
-    public void deleteTaxWithId(Long taxId) {
-        //TODO: implement logic
-    }
-
     private static boolean taxIsPaid(TaxEntity taxToUpdate) {
         return taxToUpdate.getTaxStatus().equals(TaxStatusEnum.PAID);
     }
@@ -138,6 +134,15 @@ public class TaxService {
             apartmentService.deleteTaxFromApartment(tax);
             buildingService.deleteTaxFromBuilding(tax);
             taxRepository.delete(tax);
+        }
+    }
+
+    public void setApartmentToNullWhenDeleting(ApartmentEntity apartmentToRemove) {
+        Set<TaxEntity> taxesOfApartment = taxRepository
+                .findAllByApartment_Id(apartmentToRemove.getId());
+        for (TaxEntity tax : taxesOfApartment) {
+            tax.setApartment(null);
+            taxRepository.save(tax);
         }
     }
 }

@@ -24,4 +24,6 @@ public interface TaxRepository extends JpaRepository<TaxEntity, Long> {
     @Query("SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END FROM TaxEntity t " +
             "WHERE t.taxStatus = 'PAID' AND t.expense.id = :expenseId")
     Boolean existsByTaxStatusPaidAndExpenseId(@Param("expenseId") Long expenseId);
+
+    Set<TaxEntity> findAllByApartment_Id(Long apartmentId);
 }

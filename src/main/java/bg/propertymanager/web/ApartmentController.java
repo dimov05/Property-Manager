@@ -162,13 +162,4 @@ public class ApartmentController {
         apartmentService.deleteApartmentWithId(apartmentId, buildingId);
         return "redirect:/manager/buildings/view/" + buildingId;
     }
-
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @DeleteMapping("/admin/buildings/{buildingId}/delete-apartment/{apartmentId}")
-    public String deleteApartmentConfirm(@PathVariable("buildingId") Long buildingId,
-                                         @PathVariable("apartmentId") Long apartmentId) {
-        apartmentService.deleteApartmentWithId(apartmentId, buildingId);
-        return "redirect:/manager/buildings/view/" + buildingId;
-    }
-
 }

@@ -72,7 +72,14 @@
                         </thead>
                         <tbody>
                         <tr th:each="tax: ${taxes}">
-                            <td th:text="${tax.apartment.apartmentNumber}"></td>
+                            <td>
+                                <th:block th:if="${tax.apartment == null}" th:text="'Null apartment'">
+
+                                </th:block>
+                                <th:block th:if="${tax.apartment != null}">
+                                    <div th:text="${tax.apartment.apartmentNumber}"></div>
+                                </th:block>
+                            </td>
                             <td th:text="${tax.description}"></td>
                             <td th:text="${tax.amount} + 'lv.'"></td>
                             <td th:text="${tax.taxType.name()}"></td>
