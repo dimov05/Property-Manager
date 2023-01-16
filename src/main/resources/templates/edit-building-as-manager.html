@@ -55,7 +55,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-8">
+            <div class="col-lg-9">
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="row">
@@ -116,7 +116,7 @@
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr th:each="apartment: ${building.apartments}" th:object="${apartment}">
+                                        <tr th:each="apartment: ${apartmentsList}" th:object="${apartment}">
                                             <td th:text="*{apartmentNumber}"></td>
                                             <td th:text="*{floor}"></td>
                                             <td th:text="*{area} + 'm2'"></td>

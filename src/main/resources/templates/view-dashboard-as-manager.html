@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:include="~{fragment/navbar-manager-building}"></th:block>
+<body>
+<section style="background-color: #eee;">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <img th:src="${building.imageUrl}"
+                             alt="avatar"
+                             class="img-fluid mx-auto" style="width: 150px;">
+                        <h5 class="my-3" th:text="${building.name}"></h5>
+                        <p class="text-muted mb-1"
+                           th:text="${building.street} + ', ' + ${building.city} + ', ' + ${building.country}">
+                            Address</p>
+                        <p class="text-muted">Manager:</p>
+                        <p class="text-muted mb-4"
+                           th:text="${building.manager.fullName} + ', ' + ${building.manager.phoneNumber}"></p>
+                    </div>
+                </div>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-9">
+                                <p class="mb-0">Building's money balance:</p>
+                            </div>
+                            <div class="col-sm-3 text-center">
+                                <p class="text-muted mb-0" th:text="${buildingBalance} + 'lv.'"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-9">
+                                <p class="mb-0">Collected taxes:</p>
+                            </div>
+                            <div class="col-sm-3 text-center">
+                                <p class="text-muted mb-0" th:text="${totalCollectedTaxes} + 'lv.'"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-9">
+                                <p class="mb-0">Uncollected taxes:</p>
+                            </div>
+                            <div class="col-sm-3 text-center">
+                                <p class="text-muted mb-0" th:text="${totalUncollectedTaxes} + 'lv.'"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-9">
+                                <p class="mb-0">Total paid expenses:</p>
+                            </div>
+                            <div class="col-sm-3 text-center">
+                                <p class="text-muted mb-0" th:text="${totalPaidExpenses} + 'lv.'"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-9">
+                                <p class="mb-0">Total unpaid expenses:</p>
+                            </div>
+                            <div class="col-sm-3 text-center">
+                                <p class="text-muted mb-0" th:text="${totalUnpaidExpenses} + 'lv.'"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-4">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row"><span style="font-size: 22px;text-align: center;margin-bottom: 9px">Information about Building</span>
+                            <div class="col-sm-8">
+                                <p class="mb-0">Floors count:</p>
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <p class="text-muted mb-0" th:text="${building.floors}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <p class="mb-0">Apartments count:</p>
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <p class="text-muted mb-0" th:text="${building.apartments.size()}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <p class="mb-0">Elevators count:</p>
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <p class="text-muted mb-0" th:text="${building.elevators}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <p class="mb-0">Apartment owners count:</p>
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <p class="text-muted mb-0" th:text="${building.neighbours.size()}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <p class="mb-0">Neighbours total count:</p>
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <p class="text-muted mb-0" th:text="${totalNeighbours}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <p class="mb-0">Dogs total count:</p>
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <p class="text-muted mb-0" th:text="${totalDogs}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <p class="mb-0">Elevator chips total count:</p>
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <p class="text-muted mb-0" th:text="${totalElevatorChips}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <p class="mb-0">Date of registration</p>
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <p class="text-muted mb-0" th:text="${building.registrationDate}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <p class="mb-0">Last message from manager</p>
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <p class="text-muted mb-0" th:text="${dateOfLastMessageFromManager}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row"><span style="font-size: 22px;text-align: center;margin-bottom: 9px">Information about building's taxes</span>
+                            <div class="col-sm-8">
+                                <p class="mb-0">Total amount of monthly periodic taxes</p>
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <p class="text-muted mb-0" th:text="${totalMonthlyPeriodicTaxes} + 'lv.'"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <p class="mb-0">Tax per Person:</p>
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <p class="text-muted mb-0" th:text="${building.taxPerPerson}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <p class="mb-0">Tax per Dog:</p>
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <p class="text-muted mb-0" th:text="${building.taxPerDog}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <p class="mb-0">Tax per elevator chip:</p>
+                            </div>
+                            <div class="col-sm-4 text-center">
+                                <p class="text-muted mb-0" th:text="${building.taxPerElevatorChip}"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row"><span style="font-size: 22px;text-align: center">The 5 mostly indebted apartments</span>
+                    <div class="table-responsive">
+                        <table class="table project-list-table table-nowrap align-middle table-borderless">
+                            <thead>
+                            <tr>
+                                <th scope="col">Apartment №</th>
+                                <th scope="col">Total owed money</th>
+                                <th scope="col">Owner</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="apartment: ${building.apartments}" th:object="${apartment}">
+                                <td th:text="*{apartmentNumber}"></td>
+                                <td th:text="${@taxService.findOwedMoney(apartment.id)} + 'lv.'"></td>
+                                <td th:text="*{owner.fullName}"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
