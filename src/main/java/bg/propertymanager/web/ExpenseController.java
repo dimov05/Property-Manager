@@ -4,9 +4,6 @@ import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.dto.expense.ExpenseAddDTO;
 import bg.propertymanager.model.dto.expense.ExpenseEditDTO;
 import bg.propertymanager.model.dto.expense.ExpenseViewDTO;
-import bg.propertymanager.model.dto.tax.TaxEditDTO;
-import bg.propertymanager.model.dto.tax.TaxViewDTO;
-import bg.propertymanager.model.entity.ExpenseEntity;
 import bg.propertymanager.model.enums.TaxStatusEnum;
 import bg.propertymanager.model.enums.TaxTypeEnum;
 import bg.propertymanager.service.BuildingService;
@@ -26,7 +23,6 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Controller
 public class ExpenseController {

@@ -24,7 +24,7 @@
                         <p class="text-uppercase">Log as Manager</p>
                         <div class="d-flex justify-content-center mb-2">
                             <a class="nav-item active mx-auto"
-                               th:href="@{/manager/buildings/view/{buildingId}(buildingId = ${building.id})}">Manage
+                               th:href="@{/manager/buildings/{buildingId}/dashboard(buildingId = ${building.id})}">Manage
                                 Building</a>
                         </div>
                     </div>
@@ -47,7 +47,7 @@
                         <p class="text-uppercase">Log as neighbour</p>
                         <div class="d-flex justify-content-center mb-2">
                             <a class="nav-item active mx-auto"
-                               th:href="@{/admin/buildings/view/{id}/add-apartment(id = ${building.id})}">Visit
+                               th:href="@{/neighbour/buildings/{id}/dashboard(id = ${building.id})}">Visit
                                 Building</a>
                         </div>
                     </div>
