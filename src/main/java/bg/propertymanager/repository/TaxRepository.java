@@ -15,11 +15,16 @@ import java.util.Set;
 public interface TaxRepository extends JpaRepository<TaxEntity, Long> {
     Set<TaxEntity> findAllByBuilding_Id(Long buildingId);
 
-    @Query("SELECT SUM(t.amount)  FROM TaxEntity as t WHERE t.building.id = :buildingId AND t.taxStatus = 'PAID'")
+    @Query("SELECT SUM(t.amount)  FROM TaxEntity as t " +
+            "WHERE t.building.id = :buildingId AND t.taxStatus = 'PAID'")
     Optional<BigDecimal> findAmountOfPaidTaxesByBuildingId(@Param("buildingId") Long buildingId);
+    @Query("SELECT SUM(t.amount)  FROM TaxEntity as t " +
+            "WHERE t.building.id = :buildingId AND t.taxStatus = 'UNPAID' OR t.taxStatus = 'UNCONFIRMED'")
+    Optional<BigDecimal> findAmountOfUnpaidTaxesByBuildingId(@Param("buildingId") Long buildingId);
 
-    @Query("SELECT SUM(t.amount) FROM TaxEntity  as t WHERE t.apartment.id = :apartmentId AND t.taxStatus = 'UNPAID'")
-    BigDecimal findOwedMoneyByApartmentId(@Param("apartmentId") Long apartmentId);
+    @Query("SELECT SUM(t.amount) FROM TaxEntity  as t " +
+            "WHERE t.apartment.id = :apartmentId AND t.taxStatus = 'UNPAID' OR t.taxStatus = 'UNCONFIRMED'")
+    Optional<BigDecimal> findOwedMoneyByApartmentId(@Param("apartmentId") Long apartmentId);
 
     @Query("SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END FROM TaxEntity t " +
             "WHERE t.taxStatus = 'PAID' AND t.expense.id = :expenseId")

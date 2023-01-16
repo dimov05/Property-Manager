@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -147,5 +148,32 @@ public class ApartmentService {
         ApartmentEntity apartment = tax.getApartment();
         apartment.getTaxes().remove(tax);
         apartmentRepository.save(apartment);
+    }
+
+    public BigDecimal calculateTotalMonthlyPeriodicTaxesByBuildingId(Long buildingId) {
+        return apartmentRepository.findAmountOfMonthlyPeriodicTaxes(buildingId)
+                .orElse(BigDecimal.ZERO);
+    }
+
+    public Integer findTotalCountOfNeighboursInBuilding(Long buildingId) {
+        return apartmentRepository
+                .findTotalCountOfNeighboursByBuildingId(buildingId)
+                .orElse(0);
+    }
+
+    public Integer findTotalCountOfDogsByBuildingId(Long buildingId) {
+        return apartmentRepository
+                .findTotalCountOfDogsByBuildingId(buildingId)
+                .orElse(0);
+    }
+
+    public Integer findTotalCountOfElevatorChipsByBuildingId(Long buildingId) {
+        return apartmentRepository
+                .findTotalCountOfElevatorChipsByBuildingId(buildingId)
+                .orElse(0);
+    }
+
+    public List<ApartmentEntity> findAllApartmentsByBuildingId(Long buildingId) {
+        return apartmentRepository.findAllByBuilding_IdOrderById(buildingId);
     }
 }

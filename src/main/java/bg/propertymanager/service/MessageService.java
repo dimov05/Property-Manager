@@ -79,4 +79,21 @@ public class MessageService {
 
         messageRepository.delete(messageToRemove);
     }
+
+    public String findDateOfLastMessageFromManagerByBuilding(BuildingViewDTO building) {
+        LocalDateTime dateOfLastMessageFromManager = messageRepository
+                .findDateOfLastMessageFromManagerByBuildingId(building.getId(), building.getManager().getId());
+        if (dateOfLastMessageFromManager == null) {
+            return "No messages";
+        } else {
+            StringBuilder date = new StringBuilder();
+            date
+                    .append(dateOfLastMessageFromManager.getYear())
+                    .append("-")
+                    .append(dateOfLastMessageFromManager.getMonthValue())
+                    .append("-")
+                    .append(dateOfLastMessageFromManager.getDayOfMonth());
+            return date.toString();
+        }
+    }
 }

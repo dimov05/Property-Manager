@@ -30,7 +30,7 @@ public class ExpenseService {
     private final ApartmentService apartmentService;
     private final TaxService taxService;
 
-    public ExpenseService(ExpenseRepository expenseRepository, ModelMapper modelMapper, BuildingService buildingService, ApartmentService apartmentService,@Lazy TaxService taxService) {
+    public ExpenseService(ExpenseRepository expenseRepository, ModelMapper modelMapper, BuildingService buildingService, ApartmentService apartmentService, @Lazy TaxService taxService) {
         this.expenseRepository = expenseRepository;
         this.modelMapper = modelMapper;
         this.buildingService = buildingService;
@@ -104,5 +104,17 @@ public class ExpenseService {
     public ExpenseEntity findById(Long expenseId) {
         return expenseRepository.findById(expenseId)
                 .orElseThrow(() -> new NullPointerException("No expense is existing with id " + expenseId));
+    }
+
+    public BigDecimal findAmountOfAllPaidExpensesByBuildingId(Long buildingId) {
+        return expenseRepository
+                .findAmountOfPaidExpensesByBuildingId(buildingId)
+                .orElse(BigDecimal.ZERO);
+    }
+
+    public BigDecimal findAmountOfAllUnpaidExpensesByBuildingId(Long buildingId) {
+        return expenseRepository
+                .findAmountOfUnpaidExpensesByBuildingId(buildingId)
+                .orElse(BigDecimal.ZERO);
     }
 }
