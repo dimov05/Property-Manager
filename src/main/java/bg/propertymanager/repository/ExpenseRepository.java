@@ -12,6 +12,11 @@ import java.util.Set;
 @Repository
 public interface ExpenseRepository extends JpaRepository<ExpenseEntity, Long> {
     Set<ExpenseEntity> findAllByBuilding_Id(Long buildingId);
+
     @Query("SELECT SUM(e.amount)  FROM ExpenseEntity as e WHERE e.building.id = :buildingId AND e.taxStatus = 'PAID'")
     Optional<BigDecimal> findAmountOfPaidExpensesByBuildingId(Long buildingId);
+
+    @Query("SELECT SUM(e.amount)  FROM ExpenseEntity as e " +
+            "WHERE e.building.id = :buildingId AND e.taxStatus = 'UNPAID' OR e.taxStatus = 'UNCONFIRMED'")
+    Optional<BigDecimal> findAmountOfUnpaidExpensesByBuildingId(Long buildingId);
 }
