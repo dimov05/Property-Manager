@@ -5,6 +5,7 @@ import bg.propertymanager.model.dto.building.BuildingChangeTaxesDTO;
 import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
+import bg.propertymanager.service.ApartmentService;
 import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.TaxService;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,10 +25,12 @@ import java.util.List;
 public class BuildingController {
     private final BuildingService buildingService;
     private final TaxService taxService;
+    private final ApartmentService apartmentService;
 
-    public BuildingController(BuildingService buildingService, TaxService taxService) {
+    public BuildingController(BuildingService buildingService, TaxService taxService, ApartmentService apartmentService) {
         this.buildingService = buildingService;
         this.taxService = taxService;
+        this.apartmentService = apartmentService;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -103,12 +106,13 @@ public class BuildingController {
     }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
-    @GetMapping("/manager/buildings/view/{buildingId}")
-    public ModelAndView viewBuildingAsManager(@PathVariable("buildingId") Long buildingId) {
+    @GetMapping("/manager/buildings/edit/{buildingId}")
+    public ModelAndView editBuildingAsManager(@PathVariable("buildingId") Long buildingId) {
         BuildingViewDTO buildingViewDTO = buildingService.findById(buildingId);
-        ModelAndView mav = new ModelAndView("view-building-as-manager");
+        ModelAndView mav = new ModelAndView("edit-building-as-manager");
         mav.addObject("building", buildingViewDTO);
         mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        mav.addObject("apartmentsList", apartmentService.findAllApartmentsByBuildingId(buildingId));
         return mav;
     }
 

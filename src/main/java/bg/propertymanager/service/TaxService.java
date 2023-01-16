@@ -83,11 +83,10 @@ public class TaxService {
     }
 
     public BigDecimal findOwedMoney(Long apartmentId) {
-        BigDecimal owedMoney = taxRepository.findOwedMoneyByApartmentId(apartmentId);
-        if (owedMoney == null) {
-            owedMoney = new BigDecimal("0");
-        }
-        return owedMoney;
+        return taxRepository
+                .findOwedMoneyByApartmentId(apartmentId)
+                .orElse(BigDecimal.ZERO);
+
     }
 
     public void save(TaxEntity newTaxToAdd) {
@@ -122,7 +121,7 @@ public class TaxService {
 
     private static BigDecimal getTaxForEachApartment(ExpenseEntity expense, int apartmentsCount) {
         return expense.getAmount()
-                .divide(BigDecimal.valueOf(apartmentsCount), RoundingMode.HALF_EVEN);
+                .divide(BigDecimal.valueOf(apartmentsCount), RoundingMode.HALF_UP);
     }
 
     public Boolean findIfPaidTaxesExistToExpenseById(Long expenseId) {
@@ -144,5 +143,15 @@ public class TaxService {
             tax.setApartment(null);
             taxRepository.save(tax);
         }
+    }
+
+    public BigDecimal findAmountOfAllPaidTaxesByBuildingId(Long buildingId) {
+        return taxRepository.findAmountOfPaidTaxesByBuildingId(buildingId)
+                .orElse(BigDecimal.ZERO);
+    }
+
+    public BigDecimal findAmountOfAllUnpaidTaxesByBuildingId(Long buildingId) {
+        return taxRepository.findAmountOfUnpaidTaxesByBuildingId(buildingId)
+                .orElse(BigDecimal.ZERO);
     }
 }

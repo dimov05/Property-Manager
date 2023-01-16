@@ -117,7 +117,7 @@ public class ApartmentController {
             return String.format("redirect:/manager/buildings/%d/add-apartment", buildingId);
         }
         apartmentService.addApartment(apartmentAddDTO, buildingId);
-        return "redirect:/manager/buildings/view/" + buildingId;
+        return "redirect:/manager/buildings/edit/" + buildingId;
     }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
