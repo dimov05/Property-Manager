@@ -4,11 +4,15 @@ import bg.propertymanager.model.dto.building.BuildingAddDTO;
 import bg.propertymanager.model.dto.building.BuildingChangeTaxesDTO;
 import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
+import bg.propertymanager.model.dto.user.UserViewDTO;
 import bg.propertymanager.model.entity.*;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
 import bg.propertymanager.repository.BuildingRepository;
 import bg.propertymanager.repository.TaxRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -172,4 +176,6 @@ public class BuildingService {
         building.getTaxes().remove(tax);
         buildingRepository.save(building);
     }
+
+
 }

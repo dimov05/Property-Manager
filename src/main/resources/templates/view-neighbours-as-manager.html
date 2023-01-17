@@ -72,17 +72,15 @@
                                             <th scope="col">Neighbour's name</th>
                                             <th scope="col">Phone number</th>
                                             <th scope="col">Email</th>
-                                            <th scope="col">Count of messages</th>
                                             <th scope="col">Address</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr th:each="neighbour: ${building.neighbours}" th:object="${neighbour}">
+                                        <tr th:each="neighbour: ${neighbours}" th:object="${neighbour}">
                                             <td th:text="*{id}"></td>
                                             <td th:text="*{fullName}"></td>
                                             <td th:text="*{phoneNumber}"></td>
                                             <td th:text="*{email}"></td>
-                                            <td th:text="*{messages.size()}"></td>
                                             <td th:text="*{street} + ', ' + *{city} + ', ' + *{country}"></td>
                                         </tr>
                                         </tbody>

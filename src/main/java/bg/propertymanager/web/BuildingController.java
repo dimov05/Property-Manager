@@ -4,10 +4,15 @@ import bg.propertymanager.model.dto.building.BuildingAddDTO;
 import bg.propertymanager.model.dto.building.BuildingChangeTaxesDTO;
 import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
+import bg.propertymanager.model.dto.user.UserViewDTO;
+import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
 import bg.propertymanager.service.ApartmentService;
 import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.TaxService;
+import bg.propertymanager.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,22 +20,28 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 public class BuildingController {
     private final BuildingService buildingService;
     private final TaxService taxService;
     private final ApartmentService apartmentService;
+    private final UserService userService;
 
-    public BuildingController(BuildingService buildingService, TaxService taxService, ApartmentService apartmentService) {
+    public BuildingController(BuildingService buildingService, TaxService taxService, ApartmentService apartmentService, UserService userService) {
         this.buildingService = buildingService;
         this.taxService = taxService;
         this.apartmentService = apartmentService;
+        this.userService = userService;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -148,10 +159,13 @@ public class BuildingController {
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/neighbours")
     public String viewNeighboursAsManager(@PathVariable("buildingId") Long buildingId,
+                                          @RequestParam("page") Optional<Integer> page,
+                                          @RequestParam("size") Optional<Integer> size,
                                           Model model) {
         BuildingViewDTO building = buildingService.findById(buildingId);
         model.addAttribute("building", building);
         model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        model.addAttribute("neighbours",userService.findAllNeighbours(building));
         return "view-neighbours-as-manager";
     }
 }

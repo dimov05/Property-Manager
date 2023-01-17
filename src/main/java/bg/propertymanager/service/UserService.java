@@ -1,8 +1,10 @@
 package bg.propertymanager.service;
 
+import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.dto.user.PasswordChangeDTO;
 import bg.propertymanager.model.dto.user.UserEditDTO;
 import bg.propertymanager.model.dto.user.UserRegisterDTO;
+import bg.propertymanager.model.dto.user.UserViewDTO;
 import bg.propertymanager.model.entity.*;
 import bg.propertymanager.model.enums.UserRolesEnum;
 import bg.propertymanager.model.view.AdminViewUserProfile;
@@ -11,6 +13,10 @@ import bg.propertymanager.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +25,7 @@ import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -214,5 +221,25 @@ public class UserService {
     public void removeMessageFromUser(MessageEntity messageToRemove, UserEntity author) {
         author.getMessages().remove(messageToRemove);
         userRepository.save(author);
+    }
+
+    public Page<UserEntity> findPaginated(Pageable pageable, BuildingViewDTO building) {
+        List<UserEntity> neighbours = building.getNeighbours().stream().toList();
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<UserEntity> neighboursList;
+        if (neighbours.size() < startItem) {
+            neighboursList = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, neighbours.size());
+            neighboursList = neighbours.subList(startItem, toIndex);
+        }
+        return new PageImpl<UserEntity>(neighboursList, PageRequest.of(currentPage, pageSize), neighbours.size());
+    }
+
+    public List<UserEntity> findAllNeighbours(BuildingViewDTO building){
+        BuildingEntity buildingEntity = modelMapper.map(building,BuildingEntity.class);
+        return userRepository.findAllNeighboursInBuilding(buildingEntity);
     }
 }
