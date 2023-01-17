@@ -4,7 +4,6 @@ import bg.propertymanager.model.dto.building.BuildingAddDTO;
 import bg.propertymanager.model.dto.building.BuildingChangeTaxesDTO;
 import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
-import bg.propertymanager.model.dto.user.UserViewDTO;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
 import bg.propertymanager.service.ApartmentService;
@@ -159,13 +158,24 @@ public class BuildingController {
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/neighbours")
     public String viewNeighboursAsManager(@PathVariable("buildingId") Long buildingId,
-                                          @RequestParam("page") Optional<Integer> page,
-                                          @RequestParam("size") Optional<Integer> size,
+                                          @RequestParam(name = "page") Optional<Integer> page,
+                                          @RequestParam(name = "size") Optional<Integer> size,
                                           Model model) {
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(10);
         BuildingViewDTO building = buildingService.findById(buildingId);
+        Page<UserEntity> neighboursPage = userService
+                .findAllNeighboursByBuildingPaginated(PageRequest.of(currentPage - 1, pageSize), buildingId);
+        int totalPages = neighboursPage.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            model.addAttribute("pageNumbers", pageNumbers);
+        }
+        model.addAttribute("neighboursPage", neighboursPage);
         model.addAttribute("building", building);
         model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        model.addAttribute("neighbours",userService.findAllNeighbours(building));
         return "view-neighbours-as-manager";
     }
 }

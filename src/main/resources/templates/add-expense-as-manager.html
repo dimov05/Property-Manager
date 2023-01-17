@@ -102,7 +102,7 @@
                                 <p class="mb-0">Split tax for apartments</p>
                             </div>
                             <div class="col-sm-9">
-                                <div class="form-check form-check-inline" th:each="apartment : ${building.apartments}">
+                                <div class="form-check form-check-inline" th:each="apartment : ${apartments}">
                                     <input type="checkbox"
                                            style="display: inline-block;"
                                            th:name="${apartment.apartmentNumber}"
