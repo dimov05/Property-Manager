@@ -32,4 +32,5 @@ public interface ApartmentRepository extends JpaRepository<ApartmentEntity, Long
     Optional<Integer> findTotalCountOfElevatorChipsByBuildingId(@Param("buildingId") Long buildingId);
 
 
+
 }

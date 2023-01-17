@@ -179,4 +179,8 @@ public class ApartmentService {
     public List<ApartmentEntity> findAllApartmentsByBuildingId(Long buildingId) {
         return apartmentRepository.findAllByBuilding_IdOrderById(buildingId);
     }
+
+    public List<ApartmentEntity> findAllApartmentsInBuilding(Long buildingId) {
+        return apartmentRepository.findAllByBuilding_IdOrderById(buildingId);
+    }
 }

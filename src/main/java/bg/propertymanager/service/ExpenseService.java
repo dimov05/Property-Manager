@@ -1,6 +1,5 @@
 package bg.propertymanager.service;
 
-import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.dto.expense.ExpenseAddDTO;
 import bg.propertymanager.model.dto.expense.ExpenseEditDTO;
 import bg.propertymanager.model.dto.expense.ExpenseViewDTO;
@@ -11,6 +10,10 @@ import bg.propertymanager.model.enums.TaxStatusEnum;
 import bg.propertymanager.repository.ExpenseRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -19,7 +22,6 @@ import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -27,23 +29,13 @@ public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final ModelMapper modelMapper;
     private final BuildingService buildingService;
-    private final ApartmentService apartmentService;
     private final TaxService taxService;
 
-    public ExpenseService(ExpenseRepository expenseRepository, ModelMapper modelMapper, BuildingService buildingService, ApartmentService apartmentService, @Lazy TaxService taxService) {
+    public ExpenseService(ExpenseRepository expenseRepository, ModelMapper modelMapper, BuildingService buildingService, @Lazy TaxService taxService) {
         this.expenseRepository = expenseRepository;
         this.modelMapper = modelMapper;
         this.buildingService = buildingService;
-        this.apartmentService = apartmentService;
         this.taxService = taxService;
-    }
-
-    public List<ExpenseViewDTO> findAllExpensesForBuilding(BuildingViewDTO building) {
-        return expenseRepository
-                .findAllByBuilding_Id(building.getId())
-                .stream()
-                .map(expense -> modelMapper.map(expense, ExpenseViewDTO.class))
-                .collect(Collectors.toList());
     }
 
     public void addExpenseToBuilding(ExpenseAddDTO expenseAddDTO, Long buildingId) {
@@ -116,5 +108,27 @@ public class ExpenseService {
         return expenseRepository
                 .findAmountOfUnpaidExpensesByBuildingId(buildingId)
                 .orElse(BigDecimal.ZERO);
+    }
+
+    public Page<ExpenseEntity> findAllExpensesByBuildingIdPaginated(Pageable pageable, Long buildingId) {
+        List<ExpenseEntity> expenses = expenseRepository
+                .findAllExpensesByBuildingOrderByDueDateAsc(buildingId);
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<ExpenseEntity> list;
+        list = getExpenseEntities(expenses, pageSize, startItem);
+        return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), expenses.size());
+    }
+
+    private static List<ExpenseEntity> getExpenseEntities(List<ExpenseEntity> expenses, int pageSize, int startItem) {
+        List<ExpenseEntity> list;
+        if (expenses.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, expenses.size());
+            list = expenses.subList(startItem, toIndex);
+        }
+        return list;
     }
 }
