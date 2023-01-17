@@ -60,7 +60,7 @@
                     <div class="col-md-12">
                         <div class="card mb-4 ">
                             <div class="card-body">
-                                <p class="mb-4"><span class="text-primary font-italic me-1"
+                                <p class="mb-2"><span class="text-primary font-italic me-1"
                                                       th:text="'List of neighbours ' + ${building.neighbours.size()}"></span>
                                 </p>
                                 <div class="table-responsive">
@@ -73,18 +73,39 @@
                                             <th scope="col">Phone number</th>
                                             <th scope="col">Email</th>
                                             <th scope="col">Address</th>
+                                            <th scope="col" style="width: 60px;">Action</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        <tr th:each="neighbour: ${neighbours}" th:object="${neighbour}">
-                                            <td th:text="*{id}"></td>
-                                            <td th:text="*{fullName}"></td>
-                                            <td th:text="*{phoneNumber}"></td>
-                                            <td th:text="*{email}"></td>
-                                            <td th:text="*{street} + ', ' + *{city} + ', ' + *{country}"></td>
+                                        <tr th:each="neighbour, iStat : ${neighboursPage.content}"
+                                            th:style="${iStat.odd}? 'font-weight: bold;'"
+                                            th:alt-title="${iStat.even}? 'even' : 'odd'">
+                                            <td th:text="${neighbour.id}"></td>
+                                            <td th:text="${neighbour.fullName}"></td>
+                                            <td th:text="${neighbour.phoneNumber}"></td>
+                                            <td th:text="${neighbour.email}"></td>
+                                            <td th:text="${neighbour.street} + ', ' + ${neighbour.city} + ', ' + ${neighbour.country}"></td>
+                                            <td>
+                                                <ul class="list-inline mb-0">
+                                                    <li class="list-inline-item">
+                                                        <a th:href="@{/manager/buildings/{buildingId}/taxes-neighbour/{neighbourId}
+                                        (buildingId = ${building.id}, neighbourId = ${neighbour.id})}"
+                                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"
+                                                           class="px-2 text-primary">Taxes</a>
+                                                    </li>
+                                                </ul>
+                                            </td>
                                         </tr>
                                         </tbody>
                                     </table>
+                                    <div class="align-content-center text-center">
+                                        <div th:if="${neighboursPage.totalPages > 0}" class="pagination d-inline-block"
+                                             th:each="pageNumber : ${pageNumbers}">
+                                            <a th:href="@{/manager/buildings/{buildingId}/neighbours/(buildingId = ${building.id},size=${neighboursPage.size}, page=${pageNumber})}"
+                                               th:text="${pageNumber}"
+                                               th:class="${pageNumber==neighboursPage.number + 1} ? active"></a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
