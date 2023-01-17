@@ -1,13 +1,17 @@
 package bg.propertymanager.repository;
 
 import bg.propertymanager.model.entity.ApartmentEntity;
+import bg.propertymanager.model.entity.ExpenseEntity;
 import bg.propertymanager.model.entity.TaxEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -18,6 +22,7 @@ public interface TaxRepository extends JpaRepository<TaxEntity, Long> {
     @Query("SELECT SUM(t.amount)  FROM TaxEntity as t " +
             "WHERE t.building.id = :buildingId AND t.taxStatus = 'PAID'")
     Optional<BigDecimal> findAmountOfPaidTaxesByBuildingId(@Param("buildingId") Long buildingId);
+
     @Query("SELECT SUM(t.amount)  FROM TaxEntity as t " +
             "WHERE t.building.id = :buildingId AND t.taxStatus = 'UNPAID' OR t.taxStatus = 'UNCONFIRMED'")
     Optional<BigDecimal> findAmountOfUnpaidTaxesByBuildingId(@Param("buildingId") Long buildingId);
@@ -30,5 +35,15 @@ public interface TaxRepository extends JpaRepository<TaxEntity, Long> {
             "WHERE t.taxStatus = 'PAID' AND t.expense.id = :expenseId")
     Boolean existsByTaxStatusPaidAndExpenseId(@Param("expenseId") Long expenseId);
 
+    @Query("SELECT t FROM TaxEntity as t WHERE t.building.id = :buildingId ORDER BY t.taxStatus desc, t.dueDate asc ")
+    List<TaxEntity> findAllTaxesByBuildingOrderByDueDateAscAndTaxStatus(Long buildingId);
+
+    @Query("select t FROM TaxEntity  as t where t.building.id = :buildingId AND t.apartment.owner.id = :ownerId " +
+            "Order by t.taxStatus desc, t.dueDate asc")
+    List<TaxEntity> findAllTaxesByBuildingIdAndOwnerId(Long buildingId, Long ownerId);
+
     Set<TaxEntity> findAllByApartment_Id(Long apartmentId);
+    @Query("SELECT t.apartment, SUM(t.amount) FROM TaxEntity as t WHERE t.taxStatus = 'UNPAID' " +
+            "GROUP BY t.apartment ORDER BY SUM(t.amount) desc")
+    Page<ApartmentEntity> findTopFiveApartmentsByDebtInBuilding(Pageable pageable, Long buildingId);
 }

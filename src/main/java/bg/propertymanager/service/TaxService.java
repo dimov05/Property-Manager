@@ -11,11 +11,17 @@ import bg.propertymanager.model.enums.TaxStatusEnum;
 import bg.propertymanager.repository.ExpenseRepository;
 import bg.propertymanager.repository.TaxRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -153,5 +159,42 @@ public class TaxService {
     public BigDecimal findAmountOfAllUnpaidTaxesByBuildingId(Long buildingId) {
         return taxRepository.findAmountOfUnpaidTaxesByBuildingId(buildingId)
                 .orElse(BigDecimal.ZERO);
+    }
+
+    public Page<TaxEntity> findAllTaxesByBuildingIdPaginated(Pageable pageable, Long buildingId) {
+        List<TaxEntity> taxes = taxRepository
+                .findAllTaxesByBuildingOrderByDueDateAscAndTaxStatus(buildingId);
+        return getPageOfTaxes(pageable, taxes);
+    }
+
+    public Page<TaxEntity> findAllTaxesByBuildingIdAndOwnerId(Pageable pageable, Long buildingId, Long neighbourId) {
+        List<TaxEntity> taxes = taxRepository
+                .findAllTaxesByBuildingIdAndOwnerId(buildingId, neighbourId);
+        return getPageOfTaxes(pageable, taxes);
+    }
+
+    private static PageImpl<TaxEntity> getPageOfTaxes(Pageable pageable, List<TaxEntity> taxes) {
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<TaxEntity> list;
+        list = getTaxEntities(taxes, pageSize, startItem);
+        return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), taxes.size());
+    }
+
+    private static List<TaxEntity> getTaxEntities(List<TaxEntity> taxes, int pageSize, int startItem) {
+        List<TaxEntity> list;
+        if (taxes.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, taxes.size());
+            list = taxes.subList(startItem, toIndex);
+        }
+        return list;
+    }
+
+    public Page<ApartmentEntity> findTopFiveApartmentsInBuildingByDebt(Long buildingId) {
+
+        return taxRepository.findTopFiveApartmentsByDebtInBuilding(PageRequest.of(0,5),buildingId);
     }
 }
