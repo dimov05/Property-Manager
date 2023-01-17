@@ -40,7 +40,7 @@ public class DashboardController {
         model.addAttribute("totalUncollectedTaxes", taxService.findAmountOfAllUnpaidTaxesByBuildingId(buildingId));
         model.addAttribute("totalPaidExpenses", expenseService.findAmountOfAllPaidExpensesByBuildingId(buildingId));
         model.addAttribute("totalUnpaidExpenses", expenseService.findAmountOfAllUnpaidExpensesByBuildingId(buildingId));
-
+        model.addAttribute("topFiveApartmentsByDebt", taxService.findTopFiveApartmentsInBuildingByDebt(buildingId));
         return "view-dashboard-as-manager";
     }
 }

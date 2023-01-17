@@ -25,46 +25,46 @@
                 <div class="card mb-4">
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-sm-9">
-                                <p class="mb-0">Building's money balance:</p>
+                            <div class="col-sm-7">
+                                <p class="mb-0">Building's balance:</p>
                             </div>
-                            <div class="col-sm-3 text-center">
+                            <div class="col-sm-5 text-center">
                                 <p class="text-muted mb-0" th:text="${buildingBalance} + 'lv.'"></p>
                             </div>
                         </div>
                         <hr>
                         <div class="row">
-                            <div class="col-sm-9">
+                            <div class="col-sm-7">
                                 <p class="mb-0">Collected taxes:</p>
                             </div>
-                            <div class="col-sm-3 text-center">
+                            <div class="col-sm-5 text-center">
                                 <p class="text-muted mb-0" th:text="${totalCollectedTaxes} + 'lv.'"></p>
                             </div>
                         </div>
                         <hr>
                         <div class="row">
-                            <div class="col-sm-9">
+                            <div class="col-sm-7">
                                 <p class="mb-0">Uncollected taxes:</p>
                             </div>
-                            <div class="col-sm-3 text-center">
+                            <div class="col-sm-5 text-center">
                                 <p class="text-muted mb-0" th:text="${totalUncollectedTaxes} + 'lv.'"></p>
                             </div>
                         </div>
                         <hr>
                         <div class="row">
-                            <div class="col-sm-9">
-                                <p class="mb-0">Total paid expenses:</p>
+                            <div class="col-sm-7">
+                                <p class="mb-0">Paid expenses:</p>
                             </div>
-                            <div class="col-sm-3 text-center">
+                            <div class="col-sm-5 text-center">
                                 <p class="text-muted mb-0" th:text="${totalPaidExpenses} + 'lv.'"></p>
                             </div>
                         </div>
                         <hr>
                         <div class="row">
-                            <div class="col-sm-9">
-                                <p class="mb-0">Total unpaid expenses:</p>
+                            <div class="col-sm-7">
+                                <p class="mb-0">Unpaid expenses:</p>
                             </div>
-                            <div class="col-sm-3 text-center">
+                            <div class="col-sm-5 text-center">
                                 <p class="text-muted mb-0" th:text="${totalUnpaidExpenses} + 'lv.'"></p>
                             </div>
                         </div>
@@ -212,7 +212,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr th:each="apartment: ${building.apartments}" th:object="${apartment}">
+                            <tr th:each="apartment: ${topFiveApartmentsByDebt}" th:object="${apartment}">
                                 <td th:text="*{apartmentNumber}"></td>
                                 <td th:text="${@taxService.findOwedMoney(apartment.id)} + 'lv.'"></td>
                                 <td th:text="*{owner.fullName}"></td>
