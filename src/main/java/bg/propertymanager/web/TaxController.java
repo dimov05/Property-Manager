@@ -10,6 +10,7 @@ import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.TaxService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,15 +40,15 @@ public class TaxController {
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/taxes")
     public String viewTaxesAsManager(@PathVariable("buildingId") Long buildingId,
-                                     @RequestParam(name = "page") Optional<Integer> page,
-                                     @RequestParam(name = "size") Optional<Integer> size,
+                                     @RequestParam("page") Optional<Integer> page,
+                                     @RequestParam("size") Optional<Integer> size,
                                      Model model) {
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(10);
         BuildingViewDTO building = buildingService.findById(buildingId);
-        Page<TaxEntity> taxesPage;
-        taxesPage = taxService
-                .findAllTaxesByBuildingIdPaginated(PageRequest.of(currentPage - 1, pageSize), buildingId);
+        // Implement search/filter with keyword just by fixing Controller. The other logic in Service and Repository is ready
+        Page<TaxEntity> taxesPage = taxService
+                .findAllTaxesByBuildingIdFilteredAndPaginated(PageRequest.of(currentPage - 1, pageSize), buildingId, null);
         addPageNumbersAttributeIfThereAreEnoughPages(model, taxesPage);
         model.addAttribute("taxesPage", taxesPage);
         model.addAttribute("building", building);
@@ -66,7 +67,7 @@ public class TaxController {
         int pageSize = size.orElse(10);
         BuildingViewDTO building = buildingService.findById(buildingId);
         Page<TaxEntity> taxesPage = taxService
-                .findAllTaxesByBuildingIdAndOwnerId(PageRequest.of(currentPage - 1, pageSize), buildingId,neighbourId);
+                .findAllTaxesByBuildingIdAndOwnerId(PageRequest.of(currentPage - 1, pageSize), buildingId, neighbourId);
         addPageNumbersAttributeIfThereAreEnoughPages(model, taxesPage);
         model.addAttribute("taxesPage", taxesPage);
         model.addAttribute("building", building);

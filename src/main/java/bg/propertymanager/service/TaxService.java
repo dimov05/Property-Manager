@@ -8,6 +8,7 @@ import bg.propertymanager.model.entity.BuildingEntity;
 import bg.propertymanager.model.entity.ExpenseEntity;
 import bg.propertymanager.model.entity.TaxEntity;
 import bg.propertymanager.model.enums.TaxStatusEnum;
+import bg.propertymanager.model.view.UserEntityViewModel;
 import bg.propertymanager.repository.ExpenseRepository;
 import bg.propertymanager.repository.TaxRepository;
 import org.modelmapper.ModelMapper;
@@ -71,10 +72,6 @@ public class TaxService {
         taxToUpdate
                 .setTaxStatus(taxEditDTO.getTaxStatus());
         taxRepository.save(taxToUpdate);
-    }
-
-    private static boolean taxIsPaid(TaxEntity taxToUpdate) {
-        return taxToUpdate.getTaxStatus().equals(TaxStatusEnum.PAID);
     }
 
     public BigDecimal calculateBuildingBalance(Long buildingId) {
@@ -167,6 +164,11 @@ public class TaxService {
         return getPageOfTaxes(pageable, taxes);
     }
 
+    public Page<TaxEntity> findAllTaxesByBuildingIdFilteredAndPaginated(Pageable pageable, Long buildingId, String searchKeyword) {
+        List<TaxEntity> taxes = getTaxesByBuildingWithOrWithoutFilter(searchKeyword,buildingId);
+        return getPageOfTaxes(pageable,taxes);
+    }
+
     public Page<TaxEntity> findAllTaxesByBuildingIdAndOwnerId(Pageable pageable, Long buildingId, Long neighbourId) {
         List<TaxEntity> taxes = taxRepository
                 .findAllTaxesByBuildingIdAndOwnerId(buildingId, neighbourId);
@@ -196,5 +198,17 @@ public class TaxService {
     public Page<ApartmentEntity> findTopFiveApartmentsInBuildingByDebt(Long buildingId) {
 
         return taxRepository.findTopFiveApartmentsByDebtInBuilding(PageRequest.of(0,5),buildingId);
+    }
+
+    private List<TaxEntity> getTaxesByBuildingWithOrWithoutFilter(String searchKeyword, Long buildingId) {
+        List<TaxEntity> taxes;
+        if (searchKeyword == null) {
+            taxes = taxRepository
+                    .findAllTaxesByBuildingOrderByDueDateAscAndTaxStatus(buildingId);
+        } else {
+            taxes = taxRepository
+                    .findAllTaxesByBuildingIdFilteredByKeywordOrderByDueDateAscAndTaxStatus(buildingId,searchKeyword);
+        }
+        return taxes;
     }
 }
