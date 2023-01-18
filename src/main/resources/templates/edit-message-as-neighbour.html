@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:include="~{fragment/navbar-neighbour-building}"></th:block>
+<body>
+<section style="background-color: #eee;">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="card-body text-center" th:object="${building}">
+                    <img th:src="*{imageUrl}"
+                         alt="avatar"
+                         class="img-fluid mx-auto" style="width: 150px;">
+                    <h5 class="my-3" th:text="*{name}"></h5>
+                    <p class="text-muted mb-1"
+                       th:text="*{street} + ', ' + *{city} + ', ' + *{country}">Address</p>
+                    <p class="text-muted">Manager:</p>
+                    <p class="text-muted mb-4"
+                       th:text="*{manager.fullName} + ', ' + *{manager.phoneNumber}"></p>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card mb-4">
+                    <form class="card-body" th:object="${messageEditDTO}"
+                          th:action="@{/neighbour/buildings/{buildingId}/message/{messageId}
+                                                        (buildingId = ${building.id},messageId = ${message.id})}"
+                          th:method="POST">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Title</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="title"
+                                       th:field="${message.title}"
+                                       th:placeholder="*{title}">
+                                <p th:errors="*{title}" class="text-danger"
+                                   th:if="${#fields.hasErrors('title')}"></p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <p class="mb-0">Content</p>
+                            </div>
+                            <div class="col-sm-9">
+                                <input type="text"
+                                       id="content"
+                                       th:field="${message.content}"
+                                       th:placeholder="*{content}">
+                                <p th:errors="*{content}" class="text-danger"
+                                   th:if="${#fields.hasErrors('content')}"></p>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="form-group form-button align-content-center">
+                                <input type="submit" name="save" id="save" class="form-submit"
+                                       value="Edit message"/>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="text-center">
+                    <div class="form-group form-button align-content-center">
+                        <form th:action="@{/neighbour/buildings/{buildingId}/delete-message/{messageId}
+                                                        (buildingId = ${building.id},messageId = ${message.id})}"
+                              th:method="delete">
+                            <input
+                                    type="submit" name="delete" id="delete" class="form-submit"
+                                    value="Delete message"/></form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>
