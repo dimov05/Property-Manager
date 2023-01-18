@@ -17,7 +17,7 @@
         <div class="col-md-6">
             <div class="mb-3">
                 <h5 class="card-title">Registered buildings -<span class="text-body fw-normal ms-2"
-                                                                    th:text="${buildings.size()}"></span></h5>
+                                                                   th:text="${totalBuildings}"></span></h5>
             </div>
         </div>
         <div class="col-sm-6">
@@ -27,6 +27,13 @@
     </div>
     <div class="row">
         <div class="col-lg-12">
+            <form method="get">
+                <div>
+                    <input type="text" name="searchKeyword" style="text-align: center"
+                           placeholder="Search by Id, Name or Address" th:value="${searchKeyword}">
+                    <input type="submit" value="Search">
+                </div>
+            </form>
             <div class="">
                 <div class="table-responsive">
                     <table class="table project-list-table table-nowrap align-middle table-borderless">
@@ -44,11 +51,11 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="building: ${buildings}" th:object="${building}">
+                        <tr th:each="building, iStat : ${buildingsPage}" th:object="${building}">
                             <td th:text="*{id}"></td>
                             <td th:text="*{name}"></td>
                             <td th:text="*{floors}"></td>
-                            <td th:text="*{apartments.size}"></td>
+                            <td th:text="${building.apartments.size()}"></td>
                             <td th:text="*{taxPerPerson}"></td>
                             <td th:text="*{taxPerDog}"></td>
                             <td th:text="*{taxPerElevatorChip}"></td>
@@ -65,29 +72,15 @@
                         </tr>
                         </tbody>
                     </table>
+                    <div class="align-content-center text-center">
+                        <div th:if="${buildingsPage.totalPages > 0}" class="pagination d-inline-block"
+                             th:each="pageNumber : ${pageNumbers}">
+                            <a th:href="@{/admin/users/(size=${buildingsPage.size}, page=${pageNumber})}"
+                               th:text="${pageNumber}"
+                               th:class="${pageNumber==buildingsPage.number + 1} ? active"></a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    <div class="row g-0 align-items-center pb-4">
-        <div class="col-sm-6">
-            <div><p class="mb-sm-0">Showing 1 to 10 of 57 entries</p></div>
-        </div>
-        <div class="col-sm-6">
-            <div class="float-sm-end">
-                <ul class="pagination mb-sm-0">
-                    <li class="page-item disabled">
-                        <a href="#" class="page-link"><i class="mdi mdi-chevron-left"></i></a>
-                    </li>
-                    <li class="page-item active"><a href="#" class="page-link">1</a></li>
-                    <li class="page-item"><a href="#" class="page-link">2</a></li>
-                    <li class="page-item"><a href="#" class="page-link">3</a></li>
-                    <li class="page-item"><a href="#" class="page-link">4</a></li>
-                    <li class="page-item"><a href="#" class="page-link">5</a></li>
-                    <li class="page-item">
-                        <a href="#" class="page-link"><i class="mdi mdi-chevron-right"></i></a>
-                    </li>
-                </ul>
             </div>
         </div>
     </div>

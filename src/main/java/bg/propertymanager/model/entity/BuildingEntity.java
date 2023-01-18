@@ -203,7 +203,7 @@ public class BuildingEntity {
         return this;
     }
 
-    @OneToMany(mappedBy = "building")
+    @OneToMany(mappedBy = "building", fetch = FetchType.EAGER)
     public Set<ApartmentEntity> getApartments() {
         return apartments;
     }

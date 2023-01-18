@@ -226,23 +226,12 @@ public class UserService {
     public Page<UserEntityViewModel> findAllNeighboursByBuildingPaginated(Pageable pageable, Long buildingId) {
         BuildingEntity building = buildingService.findEntityById(buildingId);
         List<UserEntityViewModel> neighbours = getNeighboursInBuilding(building);
-        return getUsersOnSelectedPage(pageable, neighbours);
+        return getPageOfUsers(pageable, neighbours);
     }
 
     public Page<UserEntityViewModel> findAllUsersWithFilterPaginated(Pageable pageable, String searchKeyword) {
         List<UserEntityViewModel> users = getUsersWithOrWithoutFilter(searchKeyword);
-        return getUsersOnSelectedPage(pageable, users);
-    }
-
-    private static List<UserEntityViewModel> getUsersPaginated(List<UserEntityViewModel> users, int pageSize, int startItem) {
-        List<UserEntityViewModel> list;
-        if (users.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, users.size());
-            list = users.subList(startItem, toIndex);
-        }
-        return list;
+        return getPageOfUsers(pageable, users);
     }
 
     private List<UserEntityViewModel> getUsersWithOrWithoutFilter(String searchKeyword) {
@@ -272,11 +261,22 @@ public class UserService {
         return neighbours;
     }
 
-    private static PageImpl<UserEntityViewModel> getUsersOnSelectedPage(Pageable pageable, List<UserEntityViewModel> neighbours) {
+    private static PageImpl<UserEntityViewModel> getPageOfUsers(Pageable pageable, List<UserEntityViewModel> neighbours) {
         int pageSize = pageable.getPageSize();
         int currentPage = pageable.getPageNumber();
         int startItem = currentPage * pageSize;
         List<UserEntityViewModel> list = getUsersPaginated(neighbours, pageSize, startItem);
         return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), neighbours.size());
+    }
+
+    private static List<UserEntityViewModel> getUsersPaginated(List<UserEntityViewModel> users, int pageSize, int startItem) {
+        List<UserEntityViewModel> list;
+        if (users.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, users.size());
+            list = users.subList(startItem, toIndex);
+        }
+        return list;
     }
 }

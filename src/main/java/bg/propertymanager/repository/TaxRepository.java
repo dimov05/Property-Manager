@@ -43,7 +43,14 @@ public interface TaxRepository extends JpaRepository<TaxEntity, Long> {
     List<TaxEntity> findAllTaxesByBuildingIdAndOwnerId(Long buildingId, Long ownerId);
 
     Set<TaxEntity> findAllByApartment_Id(Long apartmentId);
+
     @Query("SELECT t.apartment, SUM(t.amount) FROM TaxEntity as t WHERE t.taxStatus = 'UNPAID' " +
             "GROUP BY t.apartment ORDER BY SUM(t.amount) desc")
     Page<ApartmentEntity> findTopFiveApartmentsByDebtInBuilding(Pageable pageable, Long buildingId);
+
+    @Query("SELECT t FROM TaxEntity as t " +
+            "WHERE t.building.id = :buildingId " +
+            "AND CONCAT(t.apartment.apartmentNumber, ' ', t.description, ' ', t.taxType) like :keyword")
+    List<TaxEntity> findAllTaxesByBuildingIdFilteredByKeywordOrderByDueDateAscAndTaxStatus(@Param("buildingId") Long buildingId,
+                                                                                           @Param("keyword") String searchKeyword);
 }

@@ -4,6 +4,7 @@ import bg.propertymanager.model.dto.building.BuildingAddDTO;
 import bg.propertymanager.model.dto.building.BuildingChangeTaxesDTO;
 import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
+import bg.propertymanager.model.entity.BuildingEntity;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
 import bg.propertymanager.model.view.UserEntityViewModel;
@@ -13,6 +14,7 @@ import bg.propertymanager.service.TaxService;
 import bg.propertymanager.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,10 +48,24 @@ public class BuildingController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/buildings")
-    public ModelAndView manageBuildings() {
+    public ModelAndView manageBuildings(@Param("searchKeyword") String searchKeyword,
+                                        @RequestParam(name = "page") Optional<Integer> page,
+                                        @RequestParam(name = "size") Optional<Integer> size) {
         ModelAndView mav = new ModelAndView("manage-buildings");
-        List<BuildingViewDTO> buildings = buildingService.findAll();
-        mav.addObject("buildings", buildings);
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(10);
+        Page<BuildingEntity> buildingsPage = buildingService
+                .findAllBuildingsWithFilterPaginated(PageRequest.of(currentPage - 1, pageSize), searchKeyword);
+        int totalPages = buildingsPage.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            mav.addObject("pageNumbers", pageNumbers);
+        }
+        mav.addObject("totalBuildings", buildingService.findAll().size());
+        mav.addObject("buildingsPage", buildingsPage);
+        mav.addObject("searchKeyword", searchKeyword);
         return mav;
     }
 

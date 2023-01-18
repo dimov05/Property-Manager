@@ -7,10 +7,12 @@ import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.dto.user.UserViewDTO;
 import bg.propertymanager.model.entity.*;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
+import bg.propertymanager.model.view.UserEntityViewModel;
 import bg.propertymanager.repository.BuildingRepository;
 import bg.propertymanager.repository.TaxRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -178,4 +180,38 @@ public class BuildingService {
     }
 
 
+    public Page<BuildingEntity> findAllBuildingsWithFilterPaginated(Pageable pageable, String searchKeyword) {
+        List<BuildingEntity> users = getBuildingsWithOrWithoutFilter(searchKeyword);
+        return getPageOfBuildings(pageable, users);
+    }
+    private List<BuildingEntity> getBuildingsWithOrWithoutFilter(String searchKeyword) {
+        List<BuildingEntity> buildings;
+        if (searchKeyword == null) {
+            buildings = buildingRepository
+                    .findAll();
+        } else {
+            buildings = buildingRepository
+                    .findAllByKeyword(searchKeyword);
+        }
+        return buildings;
+    }
+
+    private static PageImpl<BuildingEntity> getPageOfBuildings(Pageable pageable, List<BuildingEntity> buildings) {
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<BuildingEntity> list = getBuildingsPaginated(buildings, pageSize, startItem);
+        return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), buildings.size());
+    }
+
+    private static List<BuildingEntity> getBuildingsPaginated(List<BuildingEntity> buildings, int pageSize, int startItem) {
+        List<BuildingEntity> list;
+        if (buildings.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, buildings.size());
+            list = buildings.subList(startItem, toIndex);
+        }
+        return list;
+    }
 }
