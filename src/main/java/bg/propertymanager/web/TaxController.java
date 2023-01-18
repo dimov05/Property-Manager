@@ -94,33 +94,33 @@ public class TaxController {
     public String editTaxStatusAsManager(@PathVariable("buildingId") Long buildingId,
                                          @PathVariable("taxId") Long taxId,
                                          Model model) {
-        if (!model.containsAttribute("taxEditDTO")) {
-            model.addAttribute("taxEditDTO", new TaxEditDTO());
+        if (!model.containsAttribute("taxPayDTO")) {
+            model.addAttribute("taxPayDTO", new TaxPayDTO());
         }
         BuildingViewDTO buildingEdit = buildingService.findById(buildingId);
         TaxViewDTO taxView = taxService.findViewById(taxId);
-        model.addAttribute("taxStatus", TaxStatusEnum.values());
         model.addAttribute("building", buildingEdit);
         model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         model.addAttribute("tax", taxView);
-        return "edit-tax-as-manager";
+        return "pay-tax-as-manager";
     }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @PostMapping("/manager/buildings/{buildingId}/tax/{taxId}")
-    public String editTaxStatusAsManagerConfirm(@Valid TaxEditDTO taxEditDTO,
+    public String editTaxStatusAsManagerConfirm(@Valid TaxPayDTO taxPayDTO,
                                                 BindingResult bindingResult,
                                                 RedirectAttributes redirectAttributes,
                                                 @PathVariable("buildingId") Long buildingId,
                                                 @PathVariable("taxId") Long taxId) {
-        taxEditDTO.setId(taxId);
-        if (bindingResult.hasErrors()) {
-            redirectAttributes.addFlashAttribute("taxEditDTO", taxEditDTO);
-            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.taxEditDTO", bindingResult);
+        taxPayDTO.setId(taxId);
+        if (bindingResult.hasErrors() || taxService.checkIfPaidAmountIsMoreThanRemainingAmount(taxId, taxPayDTO.getPaidAmount())) {
+            redirectAttributes.addFlashAttribute("taxPayDTO", taxPayDTO);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.taxPayDTO", bindingResult);
+            redirectAttributes.addFlashAttribute("morePaidMoney", true);
             return String.format("redirect:/manager/buildings/%d/tax/%d",
                     buildingId, taxId);
         }
-        taxService.updateTaxStatus(taxEditDTO);
+        taxService.payTaxAmount(taxPayDTO);
         return String.format("redirect:/manager/buildings/%d/taxes", buildingId);
     }
 
@@ -150,7 +150,7 @@ public class TaxController {
                                            @PathVariable("buildingId") Long buildingId,
                                            @PathVariable("taxId") Long taxId) {
         taxPayDTO.setId(taxId);
-        if (bindingResult.hasErrors() || taxService.checkIfPaidAmountIsMoreThanTax(taxId, taxPayDTO.getPaidAmount())) {
+        if (bindingResult.hasErrors() || taxService.checkIfPaidAmountIsMoreThanRemainingAmount(taxId, taxPayDTO.getPaidAmount())) {
             redirectAttributes.addFlashAttribute("taxPayDTO", taxPayDTO);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.taxPayDTO", bindingResult);
             redirectAttributes.addFlashAttribute("morePaidMoney", true);

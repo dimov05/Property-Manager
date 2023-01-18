@@ -63,6 +63,7 @@
                         <th scope="col">Apart. №</th>
                         <th scope="col">Description</th>
                         <th scope="col">Amount</th>
+                        <th scope="col">Remaining amount</th>
                         <th scope="col">Tax type</th>
                         <th scope="col">Due date</th>
                         <th scope="col">Tax status:</th>
@@ -83,10 +84,11 @@
                         </td>
                         <td th:text="${tax.description}"></td>
                         <td th:text="${tax.amount} + 'lv.'"></td>
+                        <td th:text="${tax.amount - tax.paidAmount} + 'lv.'"></td>
                         <td th:text="${tax.taxType.name()}"></td>
                         <td th:text="${tax.dueDate.dayOfMonth} + ' ' + ${tax.dueDate.month} + ' ' + ${tax.dueDate.year}"></td>
                         <td th:text="${tax.taxStatus.name()}"></td>
-                        <td>
+                        <td th:if="${tax.taxStatus.name() == 'UNPAID' || tax.taxStatus.name() == 'PARTLY_PAID'}">
                             <ul class="list-inline mb-0">
                                 <li class="list-inline-item">
                                     <a th:href="@{/manager/buildings/{buildingId}/tax/{taxId}

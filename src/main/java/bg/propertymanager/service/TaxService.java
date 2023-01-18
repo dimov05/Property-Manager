@@ -123,7 +123,7 @@ public class TaxService {
 
     private static BigDecimal getTaxForEachApartment(ExpenseEntity expense, int apartmentsCount) {
         return expense.getAmount()
-                .divide(BigDecimal.valueOf(apartmentsCount), RoundingMode.HALF_UP);
+                .divide(BigDecimal.valueOf(apartmentsCount), RoundingMode.CEILING);
     }
 
     public Boolean findIfPaidTaxesExistToExpenseById(Long expenseId) {
@@ -243,5 +243,11 @@ public class TaxService {
         TaxEntity tax = taxRepository.findById(taxId)
                 .orElseThrow(() -> new NullPointerException("There is no tax with this id " + taxId));
         return paidAmount.compareTo(tax.getAmount()) > 0;
+    }
+
+    public boolean checkIfPaidAmountIsMoreThanRemainingAmount(Long taxId, BigDecimal paidAmount) {
+        TaxEntity tax = taxRepository.findById(taxId)
+                .orElseThrow(() -> new NullPointerException("There is no tax with this id " + taxId));
+        return paidAmount.compareTo(tax.getAmount().subtract(tax.getPaidAmount())) > 0;
     }
 }

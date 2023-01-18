@@ -21,7 +21,7 @@
                        th:text="*{manager.fullName} + ', ' + *{manager.phoneNumber}"></p>
                 </div>
             </div>
-            <div class="col-lg-9">
+            <div class="col-lg-5">
                 <div class="card mb-4">
                     <form class="card-body" th:object="${taxPayDTO}"
                           th:action="@{/neighbour/buildings/{buildingId}/pay-tax/{taxId}(buildingId = ${building.id}, taxId = ${tax.id})}"
@@ -46,6 +46,7 @@
                                        value="Pay Tax amount"/>
                             </div>
                         </div>
+                    </form>
                 </div>
             </div>
         </div>

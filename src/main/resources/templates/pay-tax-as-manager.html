@@ -22,35 +22,27 @@
             </div>
             <div class="col-lg-5">
                 <div class="card mb-4">
-                    <form class="card-body" th:object="${taxEditDTO}"
-                          th:action="@{/manager/buildings/{buildingId}/tax/{taxId}
-                                                        (buildingId = ${building.id},taxId = ${tax.id})}"
+                    <form class="card-body" th:object="${taxPayDTO}"
+                          th:action="@{/manager/buildings/{buildingId}/tax/{taxId}(buildingId = ${building.id}, taxId = ${tax.id})}"
                           th:method="POST">
                         <div class="row align-content-center">
                             <div class="col-sm-3">
-                                <p class="mb-0">Tax status</p>
+                                <p class="mb-0">Pay Tax amount</p>
                             </div>
                             <div class="col-sm-9">
-                                <select
-                                        id="taxStatus"
-                                        name="taxStatus"
-                                        th:errorclass="is-invalid"
-                                        class="form-control">
-                                    <option value="">- Select tax type -</option>
-                                    <option th:each="taxStatus : ${taxStatus}"
-                                            th:field="${tax.taxStatus}"
-                                            th:value="${taxStatus}"
-                                            th:text="${taxStatus}"
-                                            th:selected="${taxStatus} == *{taxStatus}"></option>
-                                    <p th:errors="*{taxStatus}" class="text-danger"
-                                       th:if="${#fields.hasErrors('taxStatus')}"></p>
-                                </select>
+                                <input type="text"
+                                       id="paidAmount"
+                                       th:field="*{paidAmount}"
+                                       th:text="'Max amount to pay ' + ${tax.amount - tax.paidAmount} + 'lv.'">
+                                <p th:errors="*{paidAmount}" class="text-danger"
+                                   th:if="${#fields.hasErrors('paidAmount')}"></p>
+                                <p th:if="${morePaidMoney}" th:text="'Paid more than needed!'" class="text-danger">Paid more than needed</p>
                             </div>
                         </div>
                         <div class="text-center">
                             <div class="form-group form-button align-content-center">
                                 <input type="submit" name="save" id="save" class="form-submit"
-                                       value="Edit apartment"/>
+                                       value="Pay Tax amount"/>
                             </div>
                         </div>
                     </form>

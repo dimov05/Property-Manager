@@ -27,8 +27,8 @@ public interface TaxRepository extends JpaRepository<TaxEntity, Long> {
             "WHERE t.building.id = :buildingId AND t.taxStatus = 'UNPAID' OR t.taxStatus = 'PARTLY_PAID'")
     Optional<BigDecimal> findAmountOfUnpaidTaxesByBuildingId(@Param("buildingId") Long buildingId);
 
-    @Query("SELECT SUM(t.amount-t.paidAmount) FROM TaxEntity  as t " +
-            "WHERE t.apartment.id = :apartmentId AND t.taxStatus = 'UNPAID' OR t.taxStatus = 'PARTLY_PAID'")
+    @Query("SELECT SUM(t.amount - t.paidAmount) FROM TaxEntity  as t " +
+            "WHERE t.apartment.id = :apartmentId AND (t.taxStatus = 'UNPAID' OR t.taxStatus = 'PARTLY_PAID')")
     Optional<BigDecimal> findOwedMoneyByApartmentId(@Param("apartmentId") Long apartmentId);
 
     @Query("SELECT CASE WHEN COUNT(t) > 0 THEN true ELSE false END FROM TaxEntity t " +
