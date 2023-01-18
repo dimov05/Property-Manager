@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:include="~{fragment/navbar-neighbour-building}"></th:block>
+<body>
+<section style="background-color: #eee;">
+    <div class="container py-5" th:object="${building}">
+        <div class="row">
+            <div class="col-lg-3">
+                <div class="card mb-4">
+                    <div class="card-body text-center">
+                        <img th:src="*{imageUrl}"
+                             alt="avatar"
+                             class="img-fluid mx-auto" style="width: 150px;">
+                        <h5 class="my-3" th:text="*{name}"></h5>
+                        <p class="text-muted mb-1"
+                           th:text="*{street} + ', ' + *{city} + ', ' + *{country}">Address</p>
+                        <p class="text-muted">Manager:</p>
+                        <p class="text-muted mb-4"
+                           th:text="*{manager.fullName} + ', ' + *{manager.phoneNumber}"></p>
+                    </div>
+                </div>
+                <div class="card mb-4 mb-lg-0">
+                    <div class="card-body p-0 text-center">
+                        <ul class="list-group list-group-flush rounded-3">
+                            <li class="list-group-item align-items-center p-3">
+                                <i class="fas fa-globe fa-lg text-warning"></i>
+                                <p class="mb-0 align-content-center text-center"
+                                   th:text="'Building\'s money balance: ' + ${buildingBalance} +'lv.'"></p>
+                            </li>
+                            <li class="list-group-item align-items-center p-3">
+                                <i class="fas fa-globe fa-lg text-warning"></i>
+                                <p class="mb-0 align-content-center text-center"
+                                   th:text="'Building\'s tax per Person: ' + *{taxPerPerson} +'lv.'"></p>
+                            </li>
+                            <li class="list-group-item align-items-center p-3">
+                                <i class="fas fa-globe fa-lg text-warning"></i>
+                                <p class="mb-0 align-content-center text-center"
+                                   th:text="'Building\'s tax per Dog: ' + *{taxPerDog} +'lv.'"></p>
+                            </li>
+                            <li class="list-group-item align-items-center p-3">
+                                <i class="fas fa-globe fa-lg text-warning"></i>
+                                <p class="mb-0 align-content-center text-center"
+                                   th:text="'Building\'s per elevator chip: ' + *{TaxPerElevatorChip} +'lv.'"></p>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-9">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card mb-4 ">
+                            <div class="card-body">
+                                <p class="mb-2"><span class="text-primary font-italic me-1"
+                                                      th:text="'List of neighbours ' + ${building.neighbours.size()}"></span>
+                                </p>
+                                <div class="table-responsive">
+                                    <table class="table project-list-table table-nowrap align-middle table-borderless">
+                                        <thead>
+                                        <tr>
+
+                                            <th scope="col">ID</th>
+                                            <th scope="col">Neighbour's name</th>
+                                            <th scope="col">Phone number</th>
+                                            <th scope="col">Email</th>
+                                            <th scope="col">Address</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="neighbour, iStat : ${neighboursPage.content}"
+                                            th:style="${iStat.odd}? 'font-weight: bold;'"
+                                            th:alt-title="${iStat.even}? 'even' : 'odd'">
+                                            <td th:text="${neighbour.id}"></td>
+                                            <td th:text="${neighbour.fullName}"></td>
+                                            <td th:text="${neighbour.phoneNumber}"></td>
+                                            <td th:text="${neighbour.email}"></td>
+                                            <td th:text="${neighbour.street} + ', ' + ${neighbour.city} + ', ' + ${neighbour.country}"></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <div class="align-content-center text-center">
+                                        <div th:if="${neighboursPage.totalPages > 0}" class="pagination d-inline-block"
+                                             th:each="pageNumber : ${pageNumbers}">
+                                            <a th:href="@{/neighbour/buildings/{buildingId}/neighbours/(buildingId = ${building.id},size=${neighboursPage.size}, page=${pageNumber})}"
+                                               th:text="${pageNumber}"
+                                               th:class="${pageNumber==neighboursPage.number + 1} ? active"></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

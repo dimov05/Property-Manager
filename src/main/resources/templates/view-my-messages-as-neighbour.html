@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:include="~{fragment/navbar-neighbour-building}"></th:block>
+<body>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.0/css/boxicons.min.css"
+      integrity="sha512-pVCM5+SN2+qwj36KonHToF2p1oIvoU3bsqxphdOIWMYmgr4ZqD3t5DjKvvetKhXGc/ZG5REYTT6ltKfExEei/Q=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"/>
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.css"
+      integrity="sha256-NAxhqDvtY0l4xn+YVa6WjAcmd94NNfttjNsDmNatFVc=" crossorigin="anonymous"/>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <img th:src="${building.imageUrl}"
+                         alt="avatar"
+                         class="img-fluid mx-auto" style="width: 150px;">
+                    <h5 class="my-3" th:text="${building.name}"></h5>
+                    <p class="text-muted mb-1"
+                       th:text="${building.street} + ', ' + ${building.city} + ', ' + ${building.country}">Address</p>
+                    <p class="text-muted">Manager:</p>
+                    <p class="text-muted mb-4"
+                       th:text="${building.manager.fullName} + ', ' + ${building.manager.phoneNumber}"></p>
+                    <div class="d-flex justify-content-center mb-2">
+                        <a class="nav-item active mx-auto"
+                           th:href="@{/neighbour/buildings/{buildingId}/add-message(buildingId = ${building.id})}">Add
+                            message</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-4 mb-lg-0">
+                <div class="card-body p-0 text-center">
+                    <ul class="list-group list-group-flush rounded-3">
+                        <li class="list-group-item align-items-center p-3">
+                            <i class="fas fa-globe fa-lg text-warning"></i>
+                            <p class="mb-0 align-content-center text-center"
+                               th:text="'Building\'s money balance: ' + ${buildingBalance} +'lv.'"></p>
+                        </li>
+                        <li class="list-group-item align-items-center p-3">
+                            <i class="fas fa-globe fa-lg text-warning"></i>
+                            <p class="mb-0 align-content-center text-center"
+                               th:text="'Building\'s tax per Person: ' + ${building.taxPerPerson} +'lv.'"></p>
+                        </li>
+                        <li class="list-group-item align-items-center p-3">
+                            <i class="fas fa-globe fa-lg text-warning"></i>
+                            <p class="mb-0 align-content-center text-center"
+                               th:text="'Building\'s tax per Dog: ' + ${building.taxPerDog} +'lv.'"></p>
+                        </li>
+                        <li class="list-group-item align-items-center p-3">
+                            <i class="fas fa-globe fa-lg text-warning"></i>
+                            <p class="mb-0 align-content-center text-center"
+                               th:text="'Building\'s per elevator chip: ' + ${building.taxPerElevatorChip} +'lv.'"></p>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-9">
+            <div class="">
+                <div class="table-responsive">
+                    <table class="table project-list-table align-middle table-borderless">
+                        <thead>
+                        <tr>
+                            <th scope="col">Author</th>
+                            <th scope="col">Phone number</th>
+                            <th scope="col">Title</th>
+                            <th scope="col">Content</th>
+                            <th scope="col">Created:</th>
+                            <th scope="col" style="width: 60px;">Action</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="message: ${myMessages}" th:object="${message}">
+                            <td th:text="*{author.fullName}"></td>
+                            <td th:text="*{author.phoneNumber}"></td>
+                            <td th:text="*{title}"></td>
+                            <td th:text="*{content}"></td>
+                            <td th:text="*{createdDate.dayOfMonth} + ' ' + *{createdDate.month} + ' ' + *{createdDate.year}"></td>
+                            <td>
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item">
+                                        <a th:href="@{/neighbour/buildings/{buildingId}/message/{messageId}
+                                        (buildingId = ${building.id}, messageId = ${message.id})}"
+                                           data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"
+                                           class="px-2 text-primary">Edit</a>
+                                    </li>
+                                </ul>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row g-0 align-items-center pb-4">
+        <div class="col-sm-6">
+            <div><p class="mb-sm-0">Showing 1 to 10 of 57 entries</p></div>
+        </div>
+        <div class="col-sm-6">
+            <div class="float-sm-end">
+                <ul class="pagination mb-sm-0">
+                    <li class="page-item disabled">
+                        <a href="#" class="page-link"><i class="mdi mdi-chevron-left"></i></a>
+                    </li>
+                    <li class="page-item active"><a href="#" class="page-link">1</a></li>
+                    <li class="page-item"><a href="#" class="page-link">2</a></li>
+                    <li class="page-item"><a href="#" class="page-link">3</a></li>
+                    <li class="page-item"><a href="#" class="page-link">4</a></li>
+                    <li class="page-item"><a href="#" class="page-link">5</a></li>
+                    <li class="page-item">
+                        <a href="#" class="page-link"><i class="mdi mdi-chevron-right"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
