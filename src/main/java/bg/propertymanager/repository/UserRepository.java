@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,4 +21,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     @Query("SELECT u FROM UserEntity as u WHERE :building IN elements(u.ownerInBuildings) ORDER BY u.id")
     List<UserEntity> findAllNeighboursInBuilding(BuildingEntity building);
+
+    @Query("SELECT u FROM UserEntity as u WHERE CONCAT(u.id, ' ', u.username, ' ', u.fullName) like %?1%")
+    List<UserEntity> findAllByKeyword(String searchKeyword);
 }

@@ -6,6 +6,7 @@ import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
+import bg.propertymanager.model.view.UserEntityViewModel;
 import bg.propertymanager.service.ApartmentService;
 import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.TaxService;
@@ -164,18 +165,22 @@ public class BuildingController {
         int currentPage = page.orElse(1);
         int pageSize = size.orElse(10);
         BuildingViewDTO building = buildingService.findById(buildingId);
-        Page<UserEntity> neighboursPage = userService
+        Page<UserEntityViewModel> neighboursPage = userService
                 .findAllNeighboursByBuildingPaginated(PageRequest.of(currentPage - 1, pageSize), buildingId);
         int totalPages = neighboursPage.getTotalPages();
+        addPageNumbersAttribute(model, totalPages);
+        model.addAttribute("neighboursPage", neighboursPage);
+        model.addAttribute("building", building);
+        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        return "view-neighbours-as-manager";
+    }
+
+    private static void addPageNumbersAttribute(Model model, int totalPages) {
         if (totalPages > 0) {
             List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
                     .boxed()
                     .collect(Collectors.toList());
             model.addAttribute("pageNumbers", pageNumbers);
         }
-        model.addAttribute("neighboursPage", neighboursPage);
-        model.addAttribute("building", building);
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        return "view-neighbours-as-manager";
     }
 }

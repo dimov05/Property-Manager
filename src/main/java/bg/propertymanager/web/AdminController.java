@@ -3,9 +3,12 @@ package bg.propertymanager.web;
 import bg.propertymanager.model.dto.user.UserEditDTO;
 import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
-import bg.propertymanager.model.view.AdminViewUserProfile;
+import bg.propertymanager.model.view.UserEntityViewModel;
 import bg.propertymanager.repository.RoleRepository;
 import bg.propertymanager.service.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +19,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("/admin")
@@ -31,10 +37,24 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/users")
-    public ModelAndView manageUsers() {
+    public ModelAndView manageUsers(@Param("searchKeyword") String searchKeyword,
+                                    @RequestParam(name = "page") Optional<Integer> page,
+                                    @RequestParam(name = "size") Optional<Integer> size) {
         ModelAndView mav = new ModelAndView("manage-users");
-        List<AdminViewUserProfile> usersList = userService.findAll();
-        mav.addObject("users", usersList);
+        int currentPage = page.orElse(1);
+        int pageSize = size.orElse(10);
+        Page<UserEntityViewModel> usersPage = userService
+                .findAllUsersWithFilterPaginated(PageRequest.of(currentPage - 1, pageSize), searchKeyword);
+        int totalPages = usersPage.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            mav.addObject("pageNumbers", pageNumbers);
+        }
+        mav.addObject("totalUsers", userService.findAll().size());
+        mav.addObject("usersPage", usersPage);
+        mav.addObject("searchKeyword", searchKeyword);
         return mav;
     }
 
@@ -67,6 +87,7 @@ public class AdminController {
         userService.updateProfile(userEditDTO);
         return "redirect:/admin/users/edit/" + name;
     }
+
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/users/change-role/{name}")
     public ModelAndView changeRole(@PathVariable("name") String name, Model model) {
