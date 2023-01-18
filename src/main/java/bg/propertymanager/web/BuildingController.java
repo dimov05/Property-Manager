@@ -49,13 +49,19 @@ public class BuildingController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/buildings")
     public ModelAndView manageBuildings(@Param("searchKeyword") String searchKeyword,
-                                        @RequestParam(name = "page") Optional<Integer> page,
-                                        @RequestParam(name = "size") Optional<Integer> size) {
+                                        @RequestParam(name = "page", defaultValue = "1") Integer page,
+                                        @RequestParam(name = "size", defaultValue = "10") Integer size) {
         ModelAndView mav = new ModelAndView("manage-buildings");
-        int currentPage = page.orElse(1);
-        int pageSize = size.orElse(10);
         Page<BuildingEntity> buildingsPage = buildingService
-                .findAllBuildingsWithFilterPaginated(PageRequest.of(currentPage - 1, pageSize), searchKeyword);
+                .findAllBuildingsWithFilterPaginated(PageRequest.of(page - 1, size), searchKeyword);
+        addPageNumberModelAttributeIfThereAreBuildings(mav, buildingsPage);
+        mav.addObject("totalBuildings", buildingService.findAll().size());
+        mav.addObject("buildingsPage", buildingsPage);
+        mav.addObject("searchKeyword", searchKeyword);
+        return mav;
+    }
+
+    private static void addPageNumberModelAttributeIfThereAreBuildings(ModelAndView mav, Page<BuildingEntity> buildingsPage) {
         int totalPages = buildingsPage.getTotalPages();
         if (totalPages > 0) {
             List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
@@ -63,10 +69,6 @@ public class BuildingController {
                     .collect(Collectors.toList());
             mav.addObject("pageNumbers", pageNumbers);
         }
-        mav.addObject("totalBuildings", buildingService.findAll().size());
-        mav.addObject("buildingsPage", buildingsPage);
-        mav.addObject("searchKeyword", searchKeyword);
-        return mav;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -172,31 +174,4 @@ public class BuildingController {
         return "redirect:/manager/buildings/view/" + buildingId;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
-    @GetMapping("/manager/buildings/{buildingId}/neighbours")
-    public String viewNeighboursAsManager(@PathVariable("buildingId") Long buildingId,
-                                          @RequestParam(name = "page") Optional<Integer> page,
-                                          @RequestParam(name = "size") Optional<Integer> size,
-                                          Model model) {
-        int currentPage = page.orElse(1);
-        int pageSize = size.orElse(10);
-        BuildingViewDTO building = buildingService.findById(buildingId);
-        Page<UserEntityViewModel> neighboursPage = userService
-                .findAllNeighboursByBuildingPaginated(PageRequest.of(currentPage - 1, pageSize), buildingId);
-        int totalPages = neighboursPage.getTotalPages();
-        addPageNumbersAttribute(model, totalPages);
-        model.addAttribute("neighboursPage", neighboursPage);
-        model.addAttribute("building", building);
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        return "view-neighbours-as-manager";
-    }
-
-    private static void addPageNumbersAttribute(Model model, int totalPages) {
-        if (totalPages > 0) {
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
-                    .boxed()
-                    .collect(Collectors.toList());
-            model.addAttribute("pageNumbers", pageNumbers);
-        }
-    }
 }

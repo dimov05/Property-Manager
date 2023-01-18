@@ -44,30 +44,6 @@ public class ExpenseController {
     }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
-    @GetMapping("/manager/buildings/{buildingId}/expenses")
-    public String viewExpensesAsManager(@PathVariable("buildingId") Long buildingId,
-                                        @RequestParam(name = "page") Optional<Integer> page,
-                                        @RequestParam(name = "size") Optional<Integer> size,
-                                        Model model) {
-        int currentPage = page.orElse(1);
-        int pageSize = size.orElse(10);
-        BuildingViewDTO building = buildingService.findById(buildingId);
-        Page<ExpenseEntity> expensesPage = expenseService
-                .findAllExpensesByBuildingIdPaginated(PageRequest.of(currentPage - 1, pageSize), buildingId);
-        int totalPages = expensesPage.getTotalPages();
-        if (totalPages > 0) {
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
-                    .boxed()
-                    .collect(Collectors.toList());
-            model.addAttribute("pageNumbers", pageNumbers);
-        }
-        model.addAttribute("expensesPage", expensesPage);
-        model.addAttribute("building", building);
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        return "view-expenses-as-manager";
-    }
-
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/add-expense")
     public String addExpenseAsManager(@PathVariable("buildingId") Long buildingId, Model model) {
         if (!model.containsAttribute("expenseAddDTO")) {
@@ -142,5 +118,44 @@ public class ExpenseController {
             return "error-delete-expense";
         }
 
+    }
+
+    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @GetMapping("/manager/buildings/{buildingId}/expenses")
+    public String viewExpensesAsManager(@PathVariable("buildingId") Long buildingId,
+                                        @RequestParam(name = "page",defaultValue = "1") Integer page,
+                                        @RequestParam(name = "size",defaultValue = "10") Integer size,
+                                        Model model) {
+        setNeededModelAttributes(buildingId, page, size, model);
+        return "view-expenses-as-manager";
+    }
+
+    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @GetMapping("/neighbour/buildings/{buildingId}/expenses")
+    public String viewExpensesAsNeighbour(@PathVariable("buildingId") Long buildingId,
+                                        @RequestParam(name = "page",defaultValue = "1") Integer page,
+                                        @RequestParam(name = "size",defaultValue = "10") Integer size,
+                                        Model model) {
+        setNeededModelAttributes(buildingId, page, size, model);
+        return "view-expenses-as-neighbour";
+    }
+    private void setNeededModelAttributes(@PathVariable("buildingId") Long buildingId, @RequestParam(name = "page") Integer page, @RequestParam(name = "size") Integer size, Model model) {
+        BuildingViewDTO building = buildingService.findById(buildingId);
+        Page<ExpenseEntity> expensesPage = expenseService
+                .findAllExpensesByBuildingIdPaginated(PageRequest.of(page - 1, size), buildingId);
+        addPageNumbersModelAttributeIfThereAreEnoughPages(model, expensesPage);
+        model.addAttribute("expensesPage", expensesPage);
+        model.addAttribute("building", building);
+        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+    }
+
+    private static void addPageNumbersModelAttributeIfThereAreEnoughPages(Model model, Page<ExpenseEntity> expensesPage) {
+        int totalPages = expensesPage.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            model.addAttribute("pageNumbers", pageNumbers);
+        }
     }
 }

@@ -214,4 +214,10 @@ public class BuildingService {
         }
         return list;
     }
+
+    public Boolean checkIfUserIsANeighbour(String username, Long buildingId) {
+        boolean ownerInBuilding = apartmentService.findAllApartmentsByBuildingIdAndOwnerUsername(buildingId,username);
+
+        return ownerInBuilding;
+    }
 }

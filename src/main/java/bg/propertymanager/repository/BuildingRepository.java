@@ -15,4 +15,5 @@ public interface BuildingRepository extends JpaRepository<BuildingEntity, Long> 
     @Query("SELECT b FROM BuildingEntity as b " +
             "WHERE CONCAT(b.id, ' ', b.name, ' ', b.city, ' ',b.country , ' ',b.street) like %?1%")
     List<BuildingEntity> findAllByKeyword(String searchKeyword);
+
 }

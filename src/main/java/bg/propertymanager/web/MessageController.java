@@ -20,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.List;
 import java.util.Set;
 
 @Controller
@@ -42,8 +43,8 @@ public class MessageController {
         BuildingViewDTO building = buildingService.findById(buildingId);
         mav.addObject("building", building);
         mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        Set<MessageEntity> messagesFromNeighbours = messageService.findAllNeighboursMessagesForBuildingSortedFromNewToOld(building);
-        Set<MessageEntity> messagesFromManager = messageService.findAllManagersMessagesForBuildingSortedFromNewToOld(building);
+        List<MessageEntity> messagesFromNeighbours = messageService.findAllNeighboursMessagesForBuildingSortedFromNewToOld(building);
+        List<MessageEntity> messagesFromManager = messageService.findAllManagersMessagesForBuildingSortedFromNewToOld(building);
         mav.addObject("messagesFromNeighbours", messagesFromNeighbours);
         mav.addObject("messagesFromManager", messagesFromManager);
         return mav;
@@ -56,8 +57,37 @@ public class MessageController {
                                                    Model model) {
         ModelAndView mav = new ModelAndView("view-my-messages-as-manager");
         BuildingViewDTO building = buildingService.findById(buildingId);
-        Set<MessageEntity> myMessages = messageService.findAllManagersMessagesForBuildingSortedFromNewToOld(building);
+        List<MessageEntity> myMessages = messageService.findAllManagersMessagesForBuildingSortedFromNewToOld(building);
         mav.addObject("messagesFromManager", myMessages);
+        mav.addObject("building", building);
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+
+        return mav;
+    }
+
+    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @GetMapping("/neighbour/buildings/{buildingId}/messages")
+    public ModelAndView viewMessagesAsNeighbour(@PathVariable("buildingId") Long buildingId,
+                                                Model model) {
+        ModelAndView mav = new ModelAndView("view-messages-as-neighbour");
+        BuildingViewDTO building = buildingService.findById(buildingId);
+        mav.addObject("building", building);
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        List<MessageEntity> messagesFromNeighbours = messageService.findAllNeighboursMessagesForBuildingSortedFromNewToOld(building);
+        List<MessageEntity> messagesFromManager = messageService.findAllManagersMessagesForBuildingSortedFromNewToOld(building);
+        mav.addObject("messagesFromNeighbours", messagesFromNeighbours);
+        mav.addObject("messagesFromManager", messagesFromManager);
+        return mav;
+    }
+
+    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @GetMapping("/neighbour/buildings/{buildingId}/my-messages/{principalName}")
+    public ModelAndView viewAllMyMessagesAsNeighbour(@PathVariable("buildingId") Long buildingId,
+                                                     @PathVariable("principalName") String principalUsername) {
+        ModelAndView mav = new ModelAndView("view-my-messages-as-neighbour");
+        BuildingViewDTO building = buildingService.findById(buildingId);
+        List<MessageEntity> myMessages = messageService.findAllMessagesForBuildingByOwnerIdSortedFromNewToOld(buildingId, principalUsername);
+        mav.addObject("myMessages", myMessages);
         mav.addObject("building", building);
         mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
 
@@ -87,8 +117,36 @@ public class MessageController {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.messageAddDTO", bindingResult);
             return String.format("redirect:/manager/buildings/%d/add-message", buildingId);
         }
-        messageService.addMessage(messageAddDTO, buildingId);
+        messageService.addMessage(messageAddDTO, buildingId, principal.getName());
         return String.format("redirect:/manager/buildings/%d/my-messages/%s",
+                buildingId, principal.getName());
+    }
+
+    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @GetMapping("/neighbour/buildings/{buildingId}/add-message")
+    public String addMessageAsNeighbour(@PathVariable("buildingId") Long buildingId, Model model) {
+        if (!model.containsAttribute("messageAddDTO")) {
+            model.addAttribute("messageAddDTO", new MessageAddDTO());
+        }
+        model.addAttribute("building", buildingService.findById(buildingId));
+        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        return "add-message-as-neighbour";
+    }
+
+    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @PostMapping("/neighbour/buildings/{buildingId}/add-message")
+    public String addMessageAsNeighbourConfirm(@Valid MessageAddDTO messageAddDTO,
+                                               BindingResult bindingResult,
+                                               RedirectAttributes redirectAttributes,
+                                               @PathVariable("buildingId") Long buildingId,
+                                               Principal principal) {
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("messageAddDTO", messageAddDTO);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.messageAddDTO", bindingResult);
+            return String.format("redirect:/neighbour/buildings/%d/add-message", buildingId);
+        }
+        messageService.addMessage(messageAddDTO, buildingId, principal.getName());
+        return String.format("redirect:/neighbour/buildings/%d/my-messages/%s",
                 buildingId, principal.getName());
     }
 
@@ -126,13 +184,59 @@ public class MessageController {
                 buildingId, principal.getName());
     }
 
+    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)" +
+            " AND @messageService.checkIfUserIsAuthor(principal.username, #messageId)")
+    @GetMapping("/neighbour/buildings/{buildingId}/message/{messageId}")
+    public String editMessageAsNeighbour(@PathVariable("buildingId") Long buildingId,
+                                         @PathVariable("messageId") Long messageId,
+                                         Model model) {
+        if (!model.containsAttribute("messageEditDTO")) {
+            model.addAttribute("messageEditDTO", new MessageEditDTO());
+        }
+        model.addAttribute("building", buildingService.findById(buildingId));
+        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        model.addAttribute("message", messageService.findById(messageId));
+        return "edit-message-as-neighbour";
+    }
+
+    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)" +
+            " AND @messageService.checkIfUserIsAuthor(principal.username, #messageId)")
+    @PostMapping("/neighbour/buildings/{buildingId}/message/{messageId}")
+    public String editMessageAsNeighbourConfirm(@Valid MessageEditDTO messageEditDTO,
+                                                BindingResult bindingResult,
+                                                RedirectAttributes redirectAttributes,
+                                                @PathVariable("buildingId") Long buildingId,
+                                                @PathVariable("messageId") Long messageId,
+                                                Principal principal) {
+        messageEditDTO.setId(messageId);
+        if (bindingResult.hasErrors()) {
+            redirectAttributes.addFlashAttribute("messageEditDTO", messageEditDTO);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.messageEditDTO", bindingResult);
+            return String.format("redirect:/neighbour/buildings/%d/message/%d",
+                    buildingId, messageId);
+        }
+        messageService.updateMessage(messageEditDTO);
+        return String.format("redirect:/neighbour/buildings/%d/my-messages/%s",
+                buildingId, principal.getName());
+    }
+
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @DeleteMapping("/manager/buildings/{buildingId}/delete-message/{messageId}")
-    public String deleteMessageConfirm(@PathVariable("buildingId") Long buildingId,
-                                       @PathVariable("messageId") Long messageId,
-                                       Principal principal) {
-        messageService.deleteMessageWithId(messageId,buildingId);
+    public String deleteMessageAsManagerConfirm(@PathVariable("buildingId") Long buildingId,
+                                                @PathVariable("messageId") Long messageId,
+                                                Principal principal) {
+        messageService.deleteMessageWithId(messageId, buildingId);
         return String.format("redirect:/manager/buildings/%d/my-messages/%s",
+                buildingId, principal.getName());
+    }
+
+    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @DeleteMapping("/neighbour/buildings/{buildingId}/delete-message/{messageId}")
+    public String deleteMessageAsNeighbourConfirm(@PathVariable("buildingId") Long buildingId,
+                                                  @PathVariable("messageId") Long messageId,
+                                                  Principal principal) {
+        messageService.deleteMessageWithId(messageId, buildingId);
+        return String.format("redirect:/neighbour/buildings/%d/my-messages/%s",
                 buildingId, principal.getName());
     }
 }

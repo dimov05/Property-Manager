@@ -31,6 +31,6 @@ public interface ApartmentRepository extends JpaRepository<ApartmentEntity, Long
     @Query("SELECT SUM(а.elevatorChipsCount)  FROM ApartmentEntity as а WHERE а.building.id = :buildingId")
     Optional<Integer> findTotalCountOfElevatorChipsByBuildingId(@Param("buildingId") Long buildingId);
 
-
+    List<ApartmentEntity> findAllByBuilding_IdAndOwner_Username(Long buildingId, String ownerUsername);
 
 }

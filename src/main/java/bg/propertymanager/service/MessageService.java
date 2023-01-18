@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -28,20 +29,20 @@ public class MessageService {
     }
 
 
-    public Set<MessageEntity> findAllNeighboursMessagesForBuildingSortedFromNewToOld(BuildingViewDTO building) {
+    public List<MessageEntity> findAllNeighboursMessagesForBuildingSortedFromNewToOld(BuildingViewDTO building) {
         return messageRepository
                 .findAllByBuilding_IdAndAuthorIsNotOrderByCreatedDateDesc(building.getId(), building.getManager());
 
     }
 
-    public Set<MessageEntity> findAllManagersMessagesForBuildingSortedFromNewToOld(BuildingViewDTO building) {
+    public List<MessageEntity> findAllManagersMessagesForBuildingSortedFromNewToOld(BuildingViewDTO building) {
         return messageRepository
                 .findAllByBuilding_IdAndAuthorIdOrderByCreatedDateDesc(building.getId(), building.getManager().getId());
     }
 
-    public void addMessage(MessageAddDTO messageAddDTO, Long buildingId) {
+    public void addMessage(MessageAddDTO messageAddDTO, Long buildingId,String authorUsername) {
         BuildingEntity building = buildingService.findEntityById(buildingId);
-        UserEntity author = building.getManager();
+        UserEntity author = userService.findUserByUsername(authorUsername);
         MessageEntity newMessage = new MessageEntity()
                 .setAuthor(author)
                 .setBuilding(building)
@@ -95,5 +96,17 @@ public class MessageService {
                     .append(dateOfLastMessageFromManager.getDayOfMonth());
             return date.toString();
         }
+    }
+
+    public List<MessageEntity> findAllMessagesForBuildingByOwnerIdSortedFromNewToOld(Long buildingId, String authorUsername) {
+        return messageRepository.findALlByBuilding_IdAndAuthor_UsernameOrderByCreatedDateDesc(buildingId, authorUsername);
+    }
+
+    public Boolean checkIfUserIsAuthor(String authorUsername, Long messageId) {
+        MessageEntity message = messageRepository
+                .findById(messageId)
+                .orElseThrow(()-> new NullPointerException("There is no message with this id " + messageId));
+        return message.getAuthor().getUsername().equals(authorUsername);
+
     }
 }

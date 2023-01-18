@@ -28,6 +28,18 @@ public class DashboardController {
     @GetMapping("/manager/buildings/{buildingId}/dashboard")
     public String viewDashboardAsManager(@PathVariable("buildingId") Long buildingId,
                                          Model model) {
+        addAllDataAttributesForDashboard(buildingId, model);
+        return "view-dashboard-as-manager";
+    }
+    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @GetMapping("/neighbour/buildings/{buildingId}/dashboard")
+    public String viewDashboardAsNeighbour(@PathVariable("buildingId") Long buildingId,
+                                         Model model) {
+        addAllDataAttributesForDashboard(buildingId, model);
+        return "view-dashboard-as-neighbour";
+    }
+
+    private void addAllDataAttributesForDashboard(Long buildingId, Model model) {
         BuildingViewDTO building = buildingService.findById(buildingId);
         model.addAttribute("building", building);
         model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
@@ -41,6 +53,5 @@ public class DashboardController {
         model.addAttribute("totalPaidExpenses", expenseService.findAmountOfAllPaidExpensesByBuildingId(buildingId));
         model.addAttribute("totalUnpaidExpenses", expenseService.findAmountOfAllUnpaidExpensesByBuildingId(buildingId));
         model.addAttribute("topFiveApartmentsByDebt", taxService.findTopFiveApartmentsInBuildingByDebt(buildingId));
-        return "view-dashboard-as-manager";
     }
 }
