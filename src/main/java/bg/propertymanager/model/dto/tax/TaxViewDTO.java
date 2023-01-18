@@ -13,6 +13,7 @@ public class TaxViewDTO {
     private Long id;
     private TaxTypeEnum taxType;
     private BigDecimal amount;
+    private BigDecimal paidAmount;
     private TaxStatusEnum taxStatus;
     private String description;
     private LocalDateTime startDate;
@@ -49,6 +50,15 @@ public class TaxViewDTO {
 
     public TaxViewDTO setAmount(BigDecimal amount) {
         this.amount = amount;
+        return this;
+    }
+
+    public BigDecimal getPaidAmount() {
+        return paidAmount;
+    }
+
+    public TaxViewDTO setPaidAmount(BigDecimal paidAmount) {
+        this.paidAmount = paidAmount;
         return this;
     }
 

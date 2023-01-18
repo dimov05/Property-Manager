@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<th:block th:include="~{fragment/navbar-neighbour-building}"></th:block>
+<body>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.1.0/css/boxicons.min.css"
+      integrity="sha512-pVCM5+SN2+qwj36KonHToF2p1oIvoU3bsqxphdOIWMYmgr4ZqD3t5DjKvvetKhXGc/ZG5REYTT6ltKfExEei/Q=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"/>
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/MaterialDesign-Webfont/5.3.45/css/materialdesignicons.css"
+      integrity="sha256-NAxhqDvtY0l4xn+YVa6WjAcmd94NNfttjNsDmNatFVc=" crossorigin="anonymous"/>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <img th:src="${building.imageUrl}"
+                         alt="avatar"
+                         class="img-fluid mx-auto" style="width: 150px;">
+                    <h5 class="my-3" th:text="${building.name}"></h5>
+                    <p class="text-muted mb-1"
+                       th:text="${building.street} + ', ' + ${building.city} + ', ' + ${building.country}">Address</p>
+                    <p class="text-muted">Manager:</p>
+                    <p class="text-muted mb-4"
+                       th:text="${building.manager.fullName} + ', ' + ${building.manager.phoneNumber}"></p>
+                </div>
+            </div>
+            <div class="card mb-4 mb-lg-0">
+                <div class="card-body p-0 text-center">
+                    <ul class="list-group list-group-flush rounded-3">
+                        <li class="list-group-item align-items-center p-3">
+                            <i class="fas fa-globe fa-lg text-warning"></i>
+                            <p class="mb-0 align-content-center text-center"
+                               th:text="'Building\'s money balance: ' + ${buildingBalance} +'lv.'"></p>
+                        </li>
+                        <li class="list-group-item align-items-center p-3">
+                            <i class="fas fa-globe fa-lg text-warning"></i>
+                            <p class="mb-0 align-content-center text-center"
+                               th:text="'Building\'s tax per Person: ' + ${building.taxPerPerson} +'lv.'"></p>
+                        </li>
+                        <li class="list-group-item align-items-center p-3">
+                            <i class="fas fa-globe fa-lg text-warning"></i>
+                            <p class="mb-0 align-content-center text-center"
+                               th:text="'Building\'s tax per Dog: ' + ${building.taxPerDog} +'lv.'"></p>
+                        </li>
+                        <li class="list-group-item align-items-center p-3">
+                            <i class="fas fa-globe fa-lg text-warning"></i>
+                            <p class="mb-0 align-content-center text-center"
+                               th:text="'Building\'s per elevator chip: ' + ${building.taxPerElevatorChip} +'lv.'"></p>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-9">
+            <div class="table-responsive">
+                <table class="table project-list-table align-middle table-borderless">
+                    <thead>
+                    <tr>
+                        <th scope="col">Description</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Remaining Amount</th>
+                        <th scope="col">Tax type</th>
+                        <th scope="col">Due date</th>
+                        <th scope="col">Tax status:</th>
+                        <th scope="col" style="width: 60px;">Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="tax, iStat : ${taxesPage.content}"
+                        th:style="${iStat.odd}? 'font-weight: bold;'"
+                        th:alt-title="${iStat.even}? 'even' : 'odd'">
+                        <td th:text="${tax.description}"></td>
+                        <td th:text="${tax.amount} + 'lv.'"></td>
+                        <td th:text="${tax.amount - tax.paidAmount} + 'lv.'"></td>
+                        <td th:text="${tax.taxType.name()}"></td>
+                        <td th:text="${tax.dueDate.dayOfMonth} + ' ' + ${tax.dueDate.month} + ' ' + ${tax.dueDate.year}"></td>
+                        <td th:text="${tax.taxStatus.name()}"></td>
+                        <td th:if="${tax.taxStatus.name() == 'UNPAID' || tax.taxStatus.name() == 'PARTLY_PAID'}">
+                            <ul class="list-inline mb-0">
+                                <li class="list-inline-item">
+                                    <a th:href="@{/neighbour/buildings/{buildingId}/pay-tax/{taxId}
+                                        (buildingId = ${building.id}, taxId = ${tax.id})}"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Pay"
+                                       class="px-2 text-primary">Pay</a>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div class="align-content-center text-center">
+                    <div th:if="${taxesPage.totalPages > 0}" class="pagination d-inline-block"
+                         th:each="pageNumber : ${pageNumbers}">
+                        <a th:href="@{/manager/buildings/{buildingId}/taxes(buildingId = ${building.id},size=${taxesPage.size}, page=${pageNumber})}"
+                           th:text="${pageNumber}"
+                           th:class="${pageNumber==taxesPage.number + 1} ? active"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

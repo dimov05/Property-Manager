@@ -15,6 +15,7 @@ public class TaxEntity {
     private Long id;
     private TaxTypeEnum taxType;
     private BigDecimal amount;
+    private BigDecimal paidAmount;
     private TaxStatusEnum taxStatus;
     private String description;
     private LocalDateTime startDate;
@@ -55,6 +56,15 @@ public class TaxEntity {
 
     public TaxEntity setAmount(BigDecimal amount) {
         this.amount = amount;
+        return this;
+    }
+    @Column(name = "paid_amount", nullable = false)
+    public BigDecimal getPaidAmount() {
+        return paidAmount;
+    }
+
+    public TaxEntity setPaidAmount(BigDecimal paidAmount) {
+        this.paidAmount = paidAmount;
         return this;
     }
 

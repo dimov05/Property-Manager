@@ -2,6 +2,7 @@ package bg.propertymanager.service;
 
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.dto.tax.TaxEditDTO;
+import bg.propertymanager.model.dto.tax.TaxPayDTO;
 import bg.propertymanager.model.dto.tax.TaxViewDTO;
 import bg.propertymanager.model.entity.ApartmentEntity;
 import bg.propertymanager.model.entity.BuildingEntity;
@@ -36,16 +37,14 @@ public class TaxService {
     private final BuildingService buildingService;
     private final ApartmentService apartmentService;
     private final ExpenseRepository expenseRepository;
-    private final ExpenseService expenseService;
 
     public TaxService(TaxRepository taxRepository, ModelMapper modelMapper, BuildingService buildingService, ApartmentService apartmentService,
-                      ExpenseRepository expenseRepository, ExpenseService expenseService) {
+                      ExpenseRepository expenseRepository) {
         this.taxRepository = taxRepository;
         this.modelMapper = modelMapper;
         this.buildingService = buildingService;
         this.apartmentService = apartmentService;
         this.expenseRepository = expenseRepository;
-        this.expenseService = expenseService;
     }
 
     public List<TaxViewDTO> findAllTaxes(BuildingViewDTO building) {
@@ -89,7 +88,6 @@ public class TaxService {
         return taxRepository
                 .findOwedMoneyByApartmentId(apartmentId)
                 .orElse(BigDecimal.ZERO);
-
     }
 
     public void save(TaxEntity newTaxToAdd) {
@@ -106,6 +104,7 @@ public class TaxService {
             TaxEntity newTaxToAdd = new TaxEntity()
                     .setTaxType(expense.getTaxType())
                     .setAmount(taxForEachApartment)
+                    .setPaidAmount(BigDecimal.ZERO)
                     .setTaxStatus(TaxStatusEnum.UNPAID)
                     .setDescription(expense.getDescription())
                     .setStartDate(expense.getStartDate())
@@ -158,15 +157,9 @@ public class TaxService {
                 .orElse(BigDecimal.ZERO);
     }
 
-    public Page<TaxEntity> findAllTaxesByBuildingIdPaginated(Pageable pageable, Long buildingId) {
-        List<TaxEntity> taxes = taxRepository
-                .findAllTaxesByBuildingOrderByDueDateAscAndTaxStatus(buildingId);
-        return getPageOfTaxes(pageable, taxes);
-    }
-
     public Page<TaxEntity> findAllTaxesByBuildingIdFilteredAndPaginated(Pageable pageable, Long buildingId, String searchKeyword) {
-        List<TaxEntity> taxes = getTaxesByBuildingWithOrWithoutFilter(searchKeyword,buildingId);
-        return getPageOfTaxes(pageable,taxes);
+        List<TaxEntity> taxes = getTaxesByBuildingWithOrWithoutFilter(searchKeyword, buildingId);
+        return getPageOfTaxes(pageable, taxes);
     }
 
     public Page<TaxEntity> findAllTaxesByBuildingIdAndOwnerId(Pageable pageable, Long buildingId, Long neighbourId) {
@@ -197,7 +190,7 @@ public class TaxService {
 
     public Page<ApartmentEntity> findTopFiveApartmentsInBuildingByDebt(Long buildingId) {
 
-        return taxRepository.findTopFiveApartmentsByDebtInBuilding(PageRequest.of(0,5),buildingId);
+        return taxRepository.findTopFiveApartmentsByDebtInBuilding(PageRequest.of(0, 5), buildingId);
     }
 
     private List<TaxEntity> getTaxesByBuildingWithOrWithoutFilter(String searchKeyword, Long buildingId) {
@@ -207,8 +200,48 @@ public class TaxService {
                     .findAllTaxesByBuildingOrderByDueDateAscAndTaxStatus(buildingId);
         } else {
             taxes = taxRepository
-                    .findAllTaxesByBuildingIdFilteredByKeywordOrderByDueDateAscAndTaxStatus(buildingId,searchKeyword);
+                    .findAllTaxesByBuildingIdFilteredByKeywordOrderByDueDateAscAndTaxStatus(buildingId, searchKeyword);
         }
         return taxes;
+    }
+
+    public Page<TaxEntity> findALlMyTaxesByBuildingIdPaginated(Pageable pageable, Long buildingId, String ownerUsername) {
+        List<TaxEntity> taxes = taxRepository
+                .findAllTaxesByBuildingIdAndOwnerUsername(buildingId, ownerUsername);
+        return getPageOfTaxes(pageable, taxes);
+    }
+
+    public void payTaxAmount(TaxPayDTO taxPayDTO) {
+        TaxEntity taxToBePaid = taxRepository
+                .findById(taxPayDTO.getId())
+                .orElseThrow(() -> new NullPointerException("There is no such a tax with this id " + taxPayDTO.getId()));
+
+        payTaxAmountAndChangeStatusIfTaxIsPaid(taxPayDTO, taxToBePaid);
+        taxRepository.save(taxToBePaid);
+    }
+
+    private static void payTaxAmountAndChangeStatusIfTaxIsPaid(TaxPayDTO taxPayDTO, TaxEntity taxToBePaid) {
+        if (checkIfAmountToBePaidIsMoreThanPaidAmount(taxPayDTO, taxToBePaid)) {
+            taxToBePaid.setTaxStatus(TaxStatusEnum.PARTLY_PAID);
+        } else {
+            taxToBePaid.setTaxStatus(TaxStatusEnum.PAID);
+        }
+        taxToBePaid.setPaidAmount(taxToBePaid.getPaidAmount().add(taxPayDTO.getPaidAmount()));
+    }
+
+    private static boolean checkIfAmountToBePaidIsMoreThanPaidAmount(TaxPayDTO taxPayDTO, TaxEntity taxToBePaid) {
+        return (taxToBePaid.getAmount().subtract(taxToBePaid.getPaidAmount())).compareTo(taxPayDTO.getPaidAmount()) > 0;
+    }
+
+    public Boolean checkIfUserIsOwnerOfTax(String ownerUsername, Long taxId) {
+        TaxEntity tax = taxRepository.findById(taxId)
+                .orElseThrow(() -> new NullPointerException("There is no tax with this id " + taxId));
+        return tax.getApartment().getOwner().getUsername().equals(ownerUsername);
+    }
+
+    public boolean checkIfPaidAmountIsMoreThanTax(Long taxId, BigDecimal paidAmount) {
+        TaxEntity tax = taxRepository.findById(taxId)
+                .orElseThrow(() -> new NullPointerException("There is no tax with this id " + taxId));
+        return paidAmount.compareTo(tax.getAmount()) > 0;
     }
 }
