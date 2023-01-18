@@ -60,7 +60,7 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/users/edit/{name}")
-    public ModelAndView editProfileAsAdmin(@PathVariable("name") String name, Model model) {
+    public ModelAndView editUserAsAdmin(@PathVariable("name") String name, Model model) {
         if (!model.containsAttribute("userEditDTO")) {
             model.addAttribute("userEditDTO", new UserEditDTO());
         }
@@ -90,12 +90,19 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/users/change-role/{name}")
-    public ModelAndView changeRole(@PathVariable("name") String name, Model model) {
+    public ModelAndView changeUserRoleAsAdmin(@PathVariable("name") String name, Model model) {
         UserEntity userProfileToEdit = userService.findUserByUsername(name);
-        List<RoleEntity> roles = roleRepository.findAll();
         ModelAndView mav = new ModelAndView("change-roles");
         mav.addObject("user", userProfileToEdit);
-        mav.addObject("roles", roles);
+        mav.addObject("roles", roleRepository.findAll());
         return mav;
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/users/change-role/{username}")
+    public String changeUserRoleAsAdminConfirm(@PathVariable("username") String username,
+                                               @RequestParam String role) {
+        userService.changeRole(role,username);
+        return "redirect:/admin/users/";
     }
 }
