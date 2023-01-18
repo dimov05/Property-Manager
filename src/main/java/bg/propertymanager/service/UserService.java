@@ -5,7 +5,7 @@ import bg.propertymanager.model.dto.user.UserEditDTO;
 import bg.propertymanager.model.dto.user.UserRegisterDTO;
 import bg.propertymanager.model.entity.*;
 import bg.propertymanager.model.enums.UserRolesEnum;
-import bg.propertymanager.model.view.AdminViewUserProfile;
+import bg.propertymanager.model.view.UserEntityViewModel;
 import bg.propertymanager.repository.RoleRepository;
 import bg.propertymanager.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -155,11 +155,11 @@ public class UserService {
         return passwordEncoder.matches(passwordChangeDTO.getOldPassword(), actualOldPassword);
     }
 
-    public List<AdminViewUserProfile> findAll() {
+    public List<UserEntityViewModel> findAll() {
         List<UserEntity> usersList = userRepository.findAll();
         return usersList
                 .stream()
-                .map(u -> modelMapper.map(u, AdminViewUserProfile.class))
+                .map(u -> modelMapper.map(u, UserEntityViewModel.class))
                 .toList();
     }
 
@@ -223,19 +223,60 @@ public class UserService {
         userRepository.save(author);
     }
 
-    public Page<UserEntity> findAllNeighboursByBuildingPaginated(Pageable pageable, Long buildingId) {
+    public Page<UserEntityViewModel> findAllNeighboursByBuildingPaginated(Pageable pageable, Long buildingId) {
         BuildingEntity building = buildingService.findEntityById(buildingId);
-        List<UserEntity> neighbours = userRepository.findAllNeighboursInBuilding(building);
+        List<UserEntityViewModel> neighbours = getNeighboursInBuilding(building);
+        return getUsersOnSelectedPage(pageable, neighbours);
+    }
+
+    public Page<UserEntityViewModel> findAllUsersWithFilterPaginated(Pageable pageable, String searchKeyword) {
+        List<UserEntityViewModel> users = getUsersWithOrWithoutFilter(searchKeyword);
+        return getUsersOnSelectedPage(pageable, users);
+    }
+
+    private static List<UserEntityViewModel> getUsersPaginated(List<UserEntityViewModel> users, int pageSize, int startItem) {
+        List<UserEntityViewModel> list;
+        if (users.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, users.size());
+            list = users.subList(startItem, toIndex);
+        }
+        return list;
+    }
+
+    private List<UserEntityViewModel> getUsersWithOrWithoutFilter(String searchKeyword) {
+        List<UserEntityViewModel> users;
+        if (searchKeyword == null) {
+            users = userRepository
+                    .findAll()
+                    .stream()
+                    .map(u -> modelMapper.map(u, UserEntityViewModel.class))
+                    .toList();
+        } else {
+            users = userRepository
+                    .findAllByKeyword(searchKeyword)
+                    .stream()
+                    .map(u -> modelMapper.map(u, UserEntityViewModel.class))
+                    .toList();
+        }
+        return users;
+    }
+
+    private List<UserEntityViewModel> getNeighboursInBuilding(BuildingEntity building) {
+        List<UserEntityViewModel> neighbours = userRepository
+                .findAllNeighboursInBuilding(building)
+                .stream()
+                .map(u -> modelMapper.map(u, UserEntityViewModel.class))
+                .toList();
+        return neighbours;
+    }
+
+    private static PageImpl<UserEntityViewModel> getUsersOnSelectedPage(Pageable pageable, List<UserEntityViewModel> neighbours) {
         int pageSize = pageable.getPageSize();
         int currentPage = pageable.getPageNumber();
         int startItem = currentPage * pageSize;
-        List<UserEntity> list;
-        if (neighbours.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, neighbours.size());
-            list = neighbours.subList(startItem, toIndex);
-        }
-        return new PageImpl<UserEntity>(list, PageRequest.of(currentPage, pageSize), neighbours.size());
+        List<UserEntityViewModel> list = getUsersPaginated(neighbours, pageSize, startItem);
+        return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), neighbours.size());
     }
 }

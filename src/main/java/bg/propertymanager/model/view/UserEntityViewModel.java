@@ -5,7 +5,7 @@ import bg.propertymanager.model.entity.*;
 import java.util.List;
 import java.util.Set;
 
-public class AdminViewUserProfile {
+public class UserEntityViewModel {
     private Long id;
     private String username;
     private String password;
@@ -23,7 +23,7 @@ public class AdminViewUserProfile {
     private Set<MessageEntity> messages;
     private Set<TaxEntity> taxes;
 
-    public AdminViewUserProfile() {
+    public UserEntityViewModel() {
     }
 
     public Long getId() {
