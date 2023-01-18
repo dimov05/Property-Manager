@@ -4,23 +4,43 @@
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <th:block th:include="~{fragment/navbar}"></th:block>
 <body>
-<div>
-    <!--    <div class="form-check">-->
-    <!--        <input type="radio" class="form-check-input" id="user" name="user" value="user"-->
-    <!--               th:checked="${user.getRoles().contains()}"-->
-    <!--        >User-->
-    <!--        <label class="form-check-label" for="user"></label>-->
-    <!--    </div>-->
-    <th:block th:each="role : ${roles}">
-        <div class="form-check">
-            <input th:checked="${user.getRoles().contains(role)}" th:type="radio" id="user" name="user" value="user">
-            <label for="user" th:text="${role.getName()}"></label>
+<section style="background-color: #eee;">
+    <div class="container py-5">
+        <div class="row">
+            <div>
+                <div class="col-lg-9">
+                    <div class="card mb-4">
+                        <form class="card-body"
+                              th:action="@{/admin/users/change-role/{username}(username = ${user.username})}"
+                              th:method="POST">
+                            <div class="row align-content-center">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Change role</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    <div class="form-check form-check-inline" th:each="role : ${roles}">
+                                        <input type="radio"
+                                               style="display: inline-block;"
+                                               name="role"
+                                               th:id="${role.name}"
+                                               th:value="${role.name}"
+                                               th:text="${role.name}">
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <div class="form-group form-button align-content-center">
+                                    <input type="submit" name="save" id="save" class="form-submit"
+                                           value="Save role"/>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-    </th:block>
-    <div class="form-group form-button align-content-center">
-        <input type="submit" name="save" id="save" class="form-submit"
-               value="Save"/>
     </div>
-</div>
+</section>
 </body>
 </html>

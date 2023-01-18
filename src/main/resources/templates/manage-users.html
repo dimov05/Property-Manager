@@ -37,6 +37,7 @@
                             <th scope="col">Id</th>
                             <th scope="col">Full name</th>
                             <th scope="col">Username</th>
+                            <th scope="col">Role</th>
                             <th scope="col">Email</th>
                             <th scope="col">Phone number</th>
                             <th scope="col">Address</th>
@@ -50,6 +51,7 @@
                             <td th:text="*{id}"></td>
                             <td th:text="*{fullName}"></td>
                             <td th:text="*{username}"></td>
+                            <td th:text="*{roles.get(0).name}"></td>
                             <td th:text="*{email}"></td>
                             <td th:text="*{phoneNumber}"></td>
                             <td th:text="*{street} + ', ' + *{city} + ', ' + *{country}"></td>

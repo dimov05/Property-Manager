@@ -34,18 +34,20 @@ public class UserService {
     private final ModelMapper modelMapper;
     private final String adminPass;
     private final BuildingService buildingService;
+    private final RoleService roleService;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        RoleRepository roleRepository,
                        PasswordEncoder passwordEncoder,
-                       ModelMapper modelMapper, @Value("${app.default.admin.password}") String adminPass, @Lazy BuildingService buildingService) {
+                       ModelMapper modelMapper, @Value("${app.default.admin.password}") String adminPass, @Lazy BuildingService buildingService, RoleService roleService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
         this.adminPass = adminPass;
         this.buildingService = buildingService;
+        this.roleService = roleService;
     }
 
     public UserEntity register(UserRegisterDTO userRegisterDTO) {
@@ -278,5 +280,31 @@ public class UserService {
             list = users.subList(startItem, toIndex);
         }
         return list;
+    }
+
+    public void changeRole(String roleName, String username) {
+        UserEntity userToChangeRole = userRepository.findByUsername(username)
+                .orElseThrow(() -> new NullPointerException("No user with this username " + username));
+        RoleEntity roleToSet = roleService.findRoleByName(roleName);
+        RoleEntity adminRole = roleService.findRoleByName("ADMIN");
+
+        if(roleToSet.getName().equals("USER")){
+            if(checkIfUserIsAdmin(userToChangeRole,adminRole)){
+                userToChangeRole.getRoles().remove(adminRole);
+                userToChangeRole.getRoles().removeAll(List.of(adminRole));
+                userToChangeRole.setRoles(List.of(roleToSet));
+                List<RoleEntity> roles = userToChangeRole.getRoles();
+                System.out.println();
+            }
+        } else {
+            if(!checkIfUserIsAdmin(userToChangeRole,adminRole)){
+                userToChangeRole.getRoles().add(roleToSet);
+            }
+        }
+
+    }
+
+    private boolean checkIfUserIsAdmin(UserEntity userToChangeRole,RoleEntity adminRole) {
+        return userToChangeRole.getRoles().contains(adminRole);
     }
 }
