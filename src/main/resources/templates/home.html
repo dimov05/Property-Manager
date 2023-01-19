@@ -55,8 +55,8 @@
             </div>
         </div>
     </div>
-    <h1 style="text-align: center">Welcome to my Property Manager!</h1>
-    <h1 style="text-align: center">Log in to get access!</h1>
+    <h1 th:if="${loggedUser}!=true" style="text-align: center">Welcome to my Property Manager!</h1>
+    <h1 th:if="${loggedUser}!=true" style="text-align: center">Log in to get access!</h1>
 </section>
 </body>
 </html>
