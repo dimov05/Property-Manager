@@ -3,13 +3,13 @@ package bg.propertymanager.service;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.dto.tax.TaxEditDTO;
 import bg.propertymanager.model.dto.tax.TaxPayDTO;
+import bg.propertymanager.model.dto.tax.TaxReturnDTO;
 import bg.propertymanager.model.dto.tax.TaxViewDTO;
 import bg.propertymanager.model.entity.ApartmentEntity;
 import bg.propertymanager.model.entity.BuildingEntity;
 import bg.propertymanager.model.entity.ExpenseEntity;
 import bg.propertymanager.model.entity.TaxEntity;
 import bg.propertymanager.model.enums.TaxStatusEnum;
-import bg.propertymanager.model.view.UserEntityViewModel;
 import bg.propertymanager.repository.ExpenseRepository;
 import bg.propertymanager.repository.TaxRepository;
 import org.modelmapper.ModelMapper;
@@ -17,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -63,11 +62,7 @@ public class TaxService {
     }
 
     public void updateTaxStatus(TaxEditDTO taxEditDTO) {
-        TaxEntity taxToUpdate = taxRepository
-                .findById(taxEditDTO.getId())
-                .orElseThrow(() -> new NullPointerException("No tax is existing with id " + taxEditDTO.getId()));
-
-
+        TaxEntity taxToUpdate = getTaxById(taxEditDTO.getId());
         taxToUpdate
                 .setTaxStatus(taxEditDTO.getTaxStatus());
         taxRepository.save(taxToUpdate);
@@ -212,15 +207,12 @@ public class TaxService {
     }
 
     public void payTaxAmount(TaxPayDTO taxPayDTO) {
-        TaxEntity taxToBePaid = taxRepository
-                .findById(taxPayDTO.getId())
-                .orElseThrow(() -> new NullPointerException("There is no such a tax with this id " + taxPayDTO.getId()));
-
-        payTaxAmountAndChangeStatusIfTaxIsPaid(taxPayDTO, taxToBePaid);
+        TaxEntity taxToBePaid = getTaxById(taxPayDTO.getId());
+        payTaxAmountAndChangeStatusIfNeeded(taxPayDTO, taxToBePaid);
         taxRepository.save(taxToBePaid);
     }
 
-    private static void payTaxAmountAndChangeStatusIfTaxIsPaid(TaxPayDTO taxPayDTO, TaxEntity taxToBePaid) {
+    private static void payTaxAmountAndChangeStatusIfNeeded(TaxPayDTO taxPayDTO, TaxEntity taxToBePaid) {
         if (checkIfAmountToBePaidIsMoreThanPaidAmount(taxPayDTO, taxToBePaid)) {
             taxToBePaid.setTaxStatus(TaxStatusEnum.PARTLY_PAID);
         } else {
@@ -229,25 +221,46 @@ public class TaxService {
         taxToBePaid.setPaidAmount(taxToBePaid.getPaidAmount().add(taxPayDTO.getPaidAmount()));
     }
 
+    public void returnTaxAmount(TaxReturnDTO taxReturnDTO) {
+        TaxEntity taxToReturnMoneyFrom = getTaxById(taxReturnDTO.getId());
+        returnTaxAmountAndChangeStatusIfNeeded(taxReturnDTO, taxToReturnMoneyFrom);
+        taxRepository.save(taxToReturnMoneyFrom);
+    }
+
+    private void returnTaxAmountAndChangeStatusIfNeeded(TaxReturnDTO taxReturnDTO, TaxEntity taxToReturnMoneyFrom) {
+        if (checkIfAlreadyPaidAmountIsMoreThanReturnedAmount(taxToReturnMoneyFrom.getPaidAmount(),taxReturnDTO.getReturnedAmount())) {
+            taxToReturnMoneyFrom.setTaxStatus(TaxStatusEnum.PARTLY_PAID);
+        } else {
+            taxToReturnMoneyFrom.setTaxStatus(TaxStatusEnum.UNPAID);
+        }
+        taxToReturnMoneyFrom.setPaidAmount(taxToReturnMoneyFrom.getPaidAmount().subtract(taxReturnDTO.getReturnedAmount()));
+    }
+
+    private boolean checkIfAlreadyPaidAmountIsMoreThanReturnedAmount(BigDecimal paidAmount, BigDecimal returnedAmount) {
+        return paidAmount.compareTo(returnedAmount) > 0;
+    }
+
     private static boolean checkIfAmountToBePaidIsMoreThanPaidAmount(TaxPayDTO taxPayDTO, TaxEntity taxToBePaid) {
         return (taxToBePaid.getAmount().subtract(taxToBePaid.getPaidAmount())).compareTo(taxPayDTO.getPaidAmount()) > 0;
     }
 
     public Boolean checkIfUserIsOwnerOfTax(String ownerUsername, Long taxId) {
-        TaxEntity tax = taxRepository.findById(taxId)
-                .orElseThrow(() -> new NullPointerException("There is no tax with this id " + taxId));
+        TaxEntity tax = getTaxById(taxId);
         return tax.getApartment().getOwner().getUsername().equals(ownerUsername);
     }
 
-    public boolean checkIfPaidAmountIsMoreThanTax(Long taxId, BigDecimal paidAmount) {
-        TaxEntity tax = taxRepository.findById(taxId)
-                .orElseThrow(() -> new NullPointerException("There is no tax with this id " + taxId));
-        return paidAmount.compareTo(tax.getAmount()) > 0;
+    public boolean checkIfPaidAmountIsMoreThanRemainingAmount(Long taxId, BigDecimal paidAmount) {
+        TaxEntity tax = getTaxById(taxId);
+        return paidAmount.compareTo(tax.getAmount().subtract(tax.getPaidAmount())) > 0;
     }
 
-    public boolean checkIfPaidAmountIsMoreThanRemainingAmount(Long taxId, BigDecimal paidAmount) {
-        TaxEntity tax = taxRepository.findById(taxId)
+    public boolean checkIfReturnedMoneyIsMoreThanPaidMoney(Long taxId, BigDecimal returnedAmount) {
+        TaxEntity tax = getTaxById(taxId);
+        return returnedAmount.compareTo(tax.getPaidAmount()) > 0;
+    }
+
+    private TaxEntity getTaxById(Long taxId) {
+        return taxRepository.findById(taxId)
                 .orElseThrow(() -> new NullPointerException("There is no tax with this id " + taxId));
-        return paidAmount.compareTo(tax.getAmount().subtract(tax.getPaidAmount())) > 0;
     }
 }
