@@ -188,4 +188,8 @@ public class ApartmentService {
         List<ApartmentEntity> apartments = apartmentRepository.findAllByBuilding_IdAndOwner_Username(buildingId, username);
         return apartments.size() > 0;
     }
+
+    public List<ApartmentEntity> findAllApartmentsWithPositivePeriodicTax() {
+        return apartmentRepository.findAllByPeriodicTaxGreaterThan(BigDecimal.ZERO);
+    }
 }

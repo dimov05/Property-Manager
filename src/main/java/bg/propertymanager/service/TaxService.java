@@ -1,7 +1,5 @@
 package bg.propertymanager.service;
 
-import bg.propertymanager.model.dto.building.BuildingViewDTO;
-import bg.propertymanager.model.dto.tax.TaxEditDTO;
 import bg.propertymanager.model.dto.tax.TaxPayDTO;
 import bg.propertymanager.model.dto.tax.TaxReturnDTO;
 import bg.propertymanager.model.dto.tax.TaxViewDTO;
@@ -10,6 +8,7 @@ import bg.propertymanager.model.entity.BuildingEntity;
 import bg.propertymanager.model.entity.ExpenseEntity;
 import bg.propertymanager.model.entity.TaxEntity;
 import bg.propertymanager.model.enums.TaxStatusEnum;
+import bg.propertymanager.model.enums.TaxTypeEnum;
 import bg.propertymanager.repository.ExpenseRepository;
 import bg.propertymanager.repository.TaxRepository;
 import org.modelmapper.ModelMapper;
@@ -22,11 +21,11 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -46,26 +45,10 @@ public class TaxService {
         this.expenseRepository = expenseRepository;
     }
 
-    public List<TaxViewDTO> findAllTaxes(BuildingViewDTO building) {
-        return taxRepository
-                .findAllByBuilding_Id(building.getId())
-                .stream()
-                .map(tax -> modelMapper.map(tax, TaxViewDTO.class))
-                .collect(Collectors.toList());
-
-    }
-
     public TaxViewDTO findViewById(Long taxId) {
         return taxRepository.findById(taxId)
                 .map(tax -> modelMapper.map(tax, TaxViewDTO.class))
                 .orElseThrow(() -> new NullPointerException("No tax is existing with id " + taxId));
-    }
-
-    public void updateTaxStatus(TaxEditDTO taxEditDTO) {
-        TaxEntity taxToUpdate = getTaxById(taxEditDTO.getId());
-        taxToUpdate
-                .setTaxStatus(taxEditDTO.getTaxStatus());
-        taxRepository.save(taxToUpdate);
     }
 
     public BigDecimal calculateBuildingBalance(Long buildingId) {
@@ -228,7 +211,7 @@ public class TaxService {
     }
 
     private void returnTaxAmountAndChangeStatusIfNeeded(TaxReturnDTO taxReturnDTO, TaxEntity taxToReturnMoneyFrom) {
-        if (checkIfAlreadyPaidAmountIsMoreThanReturnedAmount(taxToReturnMoneyFrom.getPaidAmount(),taxReturnDTO.getReturnedAmount())) {
+        if (checkIfAlreadyPaidAmountIsMoreThanReturnedAmount(taxToReturnMoneyFrom.getPaidAmount(), taxReturnDTO.getReturnedAmount())) {
             taxToReturnMoneyFrom.setTaxStatus(TaxStatusEnum.PARTLY_PAID);
         } else {
             taxToReturnMoneyFrom.setTaxStatus(TaxStatusEnum.UNPAID);
@@ -262,5 +245,28 @@ public class TaxService {
     private TaxEntity getTaxById(Long taxId) {
         return taxRepository.findById(taxId)
                 .orElseThrow(() -> new NullPointerException("There is no tax with this id " + taxId));
+    }
+
+    public void createPeriodicTaxesForEveryApartment() {
+        List<ApartmentEntity> apartments = apartmentService.findAllApartmentsWithPositivePeriodicTax();
+        LocalDateTime now = LocalDateTime.now();
+        for (ApartmentEntity apartment : apartments) {
+            BuildingEntity currentBuilding = apartment.getBuilding();
+            TaxEntity newPeriodicTaxToAdd = new TaxEntity()
+                    .setTaxType(TaxTypeEnum.PERIODIC)
+                    .setAmount(apartment.getPeriodicTax())
+                    .setPaidAmount(BigDecimal.ZERO)
+                    .setTaxStatus(TaxStatusEnum.UNPAID)
+                    .setDescription("Periodic tax for " + now.getMonth().name())
+                    .setStartDate(now)
+                    .setDueDate(now.plusMonths(1))
+                    .setBuilding(currentBuilding)
+                    .setManager(currentBuilding.getManager())
+                    .setApartment(apartment)
+                    .setExpense(null);
+            buildingService.addNewTaxToBuilding(currentBuilding, newPeriodicTaxToAdd);
+            apartmentService.addNewTaxToApartment(apartment, newPeriodicTaxToAdd);
+            taxRepository.save(newPeriodicTaxToAdd);
+        }
     }
 }

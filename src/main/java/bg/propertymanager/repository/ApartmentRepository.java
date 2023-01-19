@@ -33,4 +33,5 @@ public interface ApartmentRepository extends JpaRepository<ApartmentEntity, Long
 
     List<ApartmentEntity> findAllByBuilding_IdAndOwner_Username(Long buildingId, String ownerUsername);
 
+    List<ApartmentEntity> findAllByPeriodicTaxGreaterThan(BigDecimal zeroAmount);
 }
