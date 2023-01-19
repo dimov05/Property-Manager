@@ -1,17 +1,15 @@
 package bg.propertymanager.web;
 
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
-import bg.propertymanager.model.dto.tax.TaxEditDTO;
 import bg.propertymanager.model.dto.tax.TaxPayDTO;
+import bg.propertymanager.model.dto.tax.TaxReturnDTO;
 import bg.propertymanager.model.dto.tax.TaxViewDTO;
 import bg.propertymanager.model.entity.TaxEntity;
-import bg.propertymanager.model.enums.TaxStatusEnum;
 import bg.propertymanager.repository.ApartmentRepository;
 import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.TaxService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.repository.query.Param;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +20,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -43,14 +40,12 @@ public class TaxController {
                                      @RequestParam(value = "page", defaultValue = "1") Integer page,
                                      @RequestParam(value = "size", defaultValue = "10") Integer size,
                                      Model model) {
-        BuildingViewDTO building = buildingService.findById(buildingId);
+        addInfoAboutBuildingAsModelAttributes(buildingId, model);
         // Implement search/filter with keyword just by fixing Controller. The other logic in Service and Repository is ready
         Page<TaxEntity> taxesPage = taxService
                 .findAllTaxesByBuildingIdFilteredAndPaginated(PageRequest.of(page - 1, size), buildingId, null);
         addPageNumbersAttributeIfThereAreEnoughPages(model, taxesPage);
         model.addAttribute("taxesPage", taxesPage);
-        model.addAttribute("building", building);
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         return "view-taxes-as-manager";
     }
 
@@ -61,14 +56,12 @@ public class TaxController {
                                          @RequestParam(value = "size", defaultValue = "10") Integer size,
                                          Model model,
                                          Principal principal) {
-        BuildingViewDTO building = buildingService.findById(buildingId);
+        addInfoAboutBuildingAsModelAttributes(buildingId, model);
 
         Page<TaxEntity> taxesPage = taxService
                 .findALlMyTaxesByBuildingIdPaginated(PageRequest.of(page - 1, size), buildingId, principal.getName());
         addPageNumbersAttributeIfThereAreEnoughPages(model, taxesPage);
         model.addAttribute("taxesPage", taxesPage);
-        model.addAttribute("building", building);
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
         return "view-my-taxes-as-neighbour";
     }
 
@@ -79,39 +72,32 @@ public class TaxController {
                                                 @RequestParam(value = "page", defaultValue = "1") Integer page,
                                                 @RequestParam(value = "size", defaultValue = "10") Integer size,
                                                 Model model) {
-        BuildingViewDTO building = buildingService.findById(buildingId);
         Page<TaxEntity> taxesPage = taxService
                 .findAllTaxesByBuildingIdAndOwnerId(PageRequest.of(page - 1, size), buildingId, neighbourId);
         addPageNumbersAttributeIfThereAreEnoughPages(model, taxesPage);
         model.addAttribute("taxesPage", taxesPage);
-        model.addAttribute("building", building);
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        addInfoAboutBuildingAsModelAttributes(buildingId, model);
         return "view-taxes-of-neighbour-as-manager";
     }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/tax/{taxId}")
-    public String editTaxStatusAsManager(@PathVariable("buildingId") Long buildingId,
-                                         @PathVariable("taxId") Long taxId,
-                                         Model model) {
-        if (!model.containsAttribute("taxPayDTO")) {
-            model.addAttribute("taxPayDTO", new TaxPayDTO());
-        }
-        BuildingViewDTO buildingEdit = buildingService.findById(buildingId);
-        TaxViewDTO taxView = taxService.findViewById(taxId);
-        model.addAttribute("building", buildingEdit);
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        model.addAttribute("tax", taxView);
+    public String payTaxAsManager(@PathVariable("buildingId") Long buildingId,
+                                  @PathVariable("taxId") Long taxId,
+                                  Model model) {
+        addInfoAboutBuildingAsModelAttributes(buildingId, model);
+        addTaxPayDTOAsModelAttributeIfNull(model);
+        addInfoAboutTaxesAsModelAttribute(taxId, model);
         return "pay-tax-as-manager";
     }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @PostMapping("/manager/buildings/{buildingId}/tax/{taxId}")
-    public String editTaxStatusAsManagerConfirm(@Valid TaxPayDTO taxPayDTO,
-                                                BindingResult bindingResult,
-                                                RedirectAttributes redirectAttributes,
-                                                @PathVariable("buildingId") Long buildingId,
-                                                @PathVariable("taxId") Long taxId) {
+    public String payTaxAsManagerConfirm(@Valid TaxPayDTO taxPayDTO,
+                                         BindingResult bindingResult,
+                                         RedirectAttributes redirectAttributes,
+                                         @PathVariable("buildingId") Long buildingId,
+                                         @PathVariable("taxId") Long taxId) {
         taxPayDTO.setId(taxId);
         if (bindingResult.hasErrors() || taxService.checkIfPaidAmountIsMoreThanRemainingAmount(taxId, taxPayDTO.getPaidAmount())) {
             redirectAttributes.addFlashAttribute("taxPayDTO", taxPayDTO);
@@ -130,14 +116,9 @@ public class TaxController {
     public String payTaxAsNeighbour(@PathVariable("buildingId") Long buildingId,
                                     @PathVariable("taxId") Long taxId,
                                     Model model) {
-        if (!model.containsAttribute("taxPayDTO")) {
-            model.addAttribute("taxPayDTO", new TaxPayDTO());
-        }
-        BuildingViewDTO buildingEdit = buildingService.findById(buildingId);
-        TaxViewDTO taxView = taxService.findViewById(taxId);
-        model.addAttribute("building", buildingEdit);
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        model.addAttribute("tax", taxView);
+        addInfoAboutBuildingAsModelAttributes(buildingId, model);
+        addTaxPayDTOAsModelAttributeIfNull(model);
+        addInfoAboutTaxesAsModelAttribute(taxId, model);
         return "pay-tax-as-neighbour";
     }
 
@@ -161,6 +142,38 @@ public class TaxController {
         return String.format("redirect:/neighbour/buildings/%d/taxes", buildingId);
     }
 
+    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @GetMapping("/manager/buildings/{buildingId}/return-tax/{taxId}")
+    public String returnTaxAsManager(@PathVariable("buildingId") Long buildingId,
+                                     @PathVariable("taxId") Long taxId,
+                                     Model model) {
+        addInfoAboutBuildingAsModelAttributes(buildingId, model);
+        if (!model.containsAttribute("taxReturnDTO")) {
+            model.addAttribute("taxReturnDTO", new TaxReturnDTO());
+        }
+        addInfoAboutTaxesAsModelAttribute(taxId, model);
+        return "return-tax-as-manager";
+    }
+
+    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PostMapping("/manager/buildings/{buildingId}/return-tax/{taxId}")
+    public String returnTaxAsManagerConfirm(@Valid TaxReturnDTO taxReturnDTO,
+                                            BindingResult bindingResult,
+                                            RedirectAttributes redirectAttributes,
+                                            @PathVariable("buildingId") Long buildingId,
+                                            @PathVariable("taxId") Long taxId) {
+        taxReturnDTO.setId(taxId);
+        if (bindingResult.hasErrors() || taxService.checkIfReturnedMoneyIsMoreThanPaidMoney(taxId, taxReturnDTO.getReturnedAmount())) {
+            redirectAttributes.addFlashAttribute("taxReturnDTO", taxReturnDTO);
+            redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.taxReturnDTO", bindingResult);
+            redirectAttributes.addFlashAttribute("moreReturnedMoney", true);
+            return String.format("redirect:/manager/buildings/%d/return-tax/%d",
+                    buildingId, taxId);
+        }
+        taxService.returnTaxAmount(taxReturnDTO);
+        return String.format("redirect:/manager/buildings/%d/taxes", buildingId);
+    }
+
     private static void addPageNumbersAttributeIfThereAreEnoughPages(Model model, Page<TaxEntity> taxesPage) {
         int totalPages = taxesPage.getTotalPages();
         if (totalPages > 0) {
@@ -168,6 +181,23 @@ public class TaxController {
                     .boxed()
                     .collect(Collectors.toList());
             model.addAttribute("pageNumbers", pageNumbers);
+        }
+    }
+
+    private void addInfoAboutBuildingAsModelAttributes(Long buildingId, Model model) {
+        BuildingViewDTO buildingEdit = buildingService.findById(buildingId);
+        model.addAttribute("building", buildingEdit);
+        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+    }
+
+    private void addInfoAboutTaxesAsModelAttribute(Long taxId, Model model) {
+        TaxViewDTO taxView = taxService.findViewById(taxId);
+        model.addAttribute("tax", taxView);
+    }
+
+    private static void addTaxPayDTOAsModelAttributeIfNull(Model model) {
+        if (!model.containsAttribute("taxPayDTO")) {
+            model.addAttribute("taxPayDTO", new TaxPayDTO());
         }
     }
 }

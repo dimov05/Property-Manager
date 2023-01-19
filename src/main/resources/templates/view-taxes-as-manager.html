@@ -88,16 +88,23 @@
                         <td th:text="${tax.taxType.name()}"></td>
                         <td th:text="${tax.dueDate.dayOfMonth} + ' ' + ${tax.dueDate.month} + ' ' + ${tax.dueDate.year}"></td>
                         <td th:text="${tax.taxStatus.name()}"></td>
-                        <td th:if="${tax.taxStatus.name() == 'UNPAID' || tax.taxStatus.name() == 'PARTLY_PAID'}">
-                            <ul class="list-inline mb-0">
-                                <li class="list-inline-item">
+                        <td >
+                            <ul class="list-inline mb-0" >
+                                <li class="list-inline-item" th:if="${tax.taxStatus.name() == 'UNPAID' || tax.taxStatus.name() == 'PARTLY_PAID'}">
                                     <a th:href="@{/manager/buildings/{buildingId}/tax/{taxId}
                                         (buildingId = ${building.id}, taxId = ${tax.id})}"
                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"
-                                       class="px-2 text-primary">Edit</a>
+                                       class="px-2 text-primary">Pay</a>
+                                </li>
+                                <li class="list-inline-item" th:if="${tax.taxStatus.name() == 'PAID' || tax.taxStatus.name() == 'PARTLY_PAID'}">
+                                    <a th:href="@{/manager/buildings/{buildingId}/return-tax/{taxId}
+                                        (buildingId = ${building.id}, taxId = ${tax.id})}"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"
+                                       class="px-2 text-primary">Return</a>
                                 </li>
                             </ul>
                         </td>
+
                     </tr>
                     </tbody>
                 </table>

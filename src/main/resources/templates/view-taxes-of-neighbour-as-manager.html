@@ -88,11 +88,19 @@
                         <td th:text="${tax.taxStatus.name()}"></td>
                         <td>
                             <ul class="list-inline mb-0">
-                                <li class="list-inline-item">
+                                <li class="list-inline-item"
+                                    th:if="${tax.taxStatus.name() == 'UNPAID' || tax.taxStatus.name() == 'PARTLY_PAID'}">
                                     <a th:href="@{/manager/buildings/{buildingId}/tax/{taxId}
                                         (buildingId = ${building.id}, taxId = ${tax.id})}"
                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"
-                                       class="px-2 text-primary">Edit</a>
+                                       class="px-2 text-primary">Pay</a>
+                                </li>
+                                <li class="list-inline-item"
+                                    th:if="${tax.taxStatus.name() == 'PAID' || tax.taxStatus.name() == 'PARTLY_PAID'}">
+                                    <a th:href="@{/manager/buildings/{buildingId}/return-tax/{taxId}
+                                        (buildingId = ${building.id}, taxId = ${tax.id})}"
+                                       data-bs-toggle="tooltip" data-bs-placement="top" title="Edit"
+                                       class="px-2 text-primary">Return</a>
                                 </li>
                             </ul>
                         </td>
