@@ -90,10 +90,10 @@ public class UserService {
     private void initUser(List<RoleEntity> roles) {
         UserEntity user = new UserEntity()
                 .setRoles(roles)
-                .setUsername("user")
-                .setPassword(passwordEncoder.encode("user"))
+                .setUsername("manager")
+                .setPassword(passwordEncoder.encode("123456"))
                 .setFullName("Dimo Dimov")
-                .setEmail("user@user.com")
+                .setEmail("manager@manager.com")
                 .setPhoneNumber("+359878123456")
                 .setCountry("Bulgaria")
                 .setCity("Plovdiv")
