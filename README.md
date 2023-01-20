@@ -1,12 +1,8 @@
-[![LinkedIn][linkedin-shield]][https://www.linkedin.com/in/dimo-dimov-10a300117/]
-
-
-
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
   <a href="https://github.com/dimov05/Property-Manager">
-    <img src="blob/main/src/main/resources/static/images/favicon.ico" alt="Logo" width="80" height="80">
+    <img src="src/main/resources/static/images/favicon.ico" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Property Manager</h3>
