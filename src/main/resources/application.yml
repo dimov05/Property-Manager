@@ -1,9 +1,9 @@
 spring:
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    username: ${JDBC_DATABASE_USERNAME:root}
-    password: ${JDBC_DATABASE_PASSWORD:root}
-    url: ${JDBC_DATABASE_URL:jdbc:mysql://localhost:3306/property_manager?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true}
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/property_manager?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
