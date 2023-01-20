@@ -1,1 +1,1 @@
-web: java -jar gradle/wrapper/gradle-wrapper.jar
+web: java -jar build/libs/property-manager.jar
