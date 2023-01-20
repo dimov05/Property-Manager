@@ -37,7 +37,7 @@
 
 ## About The Project
 
-![Screen Shot](screenshots/screenshot-home-screen.png)
+![Screen Shot](https://github.com/dimov05/Property-Manager/blob/main/screenshots/screenshot-home-screen.jpg)
 
 This web application provides a solution for building managers and homeowners. The idea behind this project is to make house manager's jobs easier and to help them make building management more transparent to the owners of properties in the building.
 
