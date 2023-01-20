@@ -79,7 +79,7 @@ How this web application works and more instructions will soon be available in t
 
 Here are you can see instructions on how to install this application locally to your PC. Soon will be updated
 
-### Prerequisites
+### Prerequisites.
 
 Soon will be updated
 
