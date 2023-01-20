@@ -136,9 +136,9 @@ public class ApartmentService {
         }
     }
 
-    public ApartmentEntity getApartmentByApartmentNumber(String apartmentNumber) {
+    public ApartmentEntity getApartmentByApartmentNumberAndBuildingId(String apartmentNumber, Long buildingId) {
         return apartmentRepository
-                .findByApartmentNumber(apartmentNumber)
+                .findByApartmentNumberAndBuilding_Id(apartmentNumber,buildingId)
                 .orElseThrow(() -> new NullPointerException("No apartment with this apartmentNumber " + apartmentNumber));
     }
 

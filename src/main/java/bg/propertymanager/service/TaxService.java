@@ -77,7 +77,7 @@ public class TaxService {
         BigDecimal taxForEachApartment = getTaxForEachApartment(expense, apartments.size());
         Set<TaxEntity> expenseTaxes = new HashSet<>();
         for (String apartmentNumber : apartments) {
-            ApartmentEntity apartmentToAddTax = apartmentService.getApartmentByApartmentNumber(apartmentNumber);
+            ApartmentEntity apartmentToAddTax = apartmentService.getApartmentByApartmentNumberAndBuildingId(apartmentNumber,buildingToUpdate.getId());
 
             TaxEntity newTaxToAdd = new TaxEntity()
                     .setTaxType(expense.getTaxType())

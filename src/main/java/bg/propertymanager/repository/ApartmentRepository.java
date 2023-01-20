@@ -15,7 +15,7 @@ import java.util.Set;
 public interface ApartmentRepository extends JpaRepository<ApartmentEntity, Long> {
     Set<ApartmentEntity> findAllByBuildingId(Long buildingId);
 
-    Optional<ApartmentEntity> findByApartmentNumber(String apartmentNumber);
+    Optional<ApartmentEntity> findByApartmentNumberAndBuilding_Id(String apartmentNumber,Long buildingId);
 
     List<ApartmentEntity> findAllByBuilding_IdOrderById(Long buildingId);
 
