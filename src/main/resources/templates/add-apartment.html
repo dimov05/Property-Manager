@@ -36,6 +36,8 @@
                                        th:field="*{apartmentNumber}">
                                 <p th:errors="*{apartmentNumber}" class="text-danger"
                                    th:if="${#fields.hasErrors('apartmentNumber')}"></p>
+                                <p th:if="${apartmentNumberExist}" th:text="'Apartment with this number already exist in the building!'"
+                                   class="text-danger">Returned more than allowed!</p>
                             </div>
                         </div>
                         <hr>

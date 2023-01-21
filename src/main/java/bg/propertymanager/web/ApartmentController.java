@@ -50,9 +50,10 @@ public class ApartmentController {
                                       BindingResult bindingResult,
                                       RedirectAttributes redirectAttributes,
                                       @PathVariable("buildingId") Long buildingId) {
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors() || apartmentService.checkIfApartmentNumberToAddExistInTheBuilding(buildingId,apartmentAddDTO.getApartmentNumber())) {
             redirectAttributes.addFlashAttribute("apartmentAddDTO", apartmentAddDTO);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.apartmentAddDTO", bindingResult);
+            redirectAttributes.addFlashAttribute("apartmentNumberExist", true);
             return String.format("redirect:/admin/buildings/%d/add-apartment", buildingId);
         }
         apartmentService.addApartment(apartmentAddDTO, buildingId);
@@ -111,9 +112,10 @@ public class ApartmentController {
                                                BindingResult bindingResult,
                                                RedirectAttributes redirectAttributes,
                                                @PathVariable("buildingId") Long buildingId) {
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors() || apartmentService.checkIfApartmentNumberToAddExistInTheBuilding(buildingId,apartmentAddDTO.getApartmentNumber())) {
             redirectAttributes.addFlashAttribute("apartmentAddDTO", apartmentAddDTO);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.apartmentAddDTO", bindingResult);
+            redirectAttributes.addFlashAttribute("apartmentNumberExist", true);
             return String.format("redirect:/manager/buildings/%d/add-apartment", buildingId);
         }
         apartmentService.addApartment(apartmentAddDTO, buildingId);

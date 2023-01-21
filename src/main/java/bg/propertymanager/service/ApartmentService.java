@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -191,5 +192,11 @@ public class ApartmentService {
 
     public List<ApartmentEntity> findAllApartmentsWithPositivePeriodicTax() {
         return apartmentRepository.findAllByPeriodicTaxGreaterThan(BigDecimal.ZERO);
+    }
+
+    public boolean checkIfApartmentNumberToAddExistInTheBuilding(Long buildingId, String apartmentNumber) {
+        Optional<ApartmentEntity> apartmentWithNumberInBuilding = apartmentRepository
+                .findByApartmentNumberAndBuilding_Id(apartmentNumber,buildingId);
+        return apartmentWithNumberInBuilding.isPresent();
     }
 }
