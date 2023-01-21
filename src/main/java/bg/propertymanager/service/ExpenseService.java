@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -38,9 +37,26 @@ public class ExpenseService {
         this.taxService = taxService;
     }
 
+    public void addExpenseAndTaxesForItToBuilding(ExpenseAddDTO expenseAddDTO, Long buildingId) {
+        BuildingEntity buildingToUpdate = getBuildingEntity(buildingId);
+        ExpenseEntity newExpenseToAdd = mapDataFromExpenseAddDTO(expenseAddDTO, buildingToUpdate);
+        expenseRepository.save(newExpenseToAdd);
+        Set<TaxEntity> expenseTaxes = taxService.addTaxForEachApartment(expenseAddDTO.getSelectedApartments(), buildingToUpdate, newExpenseToAdd);
+
+        newExpenseToAdd.setTaxes(expenseTaxes);
+
+        expenseRepository.save(newExpenseToAdd);
+    }
+
     public void addExpenseToBuilding(ExpenseAddDTO expenseAddDTO, Long buildingId) {
-        BuildingEntity buildingToUpdate = buildingService.findEntityById(buildingId);
-        ExpenseEntity newExpenseToAdd = new ExpenseEntity()
+        BuildingEntity buildingToUpdate = getBuildingEntity(buildingId);
+        ExpenseEntity newExpenseToAdd = mapDataFromExpenseAddDTO(expenseAddDTO, buildingToUpdate);
+        expenseRepository.save(newExpenseToAdd);
+
+    }
+
+    private static ExpenseEntity mapDataFromExpenseAddDTO(ExpenseAddDTO expenseAddDTO, BuildingEntity buildingToUpdate) {
+        return new ExpenseEntity()
                 .setTaxType(expenseAddDTO.getTaxType())
                 .setTaxStatus(TaxStatusEnum.UNPAID)
                 .setDescription(expenseAddDTO.getDescription())
@@ -50,17 +66,10 @@ public class ExpenseService {
                 .setManager(buildingToUpdate.getManager())
                 .setBuilding(buildingToUpdate)
                 .setTaxes(Collections.emptySet());
-        expenseRepository.save(newExpenseToAdd);
-        Set<TaxEntity> expenseTaxes = taxService.addTaxForEachApartment(expenseAddDTO.getSelectedApartments(), buildingToUpdate, newExpenseToAdd);
-
-        newExpenseToAdd.setTaxes(expenseTaxes);
-
-        expenseRepository.save(newExpenseToAdd);
     }
 
-    private static BigDecimal getTaxForEachApartment(ExpenseAddDTO expenseAddDTO) {
-        return expenseAddDTO.getAmount()
-                .divide(BigDecimal.valueOf(expenseAddDTO.getSelectedApartments().size()), RoundingMode.HALF_EVEN);
+    private BuildingEntity getBuildingEntity(Long buildingId) {
+        return buildingService.findEntityById(buildingId);
     }
 
     public ExpenseViewDTO findViewById(Long expenseId) {

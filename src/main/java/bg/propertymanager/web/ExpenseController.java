@@ -25,7 +25,6 @@ import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -68,7 +67,11 @@ public class ExpenseController {
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.expenseAddDTO", bindingResult);
             return String.format("redirect:/manager/buildings/%d/add-expense", buildingId);
         }
-        expenseService.addExpenseToBuilding(expenseAddDTO, buildingId);
+        if(expenseAddDTO.getSelectedApartments().isEmpty()){
+            expenseService.addExpenseToBuilding(expenseAddDTO,buildingId);
+        } else {
+            expenseService.addExpenseAndTaxesForItToBuilding(expenseAddDTO, buildingId);
+        }
         return String.format("redirect:/manager/buildings/%d/expenses", buildingId);
     }
 
