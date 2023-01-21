@@ -255,12 +255,11 @@ public class UserService {
     }
 
     private List<UserEntityViewModel> getNeighboursInBuilding(BuildingEntity building) {
-        List<UserEntityViewModel> neighbours = userRepository
+        return userRepository
                 .findAllNeighboursInBuilding(building)
                 .stream()
                 .map(u -> modelMapper.map(u, UserEntityViewModel.class))
                 .toList();
-        return neighbours;
     }
 
     private static PageImpl<UserEntityViewModel> getPageOfUsers(Pageable pageable, List<UserEntityViewModel> neighbours) {
@@ -293,8 +292,6 @@ public class UserService {
                 userToChangeRole.getRoles().remove(adminRole);
                 userToChangeRole.getRoles().removeAll(List.of(adminRole));
                 userToChangeRole.setRoles(List.of(roleToSet));
-                List<RoleEntity> roles = userToChangeRole.getRoles();
-                System.out.println();
             }
         } else {
             if(!checkIfUserIsAdmin(userToChangeRole,adminRole)){

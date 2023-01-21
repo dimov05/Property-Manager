@@ -3,7 +3,6 @@ package bg.propertymanager.service;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.dto.message.MessageAddDTO;
 import bg.propertymanager.model.dto.message.MessageEditDTO;
-import bg.propertymanager.model.entity.ApartmentEntity;
 import bg.propertymanager.model.entity.BuildingEntity;
 import bg.propertymanager.model.entity.MessageEntity;
 import bg.propertymanager.model.entity.UserEntity;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -70,7 +68,7 @@ public class MessageService {
         messageRepository.save(messageToUpdate);
     }
 
-    public void deleteMessageWithId(Long messageId, Long buildingId) {
+    public void deleteMessageWithId(Long messageId) {
         MessageEntity messageToRemove = findById(messageId);
         UserEntity author = messageToRemove.getAuthor();
         BuildingEntity building = messageToRemove.getBuilding();

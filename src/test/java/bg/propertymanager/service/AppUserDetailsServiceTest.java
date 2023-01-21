@@ -11,9 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,9 +59,9 @@ public class AppUserDetailsServiceTest {
         Assertions.assertEquals(testUserEntity.getStreet(), userDetails.getStreet());
         Assertions.assertEquals(testUserEntity.getFullName(), userDetails.getFullName());
 
-        var authorities = userDetails.getAuthorities();
+        Collection<GrantedAuthority> authorities = userDetails.getAuthorities();
         Assertions.assertEquals(2, authorities.size());
-        var authoritiesIter = authorities.iterator();
+        Iterator<GrantedAuthority> authoritiesIter = authorities.iterator();
         Assertions.assertEquals("ROLE_" + UserRolesEnum.ADMIN.name(), authoritiesIter.next().getAuthority());
         Assertions.assertEquals("ROLE_" + UserRolesEnum.USER.name(), authoritiesIter.next().getAuthority());
 

@@ -21,7 +21,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.List;
-import java.util.Set;
 
 @Controller
 public class MessageController {
@@ -37,9 +36,12 @@ public class MessageController {
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/messages")
-    public ModelAndView viewMessagesAsManager(@PathVariable("buildingId") Long buildingId,
-                                              Model model) {
+    public ModelAndView viewMessagesAsManager(@PathVariable("buildingId") Long buildingId) {
         ModelAndView mav = new ModelAndView("view-messages-as-manager");
+        return getModelsAndViewForMessages(buildingId, mav);
+    }
+
+    private ModelAndView getModelsAndViewForMessages(@PathVariable("buildingId") Long buildingId, ModelAndView mav) {
         BuildingViewDTO building = buildingService.findById(buildingId);
         mav.addObject("building", building);
         mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
@@ -53,8 +55,7 @@ public class MessageController {
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/my-messages/{principalName}")
     public ModelAndView viewAllMyMessagesAsManager(@PathVariable("buildingId") Long buildingId,
-                                                   @PathVariable("principalName") String principalUsername,
-                                                   Model model) {
+                                                   @PathVariable("principalName") String principalName) {
         ModelAndView mav = new ModelAndView("view-my-messages-as-manager");
         BuildingViewDTO building = buildingService.findById(buildingId);
         List<MessageEntity> myMessages = messageService.findAllManagersMessagesForBuildingSortedFromNewToOld(building);
@@ -67,17 +68,9 @@ public class MessageController {
 
     @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
     @GetMapping("/neighbour/buildings/{buildingId}/messages")
-    public ModelAndView viewMessagesAsNeighbour(@PathVariable("buildingId") Long buildingId,
-                                                Model model) {
+    public ModelAndView viewMessagesAsNeighbour(@PathVariable("buildingId") Long buildingId) {
         ModelAndView mav = new ModelAndView("view-messages-as-neighbour");
-        BuildingViewDTO building = buildingService.findById(buildingId);
-        mav.addObject("building", building);
-        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        List<MessageEntity> messagesFromNeighbours = messageService.findAllNeighboursMessagesForBuildingSortedFromNewToOld(building);
-        List<MessageEntity> messagesFromManager = messageService.findAllManagersMessagesForBuildingSortedFromNewToOld(building);
-        mav.addObject("messagesFromNeighbours", messagesFromNeighbours);
-        mav.addObject("messagesFromManager", messagesFromManager);
-        return mav;
+        return getModelsAndViewForMessages(buildingId, mav);
     }
 
     @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
@@ -225,7 +218,7 @@ public class MessageController {
     public String deleteMessageAsManagerConfirm(@PathVariable("buildingId") Long buildingId,
                                                 @PathVariable("messageId") Long messageId,
                                                 Principal principal) {
-        messageService.deleteMessageWithId(messageId, buildingId);
+        messageService.deleteMessageWithId(messageId);
         return String.format("redirect:/manager/buildings/%d/my-messages/%s",
                 buildingId, principal.getName());
     }
@@ -235,7 +228,7 @@ public class MessageController {
     public String deleteMessageAsNeighbourConfirm(@PathVariable("buildingId") Long buildingId,
                                                   @PathVariable("messageId") Long messageId,
                                                   Principal principal) {
-        messageService.deleteMessageWithId(messageId, buildingId);
+        messageService.deleteMessageWithId(messageId);
         return String.format("redirect:/neighbour/buildings/%d/my-messages/%s",
                 buildingId, principal.getName());
     }

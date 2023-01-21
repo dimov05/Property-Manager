@@ -1,7 +1,6 @@
 package bg.propertymanager.web;
 
 import bg.propertymanager.model.dto.user.UserEditDTO;
-import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.view.UserEntityViewModel;
 import bg.propertymanager.repository.RoleRepository;
@@ -90,7 +89,7 @@ public class AdminController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/users/change-role/{name}")
-    public ModelAndView changeUserRoleAsAdmin(@PathVariable("name") String name, Model model) {
+    public ModelAndView changeUserRoleAsAdmin(@PathVariable("name") String name) {
         UserEntity userProfileToEdit = userService.findUserByUsername(name);
         ModelAndView mav = new ModelAndView("change-roles");
         mav.addObject("user", userProfileToEdit);
@@ -102,7 +101,7 @@ public class AdminController {
     @PostMapping("/users/change-role/{username}")
     public String changeUserRoleAsAdminConfirm(@PathVariable("username") String username,
                                                @RequestParam String role) {
-        userService.changeRole(role,username);
+        userService.changeRole(role, username);
         return "redirect:/admin/users/";
     }
 }
