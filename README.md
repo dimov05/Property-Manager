@@ -7,7 +7,7 @@
   <h3 align="center">Property Manager</h3>
 
   <p align="center">
-    A solution for every building, property manager and neighbour
+    A solution for every building, property manager, and neighbor
     <br/>
     <br/>
     <a href="https://github.com/dimov05/Property-Manager/blob/main/Property%20Manager%20-%20short%20documentation.pdf"><strong>Check short documentation »</strong></a>
@@ -44,11 +44,11 @@ This web application provides a solution for building managers and homeowners. T
 
 Here's how:
 * The house manager can monitor and update the data for all buildings in which he is a house manager:
--- Adding all the data for a building - apartments and their owners, periodic taxes ( tax per person, dog, or elevator chip) and etc.
+-- Adding all the data for a building - apartments and their owners, periodic taxes ( tax per person, dog, or elevator chip), etc.
 -- Adding/Paying Expenses - more info available in Documentation soon.
 -- Paying/Returning Taxes - more info available in Documentation soon.
 -- Adding/Editing Messages
--- Tracking information about neighbours taxes
+-- Tracking information about neighbors taxes
 * Every user can keep track of every building in which he has a property:
 -- Check the property Dashboard
 -- Adding/Editing Messages
@@ -78,7 +78,7 @@ How this web application works and more instructions will soon be available in t
 
 ## Getting Started
 
-Here are you can see instructions on how to install this application locally to your PC. Soon will be updated
+Here you can see instructions on how to install this application locally to your PC. Soon will be updated
 
 ### Prerequisites.
 
