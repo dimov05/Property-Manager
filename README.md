@@ -10,10 +10,10 @@
     A solution for every building, property manager and neighbor
     <br/>
     <br/>
-    <a href="https://github.com/dimov05/Property-Manager"><strong>Explore the docs » (Soon)</strong></a>
+    <a href="https://github.com/dimov05/Property-Manager/blob/main/Property%20Manager%20-%20short%20documentation.pdf"><strong>Check short documentation »</strong></a>
     <br/>
     <br/>
-    <a href="https://github.com/dimov05/Property-Manager">View Demo (Soon)</a>
+    <a href="https://www.youtube.com/watch?v=acGkezTYp34&list=PLuzciGHtDoA9Dqv9OxcSA0fKwABS_SOl-">View Demo (Soon)</a>
     .
     <a href="https://github.com/dimov05/Property-Manager/issues">Report Bug</a>
     .
