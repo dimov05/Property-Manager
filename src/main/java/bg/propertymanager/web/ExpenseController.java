@@ -93,12 +93,13 @@ public class ExpenseController {
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @PostMapping("/manager/buildings/{buildingId}/expense/{expenseId}")
-    public String editTaxStatusAsManagerConfirm(@Valid ExpenseEditDTO expenseEditDTO,
+    public String editExpenseStatusAsManagerConfirm(@Valid ExpenseEditDTO expenseEditDTO,
                                                 BindingResult bindingResult,
                                                 RedirectAttributes redirectAttributes,
                                                 @PathVariable("buildingId") Long buildingId,
                                                 @PathVariable("expenseId") Long expenseId) {
         expenseEditDTO.setId(expenseId);
+        // TODO: add logic to cannot pay an expense if the buildings doesn't have enough balance
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("expenseEditDTO", expenseEditDTO);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.expenseEditDTO", bindingResult);

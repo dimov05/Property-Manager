@@ -22,7 +22,7 @@ public interface MessageRepository extends JpaRepository<MessageEntity, Long> {
     @Query("SELECT m.createdDate FROM MessageEntity as m " +
             "WHERE m.building.id = :buildingId AND m.author.id = :managerId " +
             "order by m.createdDate DESC")
-    LocalDateTime findDateOfLastMessageFromManagerByBuildingId(@Param("buildingId") Long buildingId,@Param("managerId") Long managerId);
+    List<LocalDateTime> findDateOfLastMessageFromManagerByBuildingId(@Param("buildingId") Long buildingId,@Param("managerId") Long managerId);
 
     List<MessageEntity> findALlByBuilding_IdAndAuthor_UsernameOrderByCreatedDateDesc(Long buildingId, String authorUsername);
 }

@@ -61,6 +61,7 @@
                     <thead>
                     <tr>
                         <th scope="col">Apart. №</th>
+                        <th scope="col">Owner</th>
                         <th scope="col">Description</th>
                         <th scope="col">Amount</th>
                         <th scope="col">Remaining amount</th>
@@ -82,6 +83,7 @@
                                 <div th:text="${tax.apartment.apartmentNumber}"></div>
                             </th:block>
                         </td>
+                        <td th:text="${tax.apartment.owner.fullName}"></td>
                         <td th:text="${tax.description}"></td>
                         <td th:text="${tax.amount} + 'lv.'"></td>
                         <td th:text="${tax.amount - tax.paidAmount} + 'lv.'"></td>
