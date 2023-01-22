@@ -1,6 +1,9 @@
 package bg.propertymanager.model.dto.building;
 
+import org.hibernate.validator.constraints.UniqueElements;
+
 import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -30,6 +33,7 @@ public class BuildingAddDTO {
     }
 
     @NotEmpty(message = "Building name can not be empty")
+
     public String getName() {
         return name;
     }
@@ -40,6 +44,7 @@ public class BuildingAddDTO {
     }
 
     @NotNull(message = "Floors count can not be empty")
+    @Min(0)
     public int getFloors() {
         return floors;
     }

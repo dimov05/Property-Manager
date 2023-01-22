@@ -40,7 +40,7 @@ public class ApartmentAddDTO {
         return this;
     }
 
-    @Min(value = -2, message = "Minimum floor of apartment is -2")
+    @Min(value = -1, message = "Minimum floor of apartment is -1")
     public int getFloor() {
         return floor;
     }

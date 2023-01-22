@@ -57,7 +57,7 @@ public class ApartmentController {
             return String.format("redirect:/admin/buildings/%d/add-apartment", buildingId);
         }
         apartmentService.addApartment(apartmentAddDTO, buildingId);
-        return "redirect:/admin/buildings/view/" + buildingId;
+        return "redirect:/admin/buildings/edit/" + buildingId;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -92,7 +92,7 @@ public class ApartmentController {
                     buildingId, apartmentId);
         }
         apartmentService.updateApartment(apartmentEditDTO);
-        return "redirect:/admin/buildings/view/" + buildingId;
+        return "redirect:/admin/buildings/edit/" + buildingId;
     }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
@@ -154,7 +154,7 @@ public class ApartmentController {
                     buildingId, apartmentId);
         }
         apartmentService.updateApartment(apartmentEditDTO);
-        return "redirect:/manager/buildings/view/" + buildingId;
+        return "redirect:/manager/buildings/edit/" + buildingId;
     }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
@@ -162,6 +162,6 @@ public class ApartmentController {
     public String deleteApartmentAsManagerConfirm(@PathVariable("buildingId") Long buildingId,
                                                   @PathVariable("apartmentId") Long apartmentId) {
         apartmentService.deleteApartmentWithId(apartmentId, buildingId);
-        return "redirect:/manager/buildings/view/" + buildingId;
+        return "redirect:/manager/buildings/edit/" + buildingId;
     }
 }

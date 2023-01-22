@@ -168,10 +168,10 @@ public class BuildingController {
         if (bindingResult.hasErrors()) {
             redirectAttributes.addFlashAttribute("buildingChangeTaxesDTO", buildingChangeTaxesDTO);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.buildingChangeTaxesDTO", bindingResult);
-            return "redirect:/manager/buildings/view/" + buildingId;
+            return "redirect:/manager/buildings/change-taxes/" + buildingId;
         }
         buildingService.updateBuildingsPerTaxes(buildingChangeTaxesDTO);
-        return "redirect:/manager/buildings/view/" + buildingId;
+        return "redirect:/manager/buildings/edit/" + buildingId;
     }
 
 }
