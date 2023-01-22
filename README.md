@@ -99,7 +99,7 @@ See the [open issues](https://github.com/dimov05/Property-Manager/issues) for a 
 
 ## License
 
-Distributed under the MIT License. See [LICENSE](https://github.com/dimov05/Property-Manager/LICENSE.md) for more information.
+Distributed under the MIT License. See [LICENSE](https://github.com/dimov05/Property-Manager/license) for more information.
 
 ## Authors
 
