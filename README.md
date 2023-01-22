@@ -14,6 +14,7 @@
     <br/>
     <br/>
     <a href="https://www.youtube.com/watch?v=acGkezTYp34&list=PLuzciGHtDoA9Dqv9OxcSA0fKwABS_SOl-">View Demo in Youtube</a>	
+	<br/>
     <a href="https://github.com/dimov05/Property-Manager/issues">Report Bug</a>
 <br/>
 <a href="https://www.linkedin.com/in/dimo-dimov-10a300117/">Linkedin</a>
