@@ -13,10 +13,10 @@
     <a href="https://github.com/dimov05/Property-Manager/blob/main/Property%20Manager%20-%20short%20documentation.pdf"><strong>Check short documentation »</strong></a>
     <br/>
     <br/>
-    <a href="https://www.youtube.com/watch?v=acGkezTYp34&list=PLuzciGHtDoA9Dqv9OxcSA0fKwABS_SOl-">View Demo (Soon)</a>
-    .
+    <a href="https://www.youtube.com/watch?v=acGkezTYp34&list=PLuzciGHtDoA9Dqv9OxcSA0fKwABS_SOl-">View Demo in Youtube</a>
+    [![youtube](https://cloud.githubusercontent.com/assets/17016297/18839836/0a06deb4-83d2-11e6-8078-1d0974af0f63.png)][https://www.youtube.com/watch?v=acGkezTYp34&list=PLuzciGHtDoA9Dqv9OxcSA0fKwABS_SOl-]
     <a href="https://github.com/dimov05/Property-Manager/issues">Report Bug</a>
-    .
+    [![linkedin](https://cloud.githubusercontent.com/assets/17016297/18839848/0fc7e74e-83d2-11e6-8c6a-277fc9d6e067.png)][https://www.linkedin.com/in/dimo-dimov-10a300117/]
   </p>
 </p>
 
