@@ -4,13 +4,11 @@ import bg.propertymanager.model.dto.building.BuildingAddDTO;
 import bg.propertymanager.model.dto.building.BuildingChangeTaxesDTO;
 import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
-import bg.propertymanager.model.dto.user.UserViewDTO;
 import bg.propertymanager.model.entity.*;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
-import bg.propertymanager.model.view.UserEntityViewModel;
 import bg.propertymanager.repository.BuildingRepository;
-import bg.propertymanager.repository.TaxRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -29,13 +28,17 @@ public class BuildingService {
     private final BuildingRepository buildingRepository;
     private final ModelMapper modelMapper;
     private final UserService userService;
+    private final TaxService taxService;
     private final ApartmentService apartmentService;
+    private final ExpenseService expenseService;
 
-    public BuildingService(BuildingRepository buildingRepository, ModelMapper modelMapper, UserService userService, ApartmentService apartmentService) {
+    public BuildingService(BuildingRepository buildingRepository, ModelMapper modelMapper, UserService userService, @Lazy TaxService taxService, ApartmentService apartmentService,@Lazy ExpenseService expenseService) {
         this.buildingRepository = buildingRepository;
         this.modelMapper = modelMapper;
         this.userService = userService;
+        this.taxService = taxService;
         this.apartmentService = apartmentService;
+        this.expenseService = expenseService;
     }
 
     public void register(BuildingAddDTO buildingAddDTO) {
@@ -126,9 +129,10 @@ public class BuildingService {
     }
 
     public void removeNeighbour(UserEntity owner, BuildingEntity building) {
-        building.getNeighbours().remove(owner);
-        //TODO: check if neighbour has another apartment
-        buildingRepository.save(building);
+        if(checkIfUserIsHasOnlyOneApartmentInBuilding(owner.getUsername(),building.getId())){
+            building.getNeighbours().remove(owner);
+            buildingRepository.save(building);
+        }
     }
 
     private UserEntity getManagerToSet(BuildingEditDTO buildingEditDTO) {
@@ -216,8 +220,16 @@ public class BuildingService {
     }
 
     public Boolean checkIfUserIsANeighbour(String username, Long buildingId) {
-        boolean ownerInBuilding = apartmentService.findAllApartmentsByBuildingIdAndOwnerUsername(buildingId,username);
+        return apartmentService.findAllApartmentsByBuildingIdAndOwnerUsername(buildingId,username);
+    }
 
-        return ownerInBuilding;
+    public Boolean checkIfUserIsHasOnlyOneApartmentInBuilding(String username, Long buildingId) {
+        return apartmentService.findIfUserHasOnlyOneApartmentInBuilding(buildingId,username);
+    }
+
+    public boolean checkIfBalanceIsEnoughToPayExpense(Long buildingId, Long expenseId) {
+        BigDecimal balance = taxService.calculateBuildingBalance(buildingId);
+        BigDecimal expenseAmount = expenseService.getExpenseAmountById(expenseId);
+        return balance.compareTo(expenseAmount) > 0;
     }
 }

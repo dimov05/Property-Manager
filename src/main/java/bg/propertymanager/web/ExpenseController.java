@@ -12,6 +12,7 @@ import bg.propertymanager.service.ApartmentService;
 import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.ExpenseService;
 import bg.propertymanager.service.TaxService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -99,10 +100,10 @@ public class ExpenseController {
                                                 @PathVariable("buildingId") Long buildingId,
                                                 @PathVariable("expenseId") Long expenseId) {
         expenseEditDTO.setId(expenseId);
-        // TODO: add logic to cannot pay an expense if the buildings doesn't have enough balance
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors() || !buildingService.checkIfBalanceIsEnoughToPayExpense(buildingId, expenseId)) {
             redirectAttributes.addFlashAttribute("expenseEditDTO", expenseEditDTO);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.expenseEditDTO", bindingResult);
+            redirectAttributes.addFlashAttribute("notEnoughBalance", true);
             return String.format("redirect:/manager/buildings/%d/expense/%d",
                     buildingId, expenseId);
         }

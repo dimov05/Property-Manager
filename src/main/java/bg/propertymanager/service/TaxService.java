@@ -12,6 +12,7 @@ import bg.propertymanager.model.enums.TaxTypeEnum;
 import bg.propertymanager.repository.ExpenseRepository;
 import bg.propertymanager.repository.TaxRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -36,7 +37,7 @@ public class TaxService {
     private final ApartmentService apartmentService;
     private final ExpenseRepository expenseRepository;
 
-    public TaxService(TaxRepository taxRepository, ModelMapper modelMapper, BuildingService buildingService, ApartmentService apartmentService,
+    public TaxService(TaxRepository taxRepository, ModelMapper modelMapper, @Lazy BuildingService buildingService, ApartmentService apartmentService,
                       ExpenseRepository expenseRepository) {
         this.taxRepository = taxRepository;
         this.modelMapper = modelMapper;

@@ -140,4 +140,10 @@ public class ExpenseService {
         }
         return list;
     }
+
+    public BigDecimal getExpenseAmountById(Long expenseId) {
+        ExpenseEntity expense = expenseRepository.findById(expenseId)
+                .orElseThrow(() -> new NullPointerException("No expense is existing with id " + expenseId));
+        return expense.getAmount();
+    }
 }

@@ -44,7 +44,10 @@
                                             th:selected="${taxStatus} == *{taxStatus}"></option>
                                     <p th:errors="*{taxStatus}" class="text-danger"
                                        th:if="${#fields.hasErrors('taxStatus')}"></p>
+
                                 </select>
+                                <p th:if="${notEnoughBalance}" th:text="'Not enough building balance to pay the expense!'"
+                                   class="text-danger">Not enough building balance to pay the expense!</p>
                             </div>
                         </div>
                         <div class="text-center">
