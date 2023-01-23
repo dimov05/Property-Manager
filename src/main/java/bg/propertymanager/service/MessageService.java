@@ -82,16 +82,16 @@ public class MessageService {
     public String findDateOfLastMessageFromManagerByBuilding(BuildingViewDTO building) {
         List<LocalDateTime> dateOfLastMessageFromManager = messageRepository
                 .findDateOfLastMessageFromManagerByBuildingId(building.getId(), building.getManager().getId());
-        if (dateOfLastMessageFromManager == null) {
+        if (dateOfLastMessageFromManager.isEmpty()) {
             return "No messages";
         } else {
             StringBuilder date = new StringBuilder();
             date
-                    .append(dateOfLastMessageFromManager.get(0).getYear())
+                    .append(dateOfLastMessageFromManager.get(1).getYear())
                     .append("-")
-                    .append(dateOfLastMessageFromManager.get(0).getMonthValue())
+                    .append(dateOfLastMessageFromManager.get(1).getMonthValue())
                     .append("-")
-                    .append(dateOfLastMessageFromManager.get(0).getDayOfMonth());
+                    .append(dateOfLastMessageFromManager.get(1).getDayOfMonth());
             return date.toString();
         }
     }
