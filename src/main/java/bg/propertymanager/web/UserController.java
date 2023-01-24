@@ -4,6 +4,7 @@ import bg.propertymanager.model.dto.user.PasswordChangeDTO;
 import bg.propertymanager.model.dto.user.UserEditDTO;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +25,7 @@ import java.security.Principal;
 public class UserController {
     private final UserService userService;
 
+    @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
     }
