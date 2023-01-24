@@ -7,6 +7,7 @@ import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.service.ApartmentService;
 import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.TaxService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +27,7 @@ public class ApartmentController {
     private final BuildingService buildingService;
     private final TaxService taxService;
 
+    @Autowired
     public ApartmentController(ApartmentService apartmentService, BuildingService buildingService, TaxService taxService) {
         this.apartmentService = apartmentService;
         this.buildingService = buildingService;
@@ -35,13 +37,14 @@ public class ApartmentController {
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/buildings/{buildingId}/add-apartment")
-    public String addApartment(@PathVariable("buildingId") Long buildingId, Model model) {
+    public ModelAndView addApartment(@PathVariable("buildingId") Long buildingId, Model model) {
+        ModelAndView mav = new ModelAndView("add-apartment");
         if (!model.containsAttribute("apartmentAddDTO")) {
             model.addAttribute("apartmentAddDTO", new ApartmentAddDTO());
         }
-        model.addAttribute("building", buildingService.findById(buildingId));
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        return "add-apartment";
+        mav.addObject("building", buildingService.findById(buildingId));
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        return mav;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -50,7 +53,7 @@ public class ApartmentController {
                                       BindingResult bindingResult,
                                       RedirectAttributes redirectAttributes,
                                       @PathVariable("buildingId") Long buildingId) {
-        if (bindingResult.hasErrors() || apartmentService.checkIfApartmentNumberToAddExistInTheBuilding(buildingId,apartmentAddDTO.getApartmentNumber())) {
+        if (bindingResult.hasErrors() || apartmentService.checkIfApartmentNumberToAddExistInTheBuilding(buildingId, apartmentAddDTO.getApartmentNumber())) {
             redirectAttributes.addFlashAttribute("apartmentAddDTO", apartmentAddDTO);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.apartmentAddDTO", bindingResult);
             redirectAttributes.addFlashAttribute("apartmentNumberExist", true);
@@ -97,13 +100,14 @@ public class ApartmentController {
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/add-apartment")
-    public String addApartmentAsManager(@PathVariable("buildingId") Long buildingId, Model model) {
+    public ModelAndView addApartmentAsManager(@PathVariable("buildingId") Long buildingId, Model model) {
         if (!model.containsAttribute("apartmentAddDTO")) {
             model.addAttribute("apartmentAddDTO", new ApartmentAddDTO());
         }
-        model.addAttribute("building", buildingService.findById(buildingId));
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        return "add-apartment-as-manager";
+        ModelAndView mav = new ModelAndView("add-apartment-as-manager");
+        mav.addObject("building", buildingService.findById(buildingId));
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        return mav;
     }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
@@ -112,7 +116,7 @@ public class ApartmentController {
                                                BindingResult bindingResult,
                                                RedirectAttributes redirectAttributes,
                                                @PathVariable("buildingId") Long buildingId) {
-        if (bindingResult.hasErrors() || apartmentService.checkIfApartmentNumberToAddExistInTheBuilding(buildingId,apartmentAddDTO.getApartmentNumber())) {
+        if (bindingResult.hasErrors() || apartmentService.checkIfApartmentNumberToAddExistInTheBuilding(buildingId, apartmentAddDTO.getApartmentNumber())) {
             redirectAttributes.addFlashAttribute("apartmentAddDTO", apartmentAddDTO);
             redirectAttributes.addFlashAttribute("org.springframework.validation.BindingResult.apartmentAddDTO", bindingResult);
             redirectAttributes.addFlashAttribute("apartmentNumberExist", true);

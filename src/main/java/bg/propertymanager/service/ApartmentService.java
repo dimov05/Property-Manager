@@ -10,9 +10,6 @@ import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.repository.ApartmentRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -188,6 +185,10 @@ public class ApartmentService {
     public boolean findAllApartmentsByBuildingIdAndOwnerUsername(Long buildingId, String username) {
         List<ApartmentEntity> apartments = apartmentRepository.findAllByBuilding_IdAndOwner_Username(buildingId, username);
         return apartments.size() > 0;
+    }
+    public boolean findIfUserHasOnlyOneApartmentInBuilding(Long buildingId, String username) {
+        List<ApartmentEntity> apartments = apartmentRepository.findAllByBuilding_IdAndOwner_Username(buildingId, username);
+        return apartments.size() == 1;
     }
 
     public List<ApartmentEntity> findAllApartmentsWithPositivePeriodicTax() {

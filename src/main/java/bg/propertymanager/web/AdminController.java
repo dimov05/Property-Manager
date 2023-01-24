@@ -5,6 +5,7 @@ import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.view.UserEntityViewModel;
 import bg.propertymanager.repository.RoleRepository;
 import bg.propertymanager.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.query.Param;
@@ -28,6 +29,7 @@ public class AdminController {
     private final UserService userService;
     private final RoleRepository roleRepository;
 
+    @Autowired
     public AdminController(UserService userService,
                            RoleRepository roleRepository) {
         this.userService = userService;

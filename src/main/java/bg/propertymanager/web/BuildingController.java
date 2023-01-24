@@ -5,13 +5,11 @@ import bg.propertymanager.model.dto.building.BuildingChangeTaxesDTO;
 import bg.propertymanager.model.dto.building.BuildingEditDTO;
 import bg.propertymanager.model.dto.building.BuildingViewDTO;
 import bg.propertymanager.model.entity.BuildingEntity;
-import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.ImagesOfBuildings;
-import bg.propertymanager.model.view.UserEntityViewModel;
 import bg.propertymanager.service.ApartmentService;
 import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.TaxService;
-import bg.propertymanager.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.repository.query.Param;
@@ -28,7 +26,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -37,13 +34,12 @@ public class BuildingController {
     private final BuildingService buildingService;
     private final TaxService taxService;
     private final ApartmentService apartmentService;
-    private final UserService userService;
 
-    public BuildingController(BuildingService buildingService, TaxService taxService, ApartmentService apartmentService, UserService userService) {
+    @Autowired
+    public BuildingController(BuildingService buildingService, TaxService taxService, ApartmentService apartmentService) {
         this.buildingService = buildingService;
         this.taxService = taxService;
         this.apartmentService = apartmentService;
-        this.userService = userService;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -61,24 +57,15 @@ public class BuildingController {
         return mav;
     }
 
-    private static void addPageNumberModelAttributeIfThereAreBuildings(ModelAndView mav, Page<BuildingEntity> buildingsPage) {
-        int totalPages = buildingsPage.getTotalPages();
-        if (totalPages > 0) {
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
-                    .boxed()
-                    .collect(Collectors.toList());
-            mav.addObject("pageNumbers", pageNumbers);
-        }
-    }
-
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @GetMapping("/admin/buildings/add")
-    public String addBuilding(Model model) {
+    public ModelAndView addBuilding(Model model) {
         if (!model.containsAttribute("buildingAddDTO")) {
             model.addAttribute("buildingAddDTO", new BuildingAddDTO());
         }
-        model.addAttribute("images", ImagesOfBuildings.values());
-        return "add-building";
+        ModelAndView mav = new ModelAndView("add-building");
+        mav.addObject("images", ImagesOfBuildings.values());
+        return mav;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -174,4 +161,14 @@ public class BuildingController {
         return "redirect:/manager/buildings/edit/" + buildingId;
     }
 
+
+    private static void addPageNumberModelAttributeIfThereAreBuildings(ModelAndView mav, Page<BuildingEntity> buildingsPage) {
+        int totalPages = buildingsPage.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
+                    .boxed()
+                    .collect(Collectors.toList());
+            mav.addObject("pageNumbers", pageNumbers);
+        }
+    }
 }
