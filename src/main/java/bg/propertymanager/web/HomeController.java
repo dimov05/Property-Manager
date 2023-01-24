@@ -3,8 +3,8 @@ package bg.propertymanager.web;
 import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.UserService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.security.Principal;
 
@@ -19,15 +19,16 @@ public class HomeController {
     }
 
     @GetMapping("/")
-    public String home(Model model, Principal principal) {
-        model.addAttribute("buildings", buildingService.findAll());
+    public ModelAndView home(Principal principal) {
+        ModelAndView mav = new ModelAndView("home");
+        mav.addObject("buildings", buildingService.findAll());
         if (principal != null) {
-            model.addAttribute("currentUser", userService.findUserByUsername(principal.getName()));
-            model.addAttribute("loggedUser", true);
+            mav.addObject("currentUser", userService.findUserByUsername(principal.getName()));
+            mav.addObject("loggedUser", true);
         } else {
-            model.addAttribute("loggedUser", false);
+            mav.addObject("loggedUser", false);
         }
-        return "home";
+        return mav;
     }
 
     @GetMapping("/contact-us")

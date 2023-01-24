@@ -7,6 +7,7 @@ import bg.propertymanager.model.entity.MessageEntity;
 import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.MessageService;
 import bg.propertymanager.service.TaxService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +29,7 @@ public class MessageController {
     private final MessageService messageService;
     private final TaxService taxService;
 
+    @Autowired
     public MessageController(BuildingService buildingService, MessageService messageService, TaxService taxService) {
         this.buildingService = buildingService;
         this.messageService = messageService;
@@ -39,17 +41,6 @@ public class MessageController {
     public ModelAndView viewMessagesAsManager(@PathVariable("buildingId") Long buildingId) {
         ModelAndView mav = new ModelAndView("view-messages-as-manager");
         return getModelsAndViewForMessages(buildingId, mav);
-    }
-
-    private ModelAndView getModelsAndViewForMessages(@PathVariable("buildingId") Long buildingId, ModelAndView mav) {
-        BuildingViewDTO building = buildingService.findById(buildingId);
-        mav.addObject("building", building);
-        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        List<MessageEntity> messagesFromNeighbours = messageService.findAllNeighboursMessagesForBuildingSortedFromNewToOld(building);
-        List<MessageEntity> messagesFromManager = messageService.findAllManagersMessagesForBuildingSortedFromNewToOld(building);
-        mav.addObject("messagesFromNeighbours", messagesFromNeighbours);
-        mav.addObject("messagesFromManager", messagesFromManager);
-        return mav;
     }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
@@ -89,13 +80,14 @@ public class MessageController {
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/add-message")
-    public String addMessageAsManager(@PathVariable("buildingId") Long buildingId, Model model) {
+    public ModelAndView addMessageAsManager(@PathVariable("buildingId") Long buildingId, Model model) {
         if (!model.containsAttribute("messageAddDTO")) {
             model.addAttribute("messageAddDTO", new MessageAddDTO());
         }
-        model.addAttribute("building", buildingService.findById(buildingId));
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        return "add-message-as-manager";
+        ModelAndView mav = new ModelAndView("add-message-as-manager");
+        mav.addObject("building", buildingService.findById(buildingId));
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        return mav;
     }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
@@ -117,13 +109,14 @@ public class MessageController {
 
     @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
     @GetMapping("/neighbour/buildings/{buildingId}/add-message")
-    public String addMessageAsNeighbour(@PathVariable("buildingId") Long buildingId, Model model) {
+    public ModelAndView addMessageAsNeighbour(@PathVariable("buildingId") Long buildingId, Model model) {
         if (!model.containsAttribute("messageAddDTO")) {
             model.addAttribute("messageAddDTO", new MessageAddDTO());
         }
-        model.addAttribute("building", buildingService.findById(buildingId));
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        return "add-message-as-neighbour";
+        ModelAndView mav = new ModelAndView("add-message-as-neighbour");
+        mav.addObject("building", buildingService.findById(buildingId));
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        return mav;
     }
 
     @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
@@ -145,16 +138,17 @@ public class MessageController {
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/message/{messageId}")
-    public String editMessageAsManager(@PathVariable("buildingId") Long buildingId,
-                                       @PathVariable("messageId") Long messageId,
-                                       Model model) {
+    public ModelAndView editMessageAsManager(@PathVariable("buildingId") Long buildingId,
+                                             @PathVariable("messageId") Long messageId,
+                                             Model model) {
         if (!model.containsAttribute("messageEditDTO")) {
             model.addAttribute("messageEditDTO", new MessageEditDTO());
         }
-        model.addAttribute("building", buildingService.findById(buildingId));
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        model.addAttribute("message", messageService.findById(messageId));
-        return "edit-message-as-manager";
+        ModelAndView mav = new ModelAndView("edit-message-as-manager");
+        mav.addObject("building", buildingService.findById(buildingId));
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        mav.addObject("message", messageService.findById(messageId));
+        return mav;
     }
 
     @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
@@ -180,16 +174,17 @@ public class MessageController {
     @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)" +
             " AND @messageService.checkIfUserIsAuthor(principal.username, #messageId)")
     @GetMapping("/neighbour/buildings/{buildingId}/message/{messageId}")
-    public String editMessageAsNeighbour(@PathVariable("buildingId") Long buildingId,
-                                         @PathVariable("messageId") Long messageId,
-                                         Model model) {
+    public ModelAndView editMessageAsNeighbour(@PathVariable("buildingId") Long buildingId,
+                                               @PathVariable("messageId") Long messageId,
+                                               Model model) {
         if (!model.containsAttribute("messageEditDTO")) {
             model.addAttribute("messageEditDTO", new MessageEditDTO());
         }
-        model.addAttribute("building", buildingService.findById(buildingId));
-        model.addAttribute("buildingBalance", taxService.calculateBuildingBalance(buildingId));
-        model.addAttribute("message", messageService.findById(messageId));
-        return "edit-message-as-neighbour";
+        ModelAndView mav = new ModelAndView("edit-message-as-neighbour");
+        mav.addObject("building", buildingService.findById(buildingId));
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        mav.addObject("message", messageService.findById(messageId));
+        return mav;
     }
 
     @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)" +
@@ -231,5 +226,16 @@ public class MessageController {
         messageService.deleteMessageWithId(messageId);
         return String.format("redirect:/neighbour/buildings/%d/my-messages/%s",
                 buildingId, principal.getName());
+    }
+
+    private ModelAndView getModelsAndViewForMessages(@PathVariable("buildingId") Long buildingId, ModelAndView mav) {
+        BuildingViewDTO building = buildingService.findById(buildingId);
+        mav.addObject("building", building);
+        mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));
+        List<MessageEntity> messagesFromNeighbours = messageService.findAllNeighboursMessagesForBuildingSortedFromNewToOld(building);
+        List<MessageEntity> messagesFromManager = messageService.findAllManagersMessagesForBuildingSortedFromNewToOld(building);
+        mav.addObject("messagesFromNeighbours", messagesFromNeighbours);
+        mav.addObject("messagesFromManager", messagesFromManager);
+        return mav;
     }
 }
