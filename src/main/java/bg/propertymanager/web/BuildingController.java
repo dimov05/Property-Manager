@@ -121,7 +121,7 @@ public class BuildingController {
         return "redirect:/admin/buildings/view/" + id;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/edit/{buildingId}")
     public ModelAndView editBuildingAsManager(@PathVariable("buildingId") Long buildingId) {
         BuildingViewDTO buildingViewDTO = buildingService.findById(buildingId);
@@ -132,7 +132,7 @@ public class BuildingController {
         return mav;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/change-taxes/{buildingId}")
     public ModelAndView changeTaxes(@PathVariable("buildingId") Long buildingId, Model model) {
         if (!model.containsAttribute("buildingChangeTaxesDTO")) {
@@ -145,7 +145,7 @@ public class BuildingController {
         return mav;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @PostMapping("/manager/buildings/change-taxes/{buildingId}")
     public String changeTaxesConfirm(@Valid BuildingChangeTaxesDTO buildingChangeTaxesDTO,
                                      BindingResult bindingResult,

@@ -5,6 +5,7 @@ import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.enums.UserRolesEnum;
 import bg.propertymanager.model.user.AppUserDetails;
 import bg.propertymanager.repository.UserRepository;
+import bg.propertymanager.service.impl.AppUserDetailsServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,15 +23,15 @@ import java.util.Optional;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class})
-public class AppUserDetailsServiceTest {
+public class AppUserDetailsServiceImplTest {
 
     @Mock
     private UserRepository mockUserRepo;
-    private AppUserDetailsService toTest;
+    private AppUserDetailsServiceImpl toTest;
 
     @BeforeEach
     void setUp() {
-        toTest = new AppUserDetailsService(mockUserRepo);
+        toTest = new AppUserDetailsServiceImpl(mockUserRepo);
     }
 
     @Test

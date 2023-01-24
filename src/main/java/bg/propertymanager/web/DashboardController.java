@@ -26,7 +26,7 @@ public class DashboardController {
         this.expenseService = expenseService;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/dashboard")
     public ModelAndView viewDashboardAsManager(@PathVariable("buildingId") Long buildingId) {
         ModelAndView mav = new ModelAndView("view-dashboard-as-manager");
@@ -34,7 +34,7 @@ public class DashboardController {
         return mav;
     }
 
-    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @PreAuthorize("@buildingServiceImpl.checkIfUserIsANeighbour(principal.username,#buildingId)")
     @GetMapping("/neighbour/buildings/{buildingId}/dashboard")
     public ModelAndView viewDashboardAsNeighbour(@PathVariable("buildingId") Long buildingId) {
         ModelAndView mav = new ModelAndView("view-dashboard-as-neighbour");

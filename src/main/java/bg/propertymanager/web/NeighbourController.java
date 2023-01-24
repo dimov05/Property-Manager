@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,7 +33,7 @@ public class NeighbourController {
     }
 
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/neighbours")
     public ModelAndView viewNeighboursAsManager(@PathVariable("buildingId") Long buildingId,
                                                 @RequestParam(name = "page", defaultValue = "1") Integer page,
@@ -48,7 +47,7 @@ public class NeighbourController {
         return mav;
     }
 
-    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @PreAuthorize("@buildingServiceImpl.checkIfUserIsANeighbour(principal.username,#buildingId)")
     @GetMapping("/neighbour/buildings/{buildingId}/neighbours")
     public ModelAndView viewNeighboursAsNeighbour(@PathVariable("buildingId") Long buildingId,
                                             @RequestParam(name = "page", defaultValue = "1") Integer page,

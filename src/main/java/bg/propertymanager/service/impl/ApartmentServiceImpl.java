@@ -1,4 +1,4 @@
-package bg.propertymanager.service;
+package bg.propertymanager.service.impl;
 
 import bg.propertymanager.model.dto.apartment.ApartmentAddDTO;
 import bg.propertymanager.model.dto.apartment.ApartmentEditDTO;
@@ -8,7 +8,12 @@ import bg.propertymanager.model.entity.BuildingEntity;
 import bg.propertymanager.model.entity.TaxEntity;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.repository.ApartmentRepository;
+import bg.propertymanager.service.ApartmentService;
+import bg.propertymanager.service.BuildingService;
+import bg.propertymanager.service.TaxService;
+import bg.propertymanager.service.UserService;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -20,21 +25,22 @@ import java.util.Set;
 
 @Service
 @Transactional
-public class ApartmentService {
+public class ApartmentServiceImpl implements ApartmentService {
     private final ApartmentRepository apartmentRepository;
     private final UserService userService;
     private final BuildingService buildingService;
     private final ModelMapper modelMapper;
     private final TaxService taxService;
 
-    public ApartmentService(ApartmentRepository apartmentRepository, UserService userService, @Lazy BuildingService buildingService, ModelMapper modelMapper, @Lazy TaxService taxService) {
+    @Autowired
+    public ApartmentServiceImpl(ApartmentRepository apartmentRepository, UserService userService, @Lazy BuildingService buildingService, ModelMapper modelMapper, @Lazy TaxService taxService) {
         this.apartmentRepository = apartmentRepository;
         this.userService = userService;
         this.buildingService = buildingService;
         this.modelMapper = modelMapper;
         this.taxService = taxService;
     }
-
+@Override
     public void addApartment(ApartmentAddDTO apartmentAddDTO, Long buildingId) {
         UserEntity ownerToAdd = getOwnerEntity(apartmentAddDTO);
         BuildingEntity building = buildingService.findEntityById(buildingId);
@@ -52,7 +58,7 @@ public class ApartmentService {
         userService.addApartmentToUser(newApartment, ownerToAdd);
         apartmentRepository.save(newApartment);
     }
-
+    @Override
     public void updateApartment(ApartmentEditDTO apartmentEditDTO) {
         ApartmentEntity apartmentToUpdate = findById(apartmentEditDTO.getId());
         UserEntity ownerToRemove = apartmentToUpdate.getOwner();
@@ -81,7 +87,7 @@ public class ApartmentService {
 
 
     }
-
+    @Override
     public void deleteApartmentWithId(Long apartmentId, Long buildingId) {
         ApartmentEntity apartmentToRemove = findById(apartmentId);
         UserEntity ownerToRemove = apartmentToRemove.getOwner();
@@ -98,6 +104,89 @@ public class ApartmentService {
         apartmentRepository.delete(apartmentToRemove);
     }
 
+    @Override
+    public ApartmentViewDTO findViewById(Long apartmentId) {
+        return apartmentRepository.findById(apartmentId)
+                .map(a -> modelMapper.map(a, ApartmentViewDTO.class))
+                .orElseThrow(() -> new NullPointerException("No such apartment is existing"));
+    }
+    @Override
+    public void updatePeriodicTax(BuildingEntity buildingToSave) {
+        Set<ApartmentEntity> apartments = apartmentRepository.findAllByBuildingId(buildingToSave.getId());
+        for (ApartmentEntity apartment : apartments) {
+            apartment.setPeriodicTax(calculatePeriodicTax(apartment, buildingToSave));
+            apartmentRepository.save(apartment);
+        }
+    }
+    @Override
+    public ApartmentEntity getApartmentByApartmentNumberAndBuildingId(String apartmentNumber, Long buildingId) {
+        return apartmentRepository
+                .findByApartmentNumberAndBuilding_Id(apartmentNumber,buildingId)
+                .orElseThrow(() -> new NullPointerException("No apartment with this apartmentNumber " + apartmentNumber));
+    }
+    @Override
+    public void addNewTaxToApartment(ApartmentEntity apartmentToAddTax, TaxEntity taxToAdd) {
+        apartmentToAddTax.getTaxes().add(taxToAdd);
+        apartmentRepository.save(apartmentToAddTax);
+    }
+    @Override
+    public void deleteTaxFromApartment(TaxEntity tax) {
+        ApartmentEntity apartment = tax.getApartment();
+        apartment.getTaxes().remove(tax);
+        apartmentRepository.save(apartment);
+    }
+    @Override
+    public BigDecimal calculateTotalMonthlyPeriodicTaxesByBuildingId(Long buildingId) {
+        return apartmentRepository.findAmountOfMonthlyPeriodicTaxes(buildingId)
+                .orElse(BigDecimal.ZERO);
+    }
+    @Override
+    public Integer findTotalCountOfNeighboursInBuilding(Long buildingId) {
+        return apartmentRepository
+                .findTotalCountOfNeighboursByBuildingId(buildingId)
+                .orElse(0);
+    }
+    @Override
+    public Integer findTotalCountOfDogsByBuildingId(Long buildingId) {
+        return apartmentRepository
+                .findTotalCountOfDogsByBuildingId(buildingId)
+                .orElse(0);
+    }
+    @Override
+    public Integer findTotalCountOfElevatorChipsByBuildingId(Long buildingId) {
+        return apartmentRepository
+                .findTotalCountOfElevatorChipsByBuildingId(buildingId)
+                .orElse(0);
+    }
+    @Override
+    public List<ApartmentEntity> findAllApartmentsByBuildingId(Long buildingId) {
+        return apartmentRepository.findAllByBuilding_IdOrderById(buildingId);
+    }
+    @Override
+    public List<ApartmentEntity> findAllApartmentsInBuilding(Long buildingId) {
+        return apartmentRepository.findAllByBuilding_IdOrderById(buildingId);
+    }
+    @Override
+    public boolean findAllApartmentsByBuildingIdAndOwnerUsername(Long buildingId, String username) {
+        List<ApartmentEntity> apartments = apartmentRepository.findAllByBuilding_IdAndOwner_Username(buildingId, username);
+        return apartments.size() > 0;
+    }
+    @Override
+    public boolean findIfUserHasOnlyOneApartmentInBuilding(Long buildingId, String username) {
+        List<ApartmentEntity> apartments = apartmentRepository.findAllByBuilding_IdAndOwner_Username(buildingId, username);
+        return apartments.size() == 1;
+    }
+    @Override
+    public List<ApartmentEntity> findAllApartmentsWithPositivePeriodicTax() {
+        return apartmentRepository.findAllByPeriodicTaxGreaterThan(BigDecimal.ZERO);
+    }
+    @Override
+    public boolean checkIfApartmentNumberToAddExistInTheBuilding(Long buildingId, String apartmentNumber) {
+        Optional<ApartmentEntity> apartmentWithNumberInBuilding = apartmentRepository
+                .findByApartmentNumberAndBuilding_Id(apartmentNumber,buildingId);
+        return apartmentWithNumberInBuilding.isPresent();
+    }
+
     private UserEntity getOwnerEntity(ApartmentAddDTO apartmentAddDTO) {
         return userService
                 .findById(apartmentAddDTO.getOwner().getId());
@@ -106,12 +195,6 @@ public class ApartmentService {
     private ApartmentEntity findById(Long id) {
         return apartmentRepository.findById(id)
                 .orElseThrow(() -> new NullPointerException("There is no apartment with this Id"));
-    }
-
-    public ApartmentViewDTO findViewById(Long apartmentId) {
-        return apartmentRepository.findById(apartmentId)
-                .map(a -> modelMapper.map(a, ApartmentViewDTO.class))
-                .orElseThrow(() -> new NullPointerException("No such apartment is existing"));
     }
 
     private BigDecimal calculatePeriodicTax(ApartmentAddDTO apartmentAddDTO, BuildingEntity building) {
@@ -124,80 +207,5 @@ public class ApartmentService {
         return building.getTaxPerPerson().multiply(BigDecimal.valueOf(apartment.getRoommateCount()))
                 .add(building.getTaxPerDog().multiply(BigDecimal.valueOf(apartment.getDogsCount())))
                 .add(building.getTaxPerElevatorChip().multiply(BigDecimal.valueOf(apartment.getElevatorChipsCount())));
-    }
-
-    public void updatePeriodicTax(BuildingEntity buildingToSave) {
-        Set<ApartmentEntity> apartments = apartmentRepository.findAllByBuildingId(buildingToSave.getId());
-        for (ApartmentEntity apartment : apartments) {
-            apartment.setPeriodicTax(calculatePeriodicTax(apartment, buildingToSave));
-            apartmentRepository.save(apartment);
-        }
-    }
-
-    public ApartmentEntity getApartmentByApartmentNumberAndBuildingId(String apartmentNumber, Long buildingId) {
-        return apartmentRepository
-                .findByApartmentNumberAndBuilding_Id(apartmentNumber,buildingId)
-                .orElseThrow(() -> new NullPointerException("No apartment with this apartmentNumber " + apartmentNumber));
-    }
-
-    public void addNewTaxToApartment(ApartmentEntity apartmentToAddTax, TaxEntity taxToAdd) {
-        apartmentToAddTax.getTaxes().add(taxToAdd);
-        apartmentRepository.save(apartmentToAddTax);
-    }
-
-    public void deleteTaxFromApartment(TaxEntity tax) {
-        ApartmentEntity apartment = tax.getApartment();
-        apartment.getTaxes().remove(tax);
-        apartmentRepository.save(apartment);
-    }
-
-    public BigDecimal calculateTotalMonthlyPeriodicTaxesByBuildingId(Long buildingId) {
-        return apartmentRepository.findAmountOfMonthlyPeriodicTaxes(buildingId)
-                .orElse(BigDecimal.ZERO);
-    }
-
-    public Integer findTotalCountOfNeighboursInBuilding(Long buildingId) {
-        return apartmentRepository
-                .findTotalCountOfNeighboursByBuildingId(buildingId)
-                .orElse(0);
-    }
-
-    public Integer findTotalCountOfDogsByBuildingId(Long buildingId) {
-        return apartmentRepository
-                .findTotalCountOfDogsByBuildingId(buildingId)
-                .orElse(0);
-    }
-
-    public Integer findTotalCountOfElevatorChipsByBuildingId(Long buildingId) {
-        return apartmentRepository
-                .findTotalCountOfElevatorChipsByBuildingId(buildingId)
-                .orElse(0);
-    }
-
-    public List<ApartmentEntity> findAllApartmentsByBuildingId(Long buildingId) {
-        return apartmentRepository.findAllByBuilding_IdOrderById(buildingId);
-    }
-
-    public List<ApartmentEntity> findAllApartmentsInBuilding(Long buildingId) {
-        return apartmentRepository.findAllByBuilding_IdOrderById(buildingId);
-    }
-
-    public boolean findAllApartmentsByBuildingIdAndOwnerUsername(Long buildingId, String username) {
-        List<ApartmentEntity> apartments = apartmentRepository.findAllByBuilding_IdAndOwner_Username(buildingId, username);
-        return apartments.size() > 0;
-    }
-    public boolean findIfUserHasOnlyOneApartmentInBuilding(Long buildingId, String username) {
-        List<ApartmentEntity> apartments = apartmentRepository.findAllByBuilding_IdAndOwner_Username(buildingId, username);
-        return apartments.size() == 1;
-    }
-
-    public List<ApartmentEntity> findAllApartmentsWithPositivePeriodicTax() {
-        return apartmentRepository.findAllByPeriodicTaxGreaterThan(BigDecimal.ZERO);
-    }
-
-    public boolean checkIfApartmentNumberToAddExistInTheBuilding(Long buildingId, String apartmentNumber) {
-        Optional<ApartmentEntity> apartmentWithNumberInBuilding = apartmentRepository
-                .findByApartmentNumberAndBuilding_Id(apartmentNumber,buildingId);
-        return apartmentWithNumberInBuilding.isPresent();
     }
 }

@@ -214,7 +214,7 @@
                             <tbody>
                             <tr th:each="apartment: ${topFiveApartmentsByDebt}" th:object="${apartment}">
                                 <td th:text="*{apartmentNumber}"></td>
-                                <td th:text="${@taxService.findOwedMoney(apartment.id)} + 'lv.'"></td>
+                                <td th:text="${@taxServiceImpl.findOwedMoney(apartment.id)} + 'lv.'"></td>
                                 <td th:text="*{owner.fullName}"></td>
                             </tr>
                             </tbody>

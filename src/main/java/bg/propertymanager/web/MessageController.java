@@ -36,14 +36,14 @@ public class MessageController {
         this.taxService = taxService;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/messages")
     public ModelAndView viewMessagesAsManager(@PathVariable("buildingId") Long buildingId) {
         ModelAndView mav = new ModelAndView("view-messages-as-manager");
         return getModelsAndViewForMessages(buildingId, mav);
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/my-messages/{principalName}")
     public ModelAndView viewAllMyMessagesAsManager(@PathVariable("buildingId") Long buildingId,
                                                    @PathVariable("principalName") String principalName) {
@@ -57,14 +57,14 @@ public class MessageController {
         return mav;
     }
 
-    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @PreAuthorize("@buildingServiceImpl.checkIfUserIsANeighbour(principal.username,#buildingId)")
     @GetMapping("/neighbour/buildings/{buildingId}/messages")
     public ModelAndView viewMessagesAsNeighbour(@PathVariable("buildingId") Long buildingId) {
         ModelAndView mav = new ModelAndView("view-messages-as-neighbour");
         return getModelsAndViewForMessages(buildingId, mav);
     }
 
-    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @PreAuthorize("@buildingServiceImpl.checkIfUserIsANeighbour(principal.username,#buildingId)")
     @GetMapping("/neighbour/buildings/{buildingId}/my-messages/{principalName}")
     public ModelAndView viewAllMyMessagesAsNeighbour(@PathVariable("buildingId") Long buildingId,
                                                      @PathVariable("principalName") String principalUsername) {
@@ -78,7 +78,7 @@ public class MessageController {
         return mav;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/add-message")
     public ModelAndView addMessageAsManager(@PathVariable("buildingId") Long buildingId, Model model) {
         if (!model.containsAttribute("messageAddDTO")) {
@@ -90,7 +90,7 @@ public class MessageController {
         return mav;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @PostMapping("/manager/buildings/{buildingId}/add-message")
     public String addMessageAsManagerConfirm(@Valid MessageAddDTO messageAddDTO,
                                              BindingResult bindingResult,
@@ -107,7 +107,7 @@ public class MessageController {
                 buildingId, principal.getName());
     }
 
-    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @PreAuthorize("@buildingServiceImpl.checkIfUserIsANeighbour(principal.username,#buildingId)")
     @GetMapping("/neighbour/buildings/{buildingId}/add-message")
     public ModelAndView addMessageAsNeighbour(@PathVariable("buildingId") Long buildingId, Model model) {
         if (!model.containsAttribute("messageAddDTO")) {
@@ -119,7 +119,7 @@ public class MessageController {
         return mav;
     }
 
-    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @PreAuthorize("@buildingServiceImpl.checkIfUserIsANeighbour(principal.username,#buildingId)")
     @PostMapping("/neighbour/buildings/{buildingId}/add-message")
     public String addMessageAsNeighbourConfirm(@Valid MessageAddDTO messageAddDTO,
                                                BindingResult bindingResult,
@@ -136,7 +136,7 @@ public class MessageController {
                 buildingId, principal.getName());
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/message/{messageId}")
     public ModelAndView editMessageAsManager(@PathVariable("buildingId") Long buildingId,
                                              @PathVariable("messageId") Long messageId,
@@ -151,7 +151,7 @@ public class MessageController {
         return mav;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @PostMapping("/manager/buildings/{buildingId}/message/{messageId}")
     public String editMessageAsManagerConfirm(@Valid MessageEditDTO messageEditDTO,
                                               BindingResult bindingResult,
@@ -171,8 +171,8 @@ public class MessageController {
                 buildingId, principal.getName());
     }
 
-    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)" +
-            " AND @messageService.checkIfUserIsAuthor(principal.username, #messageId)")
+    @PreAuthorize("@buildingServiceImpl.checkIfUserIsANeighbour(principal.username,#buildingId)" +
+            " AND @messageServiceImpl.checkIfUserIsAuthor(principal.username, #messageId)")
     @GetMapping("/neighbour/buildings/{buildingId}/message/{messageId}")
     public ModelAndView editMessageAsNeighbour(@PathVariable("buildingId") Long buildingId,
                                                @PathVariable("messageId") Long messageId,
@@ -187,8 +187,8 @@ public class MessageController {
         return mav;
     }
 
-    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)" +
-            " AND @messageService.checkIfUserIsAuthor(principal.username, #messageId)")
+    @PreAuthorize("@buildingServiceImpl.checkIfUserIsANeighbour(principal.username,#buildingId)" +
+            " AND @messageServiceImpl.checkIfUserIsAuthor(principal.username, #messageId)")
     @PostMapping("/neighbour/buildings/{buildingId}/message/{messageId}")
     public String editMessageAsNeighbourConfirm(@Valid MessageEditDTO messageEditDTO,
                                                 BindingResult bindingResult,
@@ -208,7 +208,7 @@ public class MessageController {
                 buildingId, principal.getName());
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @DeleteMapping("/manager/buildings/{buildingId}/delete-message/{messageId}")
     public String deleteMessageAsManagerConfirm(@PathVariable("buildingId") Long buildingId,
                                                 @PathVariable("messageId") Long messageId,
@@ -218,7 +218,7 @@ public class MessageController {
                 buildingId, principal.getName());
     }
 
-    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @PreAuthorize("@buildingServiceImpl.checkIfUserIsANeighbour(principal.username,#buildingId)")
     @DeleteMapping("/neighbour/buildings/{buildingId}/delete-message/{messageId}")
     public String deleteMessageAsNeighbourConfirm(@PathVariable("buildingId") Long buildingId,
                                                   @PathVariable("messageId") Long messageId,

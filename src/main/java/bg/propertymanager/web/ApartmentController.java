@@ -98,7 +98,7 @@ public class ApartmentController {
         return "redirect:/admin/buildings/edit/" + buildingId;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/add-apartment")
     public ModelAndView addApartmentAsManager(@PathVariable("buildingId") Long buildingId, Model model) {
         if (!model.containsAttribute("apartmentAddDTO")) {
@@ -110,7 +110,7 @@ public class ApartmentController {
         return mav;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @PostMapping("/manager/buildings/{buildingId}/add-apartment")
     public String addApartmentAsManagerConfirm(@Valid ApartmentAddDTO apartmentAddDTO,
                                                BindingResult bindingResult,
@@ -126,7 +126,7 @@ public class ApartmentController {
         return "redirect:/manager/buildings/edit/" + buildingId;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/apartment/{apartmentId}")
     public ModelAndView editApartmentAsManager(@PathVariable("buildingId") Long buildingId,
                                                @PathVariable("apartmentId") Long apartmentId,
@@ -143,7 +143,7 @@ public class ApartmentController {
         return mav;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @PostMapping("/manager/buildings/{buildingId}/apartment/{apartmentId}")
     public String editApartmentAsManagerConfirm(@Valid ApartmentEditDTO apartmentEditDTO,
                                                 BindingResult bindingResult,
@@ -161,7 +161,7 @@ public class ApartmentController {
         return "redirect:/manager/buildings/edit/" + buildingId;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @DeleteMapping("/manager/buildings/{buildingId}/delete-apartment/{apartmentId}")
     public String deleteApartmentAsManagerConfirm(@PathVariable("buildingId") Long buildingId,
                                                   @PathVariable("apartmentId") Long apartmentId) {

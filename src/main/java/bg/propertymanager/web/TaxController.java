@@ -33,7 +33,7 @@ public class TaxController {
         this.buildingService = buildingService;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/taxes")
     public ModelAndView viewTaxesAsManager(@PathVariable("buildingId") Long buildingId,
                                            @RequestParam(value = "page", defaultValue = "1") Integer page,
@@ -48,7 +48,7 @@ public class TaxController {
         return mav;
     }
 
-    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @PreAuthorize("@buildingServiceImpl.checkIfUserIsANeighbour(principal.username,#buildingId)")
     @GetMapping("/neighbour/buildings/{buildingId}/taxes")
     public ModelAndView viewMyTaxesAsNeighbour(@PathVariable("buildingId") Long buildingId,
                                                @RequestParam(value = "page", defaultValue = "1") Integer page,
@@ -64,7 +64,7 @@ public class TaxController {
         return mav;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/taxes-neighbour/{neighbourId}")
     public ModelAndView viewTaxesOfNeighbourAsManager(@PathVariable("buildingId") Long buildingId,
                                                       @PathVariable("neighbourId") Long neighbourId,
@@ -79,7 +79,7 @@ public class TaxController {
         return mav;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/tax/{taxId}")
     public ModelAndView payTaxAsManager(@PathVariable("buildingId") Long buildingId,
                                         @PathVariable("taxId") Long taxId,
@@ -91,7 +91,7 @@ public class TaxController {
         return mav;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @PostMapping("/manager/buildings/{buildingId}/tax/{taxId}")
     public String payTaxAsManagerConfirm(@Valid TaxPayDTO taxPayDTO,
                                          BindingResult bindingResult,
@@ -110,8 +110,8 @@ public class TaxController {
         return String.format("redirect:/manager/buildings/%d/taxes", buildingId);
     }
 
-    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)" +
-            " AND @taxService.checkIfUserIsOwnerOfTax(principal.username, #taxId)")
+    @PreAuthorize("@buildingServiceImpl.checkIfUserIsANeighbour(principal.username,#buildingId)" +
+            " AND @taxServiceImpl.checkIfUserIsOwnerOfTax(principal.username, #taxId)")
     @GetMapping("/neighbour/buildings/{buildingId}/pay-tax/{taxId}")
     public ModelAndView payTaxAsNeighbour(@PathVariable("buildingId") Long buildingId,
                                           @PathVariable("taxId") Long taxId,
@@ -123,8 +123,8 @@ public class TaxController {
         return mav;
     }
 
-    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)" +
-            " AND @taxService.checkIfUserIsOwnerOfTax(principal.username, #taxId)")
+    @PreAuthorize("@buildingServiceImpl.checkIfUserIsANeighbour(principal.username,#buildingId)" +
+            " AND @taxServiceImpl.checkIfUserIsOwnerOfTax(principal.username, #taxId)")
     @PostMapping("/neighbour/buildings/{buildingId}/pay-tax/{taxId}")
     public String payTaxAsNeighbourConfirm(@Valid TaxPayDTO taxPayDTO,
                                            BindingResult bindingResult,
@@ -143,7 +143,7 @@ public class TaxController {
         return String.format("redirect:/neighbour/buildings/%d/taxes", buildingId);
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/return-tax/{taxId}")
     public ModelAndView returnTaxAsManager(@PathVariable("buildingId") Long buildingId,
                                            @PathVariable("taxId") Long taxId,
@@ -155,7 +155,7 @@ public class TaxController {
         return mav;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @PostMapping("/manager/buildings/{buildingId}/return-tax/{taxId}")
     public String returnTaxAsManagerConfirm(@Valid TaxReturnDTO taxReturnDTO,
                                             BindingResult bindingResult,

@@ -45,7 +45,7 @@ public class ExpenseController {
         this.apartmentService = apartmentService;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/add-expense")
     public ModelAndView addExpenseAsManager(@PathVariable("buildingId") Long buildingId, Model model) {
         if (!model.containsAttribute("expenseAddDTO")) {
@@ -60,7 +60,7 @@ public class ExpenseController {
         return mav;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @PostMapping("/manager/buildings/{buildingId}/add-expense")
     public String addExpenseAsManagerConfirm(@Valid ExpenseAddDTO expenseAddDTO,
                                              BindingResult bindingResult,
@@ -79,7 +79,7 @@ public class ExpenseController {
         return String.format("redirect:/manager/buildings/%d/expenses", buildingId);
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/expense/{expenseId}")
     public ModelAndView editExpenseStatusAsManager(@PathVariable("buildingId") Long buildingId,
                                                    @PathVariable("expenseId") Long expenseId,
@@ -96,7 +96,7 @@ public class ExpenseController {
         return mav;
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @PostMapping("/manager/buildings/{buildingId}/expense/{expenseId}")
     public String editExpenseStatusAsManagerConfirm(@Valid ExpenseEditDTO expenseEditDTO,
                                                     BindingResult bindingResult,
@@ -115,7 +115,7 @@ public class ExpenseController {
         return String.format("redirect:/manager/buildings/%d/expenses", buildingId);
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @DeleteMapping("/manager/buildings/{buildingId}/delete-expense/{expenseId}")
     public String deleteMessageConfirm(@PathVariable("buildingId") Long buildingId,
                                        @PathVariable("expenseId") Long expenseId,
@@ -129,7 +129,7 @@ public class ExpenseController {
 
     }
 
-    @PreAuthorize("principal.username == @buildingService.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
+    @PreAuthorize("principal.username == @buildingServiceImpl.findManagerUsername(#buildingId) or hasRole('ROLE_ADMIN')")
     @GetMapping("/manager/buildings/{buildingId}/expenses")
     public ModelAndView viewExpensesAsManager(@PathVariable("buildingId") Long buildingId,
                                               @RequestParam(name = "page", defaultValue = "1") Integer page,
@@ -142,7 +142,7 @@ public class ExpenseController {
         return mav;
     }
 
-    @PreAuthorize("@buildingService.checkIfUserIsANeighbour(principal.username,#buildingId)")
+    @PreAuthorize("@buildingServiceImpl.checkIfUserIsANeighbour(principal.username,#buildingId)")
     @GetMapping("/neighbour/buildings/{buildingId}/expenses")
     public ModelAndView viewExpensesAsNeighbour(@PathVariable("buildingId") Long buildingId,
                                                 @RequestParam(name = "page", defaultValue = "1") Integer page,

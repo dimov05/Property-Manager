@@ -1,4 +1,4 @@
-package bg.propertymanager.service;
+package bg.propertymanager.service.impl;
 
 import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
@@ -8,11 +8,12 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 
-public class AppUserDetailsService implements UserDetailsService {
+public class AppUserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
-    public AppUserDetailsService(UserRepository userRepository) {
+    public AppUserDetailsServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
