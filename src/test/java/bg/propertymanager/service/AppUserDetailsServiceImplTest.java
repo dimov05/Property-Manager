@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.GrantedAuthority;
@@ -27,12 +28,9 @@ public class AppUserDetailsServiceImplTest {
 
     @Mock
     private UserRepository mockUserRepo;
-    private AppUserDetailsServiceImpl toTest;
 
-    @BeforeEach
-    void setUp() {
-        toTest = new AppUserDetailsServiceImpl(mockUserRepo);
-    }
+    @InjectMocks
+    private AppUserDetailsServiceImpl mockAppUserDetailsService;
 
     @Test
     void testLoadUserByUsername_UserExists() {
@@ -50,7 +48,7 @@ public class AppUserDetailsServiceImplTest {
         when(mockUserRepo.findByUsername(testUserEntity.getUsername()))
                 .thenReturn(Optional.of(testUserEntity));
         // Act
-        AppUserDetails userDetails = toTest.loadUserByUsername(testUserEntity.getUsername());
+        AppUserDetails userDetails = mockAppUserDetailsService.loadUserByUsername(testUserEntity.getUsername());
         // Assert
         Assertions.assertEquals(testUserEntity.getUsername(), userDetails.getUsername());
         Assertions.assertEquals(testUserEntity.getEmail(), userDetails.getEmail());
@@ -71,6 +69,6 @@ public class AppUserDetailsServiceImplTest {
     @Test
     void testLoadUserByUsername_UserDoesNotExists() {
         Assertions.assertThrows(UsernameNotFoundException.class,
-                () -> toTest.loadUserByUsername("non-existing"));
+                () -> mockAppUserDetailsService.loadUserByUsername("non-existing"));
     }
 }

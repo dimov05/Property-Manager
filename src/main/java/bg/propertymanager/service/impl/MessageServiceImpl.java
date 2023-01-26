@@ -43,7 +43,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public void addMessage(MessageAddDTO messageAddDTO, Long buildingId, String authorUsername) {
+    public void  addMessage(MessageAddDTO messageAddDTO, Long buildingId, String authorUsername){
         BuildingEntity building = buildingService.findEntityById(buildingId);
         UserEntity author = userService.findUserByUsername(authorUsername);
         MessageEntity newMessage = new MessageEntity()
@@ -96,11 +96,11 @@ public class MessageServiceImpl implements MessageService {
         } else {
             StringBuilder date = new StringBuilder();
             date
-                    .append(dateOfLastMessageFromManager.get(1).getYear())
+                    .append(dateOfLastMessageFromManager.get(0).getYear())
                     .append("-")
-                    .append(dateOfLastMessageFromManager.get(1).getMonthValue())
+                    .append(dateOfLastMessageFromManager.get(0).getMonthValue())
                     .append("-")
-                    .append(dateOfLastMessageFromManager.get(1).getDayOfMonth());
+                    .append(dateOfLastMessageFromManager.get(0).getDayOfMonth());
             return date.toString();
         }
     }
