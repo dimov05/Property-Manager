@@ -25,9 +25,9 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j:8.0.31'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.1'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
-targetCompatibility = JavaVersion.VERSION_1_9
