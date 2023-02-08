@@ -87,11 +87,17 @@ You'll need to have Java and MySQL installed.
 ### Installation
 
 First you need to clone this repository:
+
 	git clone "https://www.github.com/Dimov05/Property-Manager"
+	
 After this you have to execute this command:
+
 	./gradlew bootRun
+	
 Now you can open the browser and test the app:
+
 	localhost:8080
+	
 
 ## Usage
 
