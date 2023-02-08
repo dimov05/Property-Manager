@@ -82,16 +82,21 @@ Here you can see instructions on how to install this application locally to your
 
 ### Prerequisites.
 
-Soon will be updated
+You'll need to have Java and MySQL installed.
 
 ### Installation
 
-Soon will be updated
+First you need to clone this repository:
+	git clone "https://www.github.com/Dimov05/Property-Manager"
+After this you have to execute this command:
+	./gradlew bootRun
+Now you can open the browser and test the app:
+	localhost:8080
 
 ## Usage
 
 For details and examples of how this application can be used refer to Documentation: Soon will be uploaded!
- [Documentation](https://example.com)
+ [Documentation](https://github.com/dimov05/Property-Manager/blob/main/Property%20Manager%20-%20short%20documentation.pdf)
 
 ## Roadmap
 
@@ -104,6 +109,3 @@ Distributed under the MIT License. See [LICENSE](https://github.com/dimov05/Prop
 ## Authors
 
 * **Dimo Dimov** - [Dimo Dimov](https://github.com/dimov05/) 
-## Acknowledgements
-
-* [Stackoverflow <3](https://stackoverflow.com/)
