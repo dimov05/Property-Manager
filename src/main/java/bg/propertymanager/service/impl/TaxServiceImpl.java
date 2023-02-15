@@ -9,10 +9,10 @@ import bg.propertymanager.model.entity.ExpenseEntity;
 import bg.propertymanager.model.entity.TaxEntity;
 import bg.propertymanager.model.enums.TaxStatusEnum;
 import bg.propertymanager.model.enums.TaxTypeEnum;
-import bg.propertymanager.repository.ExpenseRepository;
 import bg.propertymanager.repository.TaxRepository;
 import bg.propertymanager.service.ApartmentService;
 import bg.propertymanager.service.BuildingService;
+import bg.propertymanager.service.ExpenseService;
 import bg.propertymanager.service.TaxService;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Lazy;
@@ -38,15 +38,15 @@ public class TaxServiceImpl implements TaxService {
     private final ModelMapper modelMapper;
     private final BuildingService buildingService;
     private final ApartmentService apartmentService;
-    private final ExpenseRepository expenseRepository;
+    private final ExpenseService expenseService;
 
     public TaxServiceImpl(TaxRepository taxRepository, ModelMapper modelMapper, @Lazy BuildingService buildingService, ApartmentService apartmentService,
-                          ExpenseRepository expenseRepository) {
+                         @Lazy ExpenseService expenseService) {
         this.taxRepository = taxRepository;
         this.modelMapper = modelMapper;
         this.buildingService = buildingService;
         this.apartmentService = apartmentService;
-        this.expenseRepository = expenseRepository;
+        this.expenseService = expenseService;
     }
 
     @Override
@@ -61,9 +61,8 @@ public class TaxServiceImpl implements TaxService {
         BigDecimal paidTaxes = taxRepository
                 .findAmountOfPaidTaxesByBuildingId(buildingId)
                 .orElse(BigDecimal.ZERO);
-        BigDecimal paidExpenses = expenseRepository
-                .findAmountOfPaidExpensesByBuildingId(buildingId)
-                .orElse(BigDecimal.ZERO);
+        BigDecimal paidExpenses = expenseService
+                .findAmountOfAllPaidExpensesByBuildingId(buildingId);
 
         return paidTaxes.subtract(paidExpenses);
     }
