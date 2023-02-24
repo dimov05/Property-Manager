@@ -2,6 +2,8 @@ package bg.propertymanager.model.entity;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -20,6 +22,19 @@ public class ApartmentEntity {
     private Set<TaxEntity> taxes;
 
     public ApartmentEntity() {
+    }
+
+    public ApartmentEntity(ApartmentBuilder apartmentBuilder) {
+        this.apartmentNumber = apartmentBuilder.apartmentNumber;
+        this.floor = apartmentBuilder.floor;
+        this.area = apartmentBuilder.area;
+        this.elevatorChipsCount = apartmentBuilder.elevatorChipsCount;
+        this.dogsCount = apartmentBuilder.dogsCount;
+        this.roommateCount = apartmentBuilder.roommateCount;
+        this.periodicTax = apartmentBuilder.periodicTax;
+        this.building = apartmentBuilder.building;
+        this.owner = apartmentBuilder.owner;
+        this.taxes = apartmentBuilder.taxes;
     }
 
     @Id
@@ -131,5 +146,66 @@ public class ApartmentEntity {
     public ApartmentEntity setTaxes(Set<TaxEntity> taxes) {
         this.taxes = taxes;
         return this;
+    }
+
+    public static class ApartmentBuilder {
+        // required parameters
+        private String apartmentNumber;
+        private BuildingEntity building;
+        private UserEntity owner;
+
+        // optional parameters
+        private int floor;
+        private double area;
+        private int elevatorChipsCount;
+        private int dogsCount;
+        private int roommateCount;
+        private BigDecimal periodicTax;
+        private Set<TaxEntity> taxes;
+
+        public ApartmentBuilder(String apartmentNumber, UserEntity owner, BuildingEntity building) {
+            this.apartmentNumber = apartmentNumber;
+            this.owner = owner;
+            this.building = building;
+        }
+
+        public ApartmentBuilder floor(int floor) {
+            this.floor = floor;
+            return this;
+        }
+
+        public ApartmentBuilder area(double area) {
+            this.area = area;
+            return this;
+        }
+
+        public ApartmentBuilder elevatorChipsCount(int elevatorChipsCount) {
+            this.elevatorChipsCount = elevatorChipsCount;
+            return this;
+        }
+
+        public ApartmentBuilder dogsCount(int dogsCount) {
+            this.dogsCount = dogsCount;
+            return this;
+        }
+
+        public ApartmentBuilder roommateCount(int roommateCount) {
+            this.roommateCount = roommateCount;
+            return this;
+        }
+
+        public ApartmentBuilder periodicTax(BigDecimal periodicTax) {
+            this.periodicTax = periodicTax;
+            return this;
+        }
+
+        public ApartmentBuilder taxes(Set<TaxEntity> taxes) {
+            this.taxes = Objects.requireNonNullElse(taxes, Collections.emptySet());
+            return this;
+        }
+
+        public ApartmentEntity build() {
+            return new ApartmentEntity(this);
+        }
     }
 }

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -44,35 +45,31 @@ public class ApartmentServiceImpl implements ApartmentService {
     public void addApartment(ApartmentAddDTO apartmentAddDTO, Long buildingId) {
         UserEntity ownerToAdd = getOwnerEntity(apartmentAddDTO);
         BuildingEntity building = buildingService.findEntityById(buildingId);
-        ApartmentEntity newApartment = new ApartmentEntity()
-                .setApartmentNumber(apartmentAddDTO.getApartmentNumber())
-                .setFloor(apartmentAddDTO.getFloor())
-                .setArea(apartmentAddDTO.getArea())
-                .setRoommateCount(apartmentAddDTO.getRoommateCount())
-                .setElevatorChipsCount(apartmentAddDTO.getElevatorChipsCount())
-                .setDogsCount(apartmentAddDTO.getDogsCount())
-                .setOwner(ownerToAdd)
-                .setBuilding(buildingService.findEntityById(buildingId))
-                .setPeriodicTax(calculatePeriodicTax(apartmentAddDTO, building));
+        ApartmentEntity newApartment = createNewApartment(apartmentAddDTO, ownerToAdd, building);
         buildingService.addNeighbour(ownerToAdd, building);
         userService.addApartmentToUser(newApartment, ownerToAdd);
         apartmentRepository.save(newApartment);
     }
+
+    private ApartmentEntity createNewApartment(ApartmentAddDTO apartmentAddDTO, UserEntity ownerToAdd, BuildingEntity building) {
+        return new ApartmentEntity.ApartmentBuilder(apartmentAddDTO.getApartmentNumber(),ownerToAdd,building)
+                .floor(apartmentAddDTO.getFloor())
+                .area(apartmentAddDTO.getArea())
+                .roommateCount(apartmentAddDTO.getRoommateCount())
+                .elevatorChipsCount(apartmentAddDTO.getElevatorChipsCount())
+                .dogsCount(apartmentAddDTO.getDogsCount())
+                .periodicTax(calculatePeriodicTax(apartmentAddDTO, building))
+                .taxes(Collections.emptySet())
+                .build();
+    }
+
     @Override
     public void updateApartment(ApartmentEditDTO apartmentEditDTO) {
         ApartmentEntity apartmentToUpdate = findById(apartmentEditDTO.getId());
         UserEntity ownerToRemove = apartmentToUpdate.getOwner();
         UserEntity ownerToAdd = userService.findById(apartmentEditDTO.getOwner().getId());
         BuildingEntity building = apartmentToUpdate.getBuilding();
-        apartmentToUpdate
-                .setApartmentNumber(apartmentEditDTO.getApartmentNumber())
-                .setFloor(apartmentEditDTO.getFloor())
-                .setArea(apartmentEditDTO.getArea())
-                .setRoommateCount(apartmentEditDTO.getRoommateCount())
-                .setElevatorChipsCount(apartmentEditDTO.getElevatorChipsCount())
-                .setDogsCount(apartmentEditDTO.getDogsCount())
-                .setOwner(ownerToAdd)
-                .setPeriodicTax(calculatePeriodicTax(apartmentToUpdate, building));
+        updateApartmentData(apartmentEditDTO, apartmentToUpdate, ownerToAdd, building);
 
         buildingService.removeNeighbour(ownerToRemove, building);
         buildingService.addNeighbour(ownerToAdd, building);
@@ -87,6 +84,19 @@ public class ApartmentServiceImpl implements ApartmentService {
 
 
     }
+
+    private void updateApartmentData(ApartmentEditDTO apartmentEditDTO, ApartmentEntity apartmentToUpdate, UserEntity ownerToAdd, BuildingEntity building) {
+        apartmentToUpdate
+                .setApartmentNumber(apartmentEditDTO.getApartmentNumber())
+                .setFloor(apartmentEditDTO.getFloor())
+                .setArea(apartmentEditDTO.getArea())
+                .setRoommateCount(apartmentEditDTO.getRoommateCount())
+                .setElevatorChipsCount(apartmentEditDTO.getElevatorChipsCount())
+                .setDogsCount(apartmentEditDTO.getDogsCount())
+                .setOwner(ownerToAdd)
+                .setPeriodicTax(calculatePeriodicTax(apartmentToUpdate, building));
+    }
+
     @Override
     public void deleteApartmentWithId(Long apartmentId, Long buildingId) {
         ApartmentEntity apartmentToRemove = findById(apartmentId);
