@@ -45,26 +45,29 @@ public class BuildingServiceImpl implements BuildingService {
     }
 
     public void register(BuildingAddDTO buildingAddDTO) {
-        BuildingEntity newBuilding =
-                new BuildingEntity()
-                        .setName(buildingAddDTO.getName())
-                        .setFloors(buildingAddDTO.getFloors())
-                        .setElevators(buildingAddDTO.getElevators())
-                        .setImageUrl(getImageUrlBySize(buildingAddDTO.getFloors()))
-                        .setTaxPerPerson(buildingAddDTO.getTaxPerPerson())
-                        .setTaxPerDog(buildingAddDTO.getTaxPerDog())
-                        .setTaxPerElevatorChip(buildingAddDTO.getTaxPerElevatorChip())
-                        .setCountry(buildingAddDTO.getCountry())
-                        .setCity(buildingAddDTO.getCity())
-                        .setStreet(buildingAddDTO.getStreet())
-                        .setRegistrationDate(LocalDate.now())
-                        .setNeighbours(Collections.emptySet())
-                        .setApartments(Collections.emptySet())
-                        .setTaxes(Collections.emptySet())
-                        .setExpenses(Collections.emptySet())
-                        .setMessages(Collections.emptySet())
-                        .setManager(userService.findById(1L));
+        BuildingEntity newBuilding = createNewBuilding(buildingAddDTO);
         buildingRepository.save(newBuilding);
+    }
+
+    private BuildingEntity createNewBuilding(BuildingAddDTO buildingAddDTO) {
+        return new BuildingEntity.BuildingBuilder(buildingAddDTO.getName())
+                .floors(buildingAddDTO.getFloors())
+                .elevators(buildingAddDTO.getElevators())
+                .imageUrl(getImageUrlBySize(buildingAddDTO.getFloors()))
+                .taxPerPerson(buildingAddDTO.getTaxPerPerson())
+                .taxPerDog(buildingAddDTO.getTaxPerDog())
+                .taxPerElevatorChip(buildingAddDTO.getTaxPerElevatorChip())
+                .country(buildingAddDTO.getCountry())
+                .city(buildingAddDTO.getCity())
+                .street(buildingAddDTO.getStreet())
+                .registrationDate(LocalDate.now())
+                .neighbours(Collections.emptySet())
+                .apartments(Collections.emptySet())
+                .taxes(Collections.emptySet())
+                .expenses(Collections.emptySet())
+                .messages(Collections.emptySet())
+                .manager(userService.findById(1L))
+                .build();
     }
 
     public void updateBuilding(BuildingEditDTO buildingEditDTO) {
@@ -79,6 +82,12 @@ public class BuildingServiceImpl implements BuildingService {
             userService.addManagerRightsInBuilding(managerToSet, buildingToSave);
             buildingToSave.setManager(managerToSet);
         }
+        updateBuildingData(buildingEditDTO, buildingToSave);
+        apartmentService.updatePeriodicTax(buildingToSave);
+        buildingRepository.save(buildingToSave);
+    }
+
+    private void updateBuildingData(BuildingEditDTO buildingEditDTO, BuildingEntity buildingToSave) {
         buildingToSave
                 .setName(buildingEditDTO.getName())
                 .setFloors(buildingEditDTO.getFloors())
@@ -90,8 +99,6 @@ public class BuildingServiceImpl implements BuildingService {
                 .setCountry(buildingEditDTO.getCountry())
                 .setCity(buildingEditDTO.getCity())
                 .setStreet(buildingEditDTO.getStreet());
-        apartmentService.updatePeriodicTax(buildingToSave);
-        buildingRepository.save(buildingToSave);
     }
 
     public void updateBuildingsPerTaxes(BuildingChangeTaxesDTO buildingChangeTaxesDTO) {
