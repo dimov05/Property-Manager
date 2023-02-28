@@ -3,7 +3,7 @@ package bg.propertymanager.web;
 import bg.propertymanager.model.dto.user.UserEditDTO;
 import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.model.view.UserEntityViewModel;
-import bg.propertymanager.repository.RoleRepository;
+import bg.propertymanager.service.RoleService;
 import bg.propertymanager.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,13 +27,13 @@ import java.util.stream.IntStream;
 @RequestMapping("/admin")
 public class AdminController {
     private final UserService userService;
-    private final RoleRepository roleRepository;
+    private final RoleService roleService;
 
     @Autowired
     public AdminController(UserService userService,
-                           RoleRepository roleRepository) {
+                           RoleService roleService) {
         this.userService = userService;
-        this.roleRepository = roleRepository;
+        this.roleService = roleService;
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -95,7 +95,7 @@ public class AdminController {
         UserEntity userProfileToEdit = userService.findUserByUsername(name);
         ModelAndView mav = new ModelAndView("change-roles");
         mav.addObject("user", userProfileToEdit);
-        mav.addObject("roles", roleRepository.findAll());
+        mav.addObject("roles", roleService.findAll());
         return mav;
     }
 
