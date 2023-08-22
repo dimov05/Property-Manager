@@ -16,6 +16,7 @@ public class ScheduledTask {
 
     // Every 1st day of month at 02:00 am, periodicTaxes will be added for every apartment
     @Scheduled(cron = "0 0 2 1 * ?")
+    //                0 0 2 1 1/1 ? *
     public void createPeriodicTaxesEveryMonth() {
         taxService.createPeriodicTaxesForEveryApartment();
     }

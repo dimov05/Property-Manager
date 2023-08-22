@@ -1,6 +1,9 @@
 package bg.propertymanager.model.enums;
 
+import jakarta.persistence.Enumerated;
+
 public enum UserRolesEnum {
-    ADMIN,
-    USER
+    EMPLOYEE,
+    MANAGER,
+    ADMIN
 }
