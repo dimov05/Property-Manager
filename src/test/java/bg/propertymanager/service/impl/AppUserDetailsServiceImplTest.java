@@ -1,4 +1,4 @@
-package bg.propertymanager.service;
+package bg.propertymanager.service.impl;
 
 import bg.propertymanager.model.entity.RoleEntity;
 import bg.propertymanager.model.entity.UserEntity;
