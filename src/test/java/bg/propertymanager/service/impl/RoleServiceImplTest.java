@@ -23,6 +23,7 @@ class RoleServiceImplTest {
 
     @InjectMocks
     private RoleServiceImpl roleService;
+    private static final long INDEX_ONE = 1L;
 
     @Test
     @DisplayName("Should return null when the role name is not found")
@@ -72,7 +73,7 @@ class RoleServiceImplTest {
 
     private static void addRoles(List<RoleEntity> roles) {
         roles.add(new RoleEntity()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setName("USER")
                 .setRole(UserRolesEnum.USER));
         roles.add(new RoleEntity()

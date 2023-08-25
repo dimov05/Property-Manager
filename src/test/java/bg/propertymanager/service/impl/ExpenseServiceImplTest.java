@@ -53,6 +53,9 @@ class ExpenseServiceImplTest {
     @Mock
     private TaxService taxService;
 
+    private static final long INDEX_OF_ONE = 1L;
+
+    private static final BigDecimal AMOUNT_OF_200 = BigDecimal.valueOf(200);
     private static ExpenseAddDTO expenseAddDTO;
     private static ExpenseEntity expenseEntity;
     private static BuildingEntity building;
@@ -249,8 +252,8 @@ class ExpenseServiceImplTest {
 
     private static ExpenseAddDTO initExpenseAddDTO() {
         return new ExpenseAddDTO()
-                .setId(1L)
-                .setAmount(new BigDecimal(200))
+                .setId(INDEX_OF_ONE)
+                .setAmount(AMOUNT_OF_200)
                 .setDescription("Expense No:1")
                 .setTaxType(TaxTypeEnum.EMERGENCY)
                 .setStartDate(LocalDateTime.of(2023, Month.AUGUST, 5, 12, 20))
@@ -261,15 +264,15 @@ class ExpenseServiceImplTest {
     private static List<RoleEntity> initRoles() {
         List<RoleEntity> roles = new ArrayList<>();
         roles.add(new RoleEntity()
-                .setId(1L)
+                .setId(INDEX_OF_ONE)
                 .setName("USER")
                 .setRole(UserRolesEnum.USER));
         roles.add(new RoleEntity()
-                .setId(2L)
+                .setId(INDEX_OF_ONE)
                 .setName("MANAGER")
                 .setRole(UserRolesEnum.MANAGER));
         roles.add(new RoleEntity()
-                .setId(3L)
+                .setId(INDEX_OF_ONE)
                 .setName("ADMIN")
                 .setRole(UserRolesEnum.ADMIN));
         return roles;
@@ -277,7 +280,7 @@ class ExpenseServiceImplTest {
 
     private static BuildingEntity initBuilding() {
         return new BuildingEntity()
-                .setId(1L)
+                .setId(INDEX_OF_ONE)
                 .setApartments(new HashSet<>())
                 .setExpenses(new HashSet<>())
                 .setCity("Plovdiv")
@@ -305,7 +308,7 @@ class ExpenseServiceImplTest {
 
     private static UserEntity initManager() {
         return new UserEntity()
-                .setId(1L)
+                .setId(INDEX_OF_ONE)
                 .setUsername("manager")
                 .setCity("Plovdiv")
                 .setCountry("Bulgaria")
@@ -338,15 +341,15 @@ class ExpenseServiceImplTest {
 
     private static Set<ExpenseEntity> initExpenses() {
         Set<ExpenseEntity> expenseEntities = new HashSet<>();
-        ExpenseEntity expense1 = new ExpenseEntity().setId(1L)
+        ExpenseEntity expense1 = new ExpenseEntity().setId(INDEX_OF_ONE)
                 .setTaxStatus(TaxStatusEnum.PAID); // amount 200
         ExpenseEntity expense2 = new ExpenseEntity()
                 .setId(2L)
-                .setAmount(new BigDecimal(100))
+                .setAmount(AMOUNT_OF_200)
                 .setTaxStatus(TaxStatusEnum.PAID); // amount 100
         ExpenseEntity expense3 = new ExpenseEntity()
                 .setId(3L)
-                .setAmount(new BigDecimal(300))
+                .setAmount(AMOUNT_OF_200)
                 .setTaxStatus(TaxStatusEnum.PAID); // amount 300
         expenseEntities.add(expense1);
         expenseEntities.add(expense2);
