@@ -55,22 +55,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserEntity register(UserRegisterDTO userRegisterDTO) {
-        UserEntity newUser =
-                new UserEntity()
-                        .setUsername(userRegisterDTO.getUsername())
-                        .setRoles(List.of(roleRepository.getById(2L)))
-                        .setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()))
-                        .setEmail(userRegisterDTO.getEmail())
-                        .setPhoneNumber(userRegisterDTO.getPhoneNumber())
-                        .setFullName(userRegisterDTO.getFullName())
-                        .setCountry(userRegisterDTO.getCountry())
-                        .setCity(userRegisterDTO.getCity())
-                        .setStreet(userRegisterDTO.getStreet())
-                        .setRegistrationDate(LocalDate.now())
-                        .setManagerInBuildings(Collections.emptySet())
-                        .setOwnerInBuildings(Collections.emptySet())
-                        .setApartments(Collections.emptySet())
-                        .setMessages(Collections.emptySet());
+        UserEntity newUser = new UserEntity()
+                .setUsername(userRegisterDTO.getUsername())
+                .setRoles(List.of(roleRepository.getById(2L)))
+                .setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()))
+                .setEmail(userRegisterDTO.getEmail())
+                .setPhoneNumber(userRegisterDTO.getPhoneNumber())
+                .setFullName(userRegisterDTO.getFullName())
+                .setCountry(userRegisterDTO.getCountry())
+                .setCity(userRegisterDTO.getCity())
+                .setStreet(userRegisterDTO.getStreet())
+                .setRegistrationDate(LocalDate.now())
+                .setManagerInBuildings(Collections.emptySet())
+                .setOwnerInBuildings(Collections.emptySet())
+                .setApartments(Collections.emptySet())
+                .setMessages(Collections.emptySet());
 
         userRepository.save(newUser);
 
@@ -91,7 +90,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    private void initUser(List<RoleEntity> roles) {
+    public void initUser(List<RoleEntity> roles) {
         UserEntity user = new UserEntity()
                 .setRoles(roles)
                 .setUsername("manager")
@@ -111,7 +110,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private void initAdmin(List<RoleEntity> roles) {
+    public void initAdmin(List<RoleEntity> roles) {
         UserEntity admin = new UserEntity()
                 .setRoles(roles)
                 .setUsername("admin")
@@ -226,8 +225,8 @@ public class UserServiceImpl implements UserService {
         }
         if (!ownerHaveMoreApartmentsInThisBuilding) {
             userToUpdate.getOwnerInBuildings().remove(building);
-            userRepository.save(userToUpdate);
         }
+        userRepository.save(userToUpdate);
     }
 
     @Override
@@ -277,7 +276,14 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean checkIfUserIsAdmin(UserEntity userToChangeRole, RoleEntity adminRole) {
-        return userToChangeRole.getRoles().contains(adminRole);
+        boolean checkAdmin = false;
+        for (RoleEntity role : userToChangeRole.getRoles()) {
+            if (role.getRole() == UserRolesEnum.ADMIN) {
+                checkAdmin = true;
+            }
+        }
+        return checkAdmin;
+//        return userToChangeRole.getRoles().contains(adminRole);
     }
 
     private static PageImpl<UserEntityViewModel> getPageOfUsers(Pageable pageable, List<UserEntityViewModel> neighbours) {
