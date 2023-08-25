@@ -496,16 +496,16 @@ class UserServiceImplTest {
 
     @ParameterizedTest
     @CsvSource(value = {"0,USER", "1,MANAGER", "2,ADMIN"})
-    void testChangeRole_ShouldChangeRoleToAnyRole(long id,String roleName) {
+    void testChangeRole_ShouldChangeRoleToAnyRole(long id, String roleName) {
         RoleEntity adminRole = roles.get(2);
         RoleEntity managerRole = roles.get(1);
         RoleEntity userRole = roles.get(0);
         RoleEntity roleToReturn = new RoleEntity()
                 .setId(id)
                 .setName(roleName);
-        if(roleName.equals("USER")){
+        if (roleName.equals("USER")) {
             roleToReturn.setRole(UserRolesEnum.USER);
-        } else if (roleName.equals("MANAGER")){
+        } else if (roleName.equals("MANAGER")) {
             roleToReturn.setRole(UserRolesEnum.MANAGER);
         } else {
             roleToReturn.setRole(UserRolesEnum.ADMIN);
@@ -529,10 +529,11 @@ class UserServiceImplTest {
 //            userToChangeRole.getRoles().addAll(roles);
 //        }
         assert userToChangeRole != null;
-        this.userService.changeRole(roleName,userToChangeRole.getUsername());
-        verify(this.userRepository,times(1)).findByUsername(userToChangeRole.getUsername());
-        verify(this.roleService,times(2)).findRoleByName(anyString());
+        this.userService.changeRole(roleName, userToChangeRole.getUsername());
+        verify(this.userRepository, times(1)).findByUsername(userToChangeRole.getUsername());
+        verify(this.roleService, times(2)).findRoleByName(anyString());
     }
+
     @Test
     void testChangeRole_ShouldChangeRoleToAnyRole() {
         RoleEntity adminRole = roles.get(2);
@@ -554,9 +555,9 @@ class UserServiceImplTest {
 //            userToChangeRole.getRoles().addAll(roles);
 //        }
         assert userToChangeRole != null;
-        this.userService.changeRole("USER",userToChangeRole.getUsername());
-        verify(this.userRepository,times(1)).findByUsername(userToChangeRole.getUsername());
-        verify(this.roleService,times(2)).findRoleByName(anyString());
+        this.userService.changeRole("USER", userToChangeRole.getUsername());
+        verify(this.userRepository, times(1)).findByUsername(userToChangeRole.getUsername());
+        verify(this.roleService, times(2)).findRoleByName(anyString());
     }
 
 //    @Override

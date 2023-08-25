@@ -56,20 +56,20 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserEntity register(UserRegisterDTO userRegisterDTO) {
         UserEntity newUser = new UserEntity()
-                        .setUsername(userRegisterDTO.getUsername())
-                        .setRoles(List.of(roleRepository.getById(2L)))
-                        .setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()))
-                        .setEmail(userRegisterDTO.getEmail())
-                        .setPhoneNumber(userRegisterDTO.getPhoneNumber())
-                        .setFullName(userRegisterDTO.getFullName())
-                        .setCountry(userRegisterDTO.getCountry())
-                        .setCity(userRegisterDTO.getCity())
-                        .setStreet(userRegisterDTO.getStreet())
-                        .setRegistrationDate(LocalDate.now())
-                        .setManagerInBuildings(Collections.emptySet())
-                        .setOwnerInBuildings(Collections.emptySet())
-                        .setApartments(Collections.emptySet())
-                        .setMessages(Collections.emptySet());
+                .setUsername(userRegisterDTO.getUsername())
+                .setRoles(List.of(roleRepository.getById(2L)))
+                .setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()))
+                .setEmail(userRegisterDTO.getEmail())
+                .setPhoneNumber(userRegisterDTO.getPhoneNumber())
+                .setFullName(userRegisterDTO.getFullName())
+                .setCountry(userRegisterDTO.getCountry())
+                .setCity(userRegisterDTO.getCity())
+                .setStreet(userRegisterDTO.getStreet())
+                .setRegistrationDate(LocalDate.now())
+                .setManagerInBuildings(Collections.emptySet())
+                .setOwnerInBuildings(Collections.emptySet())
+                .setApartments(Collections.emptySet())
+                .setMessages(Collections.emptySet());
 
         userRepository.save(newUser);
 
@@ -277,8 +277,8 @@ public class UserServiceImpl implements UserService {
 
     private boolean checkIfUserIsAdmin(UserEntity userToChangeRole, RoleEntity adminRole) {
         boolean checkAdmin = false;
-        for(RoleEntity role : userToChangeRole.getRoles()){
-            if(role.getRole()==UserRolesEnum.ADMIN){
+        for (RoleEntity role : userToChangeRole.getRoles()) {
+            if (role.getRole() == UserRolesEnum.ADMIN) {
                 checkAdmin = true;
             }
         }
