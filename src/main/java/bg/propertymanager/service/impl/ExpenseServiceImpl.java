@@ -60,23 +60,6 @@ public class ExpenseServiceImpl implements ExpenseService {
 
     }
 
-    private static ExpenseEntity mapDataFromExpenseAddDTO(ExpenseAddDTO expenseAddDTO, BuildingEntity buildingToUpdate) {
-        return new ExpenseEntity()
-                .setTaxType(expenseAddDTO.getTaxType())
-                .setTaxStatus(TaxStatusEnum.UNPAID)
-                .setDescription(expenseAddDTO.getDescription())
-                .setStartDate(expenseAddDTO.getStartDate())
-                .setDueDate(expenseAddDTO.getDueDate())
-                .setAmount(expenseAddDTO.getAmount())
-                .setManager(buildingToUpdate.getManager())
-                .setBuilding(buildingToUpdate)
-                .setTaxes(Collections.emptySet());
-    }
-
-    private BuildingEntity getBuildingEntity(Long buildingId) {
-        return buildingService.findEntityById(buildingId);
-    }
-
     @Override
     public ExpenseViewDTO findViewById(Long expenseId) {
         return expenseRepository
@@ -90,8 +73,6 @@ public class ExpenseServiceImpl implements ExpenseService {
         ExpenseEntity expenseToUpdate = expenseRepository
                 .findById(expenseEditDTO.getId())
                 .orElseThrow(() -> new NullPointerException("No expense is existing with id " + expenseEditDTO.getId()));
-
-
         expenseToUpdate
                 .setTaxStatus(expenseEditDTO.getTaxStatus());
         expenseRepository.save(expenseToUpdate);
@@ -142,6 +123,30 @@ public class ExpenseServiceImpl implements ExpenseService {
         return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), expenses.size());
     }
 
+    @Override
+    public BigDecimal getExpenseAmountById(Long expenseId) {
+        ExpenseEntity expense = expenseRepository.findById(expenseId)
+                .orElseThrow(() -> new NullPointerException("No expense is existing with id " + expenseId));
+        return expense.getAmount();
+    }
+
+    private BuildingEntity getBuildingEntity(Long buildingId) {
+        return buildingService.findEntityById(buildingId);
+    }
+
+    private static ExpenseEntity mapDataFromExpenseAddDTO(ExpenseAddDTO expenseAddDTO, BuildingEntity buildingToUpdate) {
+        return new ExpenseEntity()
+                .setTaxType(expenseAddDTO.getTaxType())
+                .setTaxStatus(TaxStatusEnum.UNPAID)
+                .setDescription(expenseAddDTO.getDescription())
+                .setStartDate(expenseAddDTO.getStartDate())
+                .setDueDate(expenseAddDTO.getDueDate())
+                .setAmount(expenseAddDTO.getAmount())
+                .setManager(buildingToUpdate.getManager())
+                .setBuilding(buildingToUpdate)
+                .setTaxes(Collections.emptySet());
+    }
+
     private static List<ExpenseEntity> getExpenseEntities(List<ExpenseEntity> expenses, int pageSize, int startItem) {
         List<ExpenseEntity> list;
         if (expenses.size() < startItem) {
@@ -151,12 +156,5 @@ public class ExpenseServiceImpl implements ExpenseService {
             list = expenses.subList(startItem, toIndex);
         }
         return list;
-    }
-
-    @Override
-    public BigDecimal getExpenseAmountById(Long expenseId) {
-        ExpenseEntity expense = expenseRepository.findById(expenseId)
-                .orElseThrow(() -> new NullPointerException("No expense is existing with id " + expenseId));
-        return expense.getAmount();
     }
 }

@@ -73,8 +73,8 @@ class UserServiceImplTest {
     @Test
     void testRegister_ShouldRegisterAndSaveNewUser() {
         UserRegisterDTO userToRegister = initUserRegisterDto(new UserRegisterDTO());
-
-        when(roleRepository.getById(2L)).thenReturn(roles.get(0));
+        RoleEntity userRole = roles.get(0);
+        when(roleRepository.getById(2L)).thenReturn(userRole);
         UserEntity registeredUser = this.userService.register(userToRegister);
         verify(this.userRepository, times(1)).save(any());
 
@@ -139,7 +139,6 @@ class UserServiceImplTest {
 //            adminRole = roleRepository.save(adminRole);
 //            userRole = roleRepository.save(userRole);
 //
-//            initAdmin(List.of(adminRole, userRole));
 //            initAdmin(List.of(adminRole, userRole));
 //            initUser(List.of(userRole));
 //        }
@@ -580,19 +579,6 @@ class UserServiceImplTest {
 //        }
 //
 //    }
-
-    @Test
-    @Disabled
-    void testChangeRole_ShouldChangeRoleToManager() {
-
-    }
-
-
-    @Test
-    @Disabled
-    void testChangeRole_ShouldChangeRoleToAdmin() {
-
-    }
 
     @Test
     void testChangeRole_ShouldThrowNullPointerException_OnMissingUserWithThisUsername() {
