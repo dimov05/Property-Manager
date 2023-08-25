@@ -49,6 +49,8 @@ class MessageServiceImplTest {
     @InjectMocks
     private MessageServiceImpl messageService;
 
+    private static final long INDEX_ONE = 1L;
+
     @Test
     @DisplayName("Should save the message when the building and author exist")
     void addMessageWhenBuildingAndAuthorExist() {
@@ -59,7 +61,7 @@ class MessageServiceImplTest {
         when(userService.findUserByUsername(anyString())).thenReturn(author);
         when(messageRepository.save(any())).thenReturn(message);
 
-        messageService.addMessage(new MessageAddDTO(), 1L, "test");
+        messageService.addMessage(new MessageAddDTO(), INDEX_ONE, "test");
 
         verify(buildingService, times(1)).findEntityById(anyLong());
         verify(userService, times(1)).findUserByUsername(anyString());
@@ -138,15 +140,15 @@ class MessageServiceImplTest {
     @DisplayName("Should update message on method call")
     void testUpdateMessage_ShouldUpdateMessage() {
         UserEntity user = initUser();
-        MessageEntity existingMessage = initMessageWithIdAndAuthor(1L, user);
+        MessageEntity existingMessage = initMessageWithIdAndAuthor(INDEX_ONE, user);
         MessageEditDTO updatedMessage = new MessageEditDTO()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setContent("Updated content")
                 .setTitle("Updated title");
-        when(messageRepository.findById(1L)).thenReturn(Optional.ofNullable(existingMessage));
+        when(messageRepository.findById(INDEX_ONE)).thenReturn(Optional.ofNullable(existingMessage));
         messageService.updateMessage(updatedMessage);
 
-        verify(this.messageRepository, times(1)).findById(1L);
+        verify(this.messageRepository, times(1)).findById(INDEX_ONE);
         if (existingMessage != null) {
             verify(this.messageRepository, times(1)).save(existingMessage);
         }
@@ -162,7 +164,7 @@ class MessageServiceImplTest {
         UserEntity user = initUser();
         UserEntity manager = initManager();
         BuildingEntity building = new BuildingEntity()
-                .setId(1L);
+                .setId(INDEX_ONE);
         MessageEntity existingMessage = initMessageWithIdAndAuthor(id, user);
         existingMessage.setBuilding(building);
         when(messageRepository.findById(id)).thenReturn(Optional.ofNullable(existingMessage));
@@ -298,13 +300,13 @@ class MessageServiceImplTest {
 
     private static BuildingViewDTO initBuilding(UserEntity manager) {
         return new BuildingViewDTO()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setManager(manager);
     }
 
     private static UserEntity initManager() {
         return new UserEntity()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setUsername("manager")
                 .setCity("Plovdiv")
                 .setCountry("Bulgaria")
@@ -315,7 +317,7 @@ class MessageServiceImplTest {
     private static void addMessagesByAuthor(List<MessageEntity> messages, UserEntity author) {
         messages.add(
                 new MessageEntity()
-                        .setId(1L)
+                        .setId(INDEX_ONE)
                         .setAuthor(author)
                         .setCreatedDate(LocalDateTime.of(2023, Month.AUGUST, 5, 6, 30))
                         .setTitle("Message 1")

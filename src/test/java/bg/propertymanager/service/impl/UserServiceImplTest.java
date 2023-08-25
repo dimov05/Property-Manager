@@ -58,9 +58,10 @@ class UserServiceImplTest {
     @Mock
     private RoleService roleService;
 
-    static List<RoleEntity> roles;
-    static UserEntity user;
+    private static List<RoleEntity> roles;
+    private static UserEntity user;
 
+    private static final long INDEX_ONE = 1L;
     @BeforeAll
     static void setup() {
         roles = new ArrayList<>();
@@ -73,8 +74,8 @@ class UserServiceImplTest {
     @Test
     void testRegister_ShouldRegisterAndSaveNewUser() {
         UserRegisterDTO userToRegister = initUserRegisterDto(new UserRegisterDTO());
-
-        when(roleRepository.getById(2L)).thenReturn(roles.get(0));
+        RoleEntity userRole = roles.get(0);
+        when(roleRepository.getById(2L)).thenReturn(userRole);
         UserEntity registeredUser = this.userService.register(userToRegister);
         verify(this.userRepository, times(1)).save(any());
 
@@ -139,7 +140,6 @@ class UserServiceImplTest {
 //            adminRole = roleRepository.save(adminRole);
 //            userRole = roleRepository.save(userRole);
 //
-//            initAdmin(List.of(adminRole, userRole));
 //            initAdmin(List.of(adminRole, userRole));
 //            initUser(List.of(userRole));
 //        }
@@ -210,7 +210,7 @@ class UserServiceImplTest {
     @Test
     void testUpdateProfile_ShouldThrowException_OnNotExistingProfileWithThisId() {
         UserEditDTO userToUpdate = new UserEditDTO()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setUsername("testUsername");
         assertThrows(NullPointerException.class, () -> this.userService.updateProfile(userToUpdate));
     }
@@ -241,7 +241,7 @@ class UserServiceImplTest {
     @Test
     void testUpdatePassword_ShouldThrowException_OnNotExistingProfileWithThisId() {
         PasswordChangeDTO passwordToUpdate = new PasswordChangeDTO()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setNewPassword("newPassword")
                 .setOldPassword("oldPassword");
         assertThrows(NullPointerException.class, () -> this.userService.updatePassword(passwordToUpdate));
@@ -251,7 +251,7 @@ class UserServiceImplTest {
     @WithMockUser(username = "user")
     void testCheckIfOldPasswordIsCorrect_ShouldReturnTrueOnCorrectOldPassword() {
         UserEntity userToReturn = new UserEntity()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setUsername("user")
                 .setPassword("password");
         PasswordChangeDTO passwordChangeDTO = new PasswordChangeDTO()
@@ -306,10 +306,10 @@ class UserServiceImplTest {
     void testRemoveApartmentFromUser_ShouldRemoveApartmentFromUser() {
         ApartmentEntity apartmentToRemove = new ApartmentEntity()
                 .setApartmentNumber("2A")
-                .setId(1L);
-        UserEntity ownerToRemove = new UserEntity().setId(1L).setUsername("user")
+                .setId(INDEX_ONE);
+        UserEntity ownerToRemove = new UserEntity().setId(INDEX_ONE).setUsername("user")
                 .setApartments(new HashSet<>());
-        when(this.userRepository.findById(1L)).thenReturn(Optional.ofNullable(ownerToRemove));
+        when(this.userRepository.findById(INDEX_ONE)).thenReturn(Optional.ofNullable(ownerToRemove));
         this.userService.removeApartmentFromUser(apartmentToRemove, ownerToRemove);
         verify(this.userRepository, times(1)).save(ownerToRemove);
     }
@@ -330,14 +330,14 @@ class UserServiceImplTest {
     @Test
     void testRemoveManagerRightInBuildingForUser_ShouldRemoveManagerRightsForUserInBuilding() {
         BuildingEntity building = new BuildingEntity()
-                .setId(1L);
+                .setId(INDEX_ONE);
         Set<BuildingEntity> managerInBuildings = new HashSet<>();
         managerInBuildings.add(building);
         UserEntity manager = new UserEntity()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setRoles(List.of(roles.get(1)))
                 .setManagerInBuildings(managerInBuildings);
-        when(this.userRepository.findById(1L)).thenReturn(Optional.ofNullable(manager));
+        when(this.userRepository.findById(INDEX_ONE)).thenReturn(Optional.ofNullable(manager));
         this.userService.removeManagerRightsInBuilding(manager, building);
         verify(this.userRepository, times(1)).save(manager);
         assertFalse(manager.getManagerInBuildings().contains(building));
@@ -346,13 +346,13 @@ class UserServiceImplTest {
     @Test
     void testAddManagerRightInBuildingForUser_ShouldAddManagerRightsForUserInBuilding() {
         BuildingEntity building = new BuildingEntity()
-                .setId(1L);
+                .setId(INDEX_ONE);
         Set<BuildingEntity> managerInBuildings = new HashSet<>();
         UserEntity manager = new UserEntity()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setRoles(List.of(roles.get(1)))
                 .setManagerInBuildings(managerInBuildings);
-        when(this.userRepository.findById(1L)).thenReturn(Optional.ofNullable(manager));
+        when(this.userRepository.findById(INDEX_ONE)).thenReturn(Optional.ofNullable(manager));
         this.userService.addManagerRightsInBuilding(manager, building);
         verify(this.userRepository, times(1)).save(manager);
         assert manager.getManagerInBuildings().contains(building);
@@ -361,13 +361,13 @@ class UserServiceImplTest {
     @Test
     void testAddBuildingToUser_ShouldAddBuildingToUser() {
         BuildingEntity building = new BuildingEntity()
-                .setId(1L);
+                .setId(INDEX_ONE);
         Set<BuildingEntity> ownerInBuildings = new HashSet<>();
         UserEntity user = new UserEntity()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setRoles(List.of(roles.get(1)))
                 .setOwnerInBuildings(ownerInBuildings);
-        when(this.userRepository.findById(1L)).thenReturn(Optional.ofNullable(user));
+        when(this.userRepository.findById(INDEX_ONE)).thenReturn(Optional.ofNullable(user));
         this.userService.addBuildingToUser(user, building);
         verify(this.userRepository, times(1)).save(user);
         assert user.getOwnerInBuildings().contains(building);
@@ -376,9 +376,9 @@ class UserServiceImplTest {
     @Test
     void testRemoveBuildingFromUser_ShouldRemoveBuildingFromUser_WhenUserHasNoMoreApartmentsInThisBuilding() {
         UserEntity ownerToRemove = new UserEntity()
-                .setId(1L);
+                .setId(INDEX_ONE);
         BuildingEntity building = new BuildingEntity()
-                .setId(1L);
+                .setId(INDEX_ONE);
         ApartmentEntity apartmentWithOwner = new ApartmentEntity()
                 .setOwner(ownerToRemove);
         ApartmentEntity apartmentWithOwner2 = new ApartmentEntity()
@@ -403,9 +403,9 @@ class UserServiceImplTest {
     @Test
     void testRemoveBuildingFromUser_ShouldNotRemoveBuildingFromUser_WhenUserHasMoreApartmentsInThisBuilding() {
         UserEntity ownerToRemove = new UserEntity()
-                .setId(1L);
+                .setId(INDEX_ONE);
         BuildingEntity building = new BuildingEntity()
-                .setId(1L);
+                .setId(INDEX_ONE);
         ApartmentEntity apartmentWithOwner = new ApartmentEntity()
                 .setOwner(ownerToRemove);
         ApartmentEntity apartmentWithoutOwner = new ApartmentEntity()
@@ -478,7 +478,7 @@ class UserServiceImplTest {
         List<UserEntity> users = new ArrayList<>();
         initUsers(users);
         BuildingEntity building = new BuildingEntity()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setNeighbours(new HashSet<>());
         building.getNeighbours().addAll(users);
         List<UserEntityViewModel> neighbours = Collections.singletonList(modelMapper.map(users, UserEntityViewModel.class));
@@ -511,7 +511,7 @@ class UserServiceImplTest {
             roleToReturn.setRole(UserRolesEnum.ADMIN);
         }
         UserEntity userToChangeRole = new UserEntity()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setUsername("username")
                 .setRoles(new ArrayList<>());
 
@@ -538,7 +538,7 @@ class UserServiceImplTest {
     void testChangeRole_ShouldChangeRoleToAnyRole() {
         RoleEntity adminRole = roles.get(2);
         UserEntity userToChangeRole = new UserEntity()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setUsername("username")
                 .setRoles(List.of(adminRole));
 
@@ -580,19 +580,6 @@ class UserServiceImplTest {
 //        }
 //
 //    }
-
-    @Test
-    @Disabled
-    void testChangeRole_ShouldChangeRoleToManager() {
-
-    }
-
-
-    @Test
-    @Disabled
-    void testChangeRole_ShouldChangeRoleToAdmin() {
-
-    }
 
     @Test
     void testChangeRole_ShouldThrowNullPointerException_OnMissingUserWithThisUsername() {
@@ -657,7 +644,7 @@ class UserServiceImplTest {
 
     private static void initRoles() {
         roles.add(new RoleEntity()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setName("USER")
                 .setRole(UserRolesEnum.USER));
         roles.add(new RoleEntity()
