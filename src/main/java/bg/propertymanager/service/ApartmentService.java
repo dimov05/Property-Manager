@@ -39,8 +39,6 @@ public interface ApartmentService {
 
     List<ApartmentEntity> findAllApartmentsByBuildingId(Long buildingId);
 
-    List<ApartmentEntity> findAllApartmentsInBuilding(Long buildingId);
-
     boolean findAllApartmentsByBuildingIdAndOwnerUsername(Long buildingId, String username);
     boolean findIfUserHasOnlyOneApartmentInBuilding(Long buildingId, String username);
 
