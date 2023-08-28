@@ -60,25 +60,35 @@ class UserServiceImplTest {
 
     private static List<RoleEntity> roles;
     private static UserEntity user;
+    private static RoleEntity userRole;
+    private static RoleEntity managerRole;
+    private static RoleEntity adminRole;
 
     private static final long INDEX_ONE = 1L;
+    private static final long INDEX_TWO = 2L;
+    private static final long INDEX_THREE = 3L;
+    private static final String NEW_PASSWORD = "newPassoword";
+    private static final String OLD_PASSWORD = "oldPassword";
+
     @BeforeAll
     static void setup() {
         roles = new ArrayList<>();
         user = new UserEntity();
         initRoles();
         initUser();
-
+        userRole = roles.get(0);
+        managerRole = roles.get(1);
+        adminRole = roles.get(2);
     }
 
     @Test
     void testRegister_ShouldRegisterAndSaveNewUser() {
         UserRegisterDTO userToRegister = initUserRegisterDto(new UserRegisterDTO());
-        RoleEntity userRole = roles.get(0);
-        when(roleRepository.getById(2L)).thenReturn(userRole);
-        UserEntity registeredUser = this.userService.register(userToRegister);
-        verify(this.userRepository, times(1)).save(any());
 
+        when(roleRepository.getById(INDEX_TWO)).thenReturn(userRole);
+        UserEntity registeredUser = this.userService.register(userToRegister);
+
+        verify(this.userRepository, times(1)).save(any());
         assertAll(
                 () -> assertEquals(registeredUser.getId(), user.getId()),
                 () -> assertEquals(registeredUser.getEmail(), user.getEmail()),
@@ -88,50 +98,29 @@ class UserServiceImplTest {
                 () -> assertEquals(registeredUser.getCity(), user.getCity()),
                 () -> assertEquals(registeredUser.getStreet(), user.getStreet())
         );
-
     }
 
+    @Test
+    @Disabled
+    void testInitMethod_ShouldInitOneUserAndOneAdminToDatabase() throws NoSuchMethodException {
+        when(userRepository.count()).thenReturn(0L);
+        when(roleRepository.count()).thenReturn(0L);
 
-    private UserEntity initUserForInitMethod(RoleEntity userRole, LocalDate date) {
-        return new UserEntity()
-                .setRoles(List.of(userRole))
-                .setUsername("manager")
-                .setPassword(passwordEncoder.encode("123456"))
-                .setFullName("Dimo Dimov")
-                .setEmail("manager@manager.com")
-                .setPhoneNumber("+359878123456")
-                .setCountry("Bulgaria")
-                .setCity("Plovdiv")
-                .setStreet("Vasil Levski 37")
-                .setManagerInBuildings(Collections.emptySet())
-                .setOwnerInBuildings(Collections.emptySet())
-                .setApartments(Collections.emptySet())
-                .setMessages(Collections.emptySet())
-                .setRegistrationDate(date);
+        LocalDate date = LocalDate.now();
+        UserEntity userToInit = initUserForInitMethod(userRole, date);
+        UserEntity adminToInit = initAdminForInitMethod(userRole, adminRole, date);
+        when(roleRepository.save(adminRole)).thenReturn(adminRole);
+        when(roleRepository.save(userRole)).thenReturn(userRole);
+
+        this.userService.init();
+
+        verify(roleRepository, times(1)).save(adminRole);
+        verify(roleRepository, times(1)).save(userRole);
+
+        verify(userRepository, times(1)).save(adminToInit);
+        verify(userRepository, times(1)).save(userToInit);
     }
 
-
-//    @Test
-//    void testInitMethod_ShouldInitOneUserAndOneAdminToDatabase() throws NoSuchMethodException {
-//        when(userRepository.count()).thenReturn(0L);
-//        when(roleRepository.count()).thenReturn(0L);
-//
-//        RoleEntity adminRole = roles.get(2);
-//        RoleEntity userRole = roles.get(0);
-//        LocalDate date = LocalDate.now();
-//        UserEntity userToInit = initUserForInitMethod(userRole, date);
-//        UserEntity adminToInit = initAdminForInitMethod(userRole, adminRole, date);
-////        when(roleRepository.save(adminRole)).thenReturn(adminRole);
-////        when(roleRepository.save(userRole)).thenReturn(userRole);
-//
-//        this.userService.init();
-//
-//        verify(roleRepository, times(1)).save(adminRole);
-//        verify(roleRepository, times(1)).save(userRole);
-//
-//        verify(userRepository, times(1)).save(adminToInit);
-//        verify(userRepository, times(1)).save(userToInit);
-//    }
     //    public void init() {
 //        if (userRepository.count() == 0 && roleRepository.count() == 0) {
 //            RoleEntity adminRole = new RoleEntity().setRole(UserRolesEnum.ADMIN);
@@ -144,13 +133,8 @@ class UserServiceImplTest {
 //            initUser(List.of(userRole));
 //        }
 //    }
-
     @Test
     void testInitUser_ShouldInitUserToDatabase() {
-        RoleEntity userRole = roles.get(0);
-        LocalDate date = LocalDate.now();
-        UserEntity userToInit = initUserForInitMethod(userRole, date);
-
         this.userService.initUser(List.of(userRole));
 
         verify(this.userRepository, times(1)).save(any(UserEntity.class));
@@ -158,11 +142,6 @@ class UserServiceImplTest {
 
     @Test
     void testInitAdmin_ShouldInitAdminToDatabase() {
-        RoleEntity userRole = roles.get(0);
-        RoleEntity adminRole = roles.get(2);
-        LocalDate date = LocalDate.now();
-        UserEntity adminToInit = initAdminForInitMethod(userRole, adminRole, date);
-
         this.userService.initAdmin(List.of(adminRole, userRole));
 
         verify(this.userRepository, times(1)).save(any(UserEntity.class));
@@ -172,7 +151,7 @@ class UserServiceImplTest {
     @CsvSource(value = {"user1", "user2", "user4", "user6", "user1231"})
     void testFindUserByUsername_ShouldReturnCorrectUser_OnCorrectUsername(String username) {
         LocalDate date = LocalDate.now();
-        UserEntity expected = initUserForInitMethod(username, roles.get(0), date);
+        UserEntity expected = initUserForInitMethod(username, userRole, date);
         when(this.userRepository.findByUsername(username)).thenReturn(Optional.ofNullable(expected));
 
         UserEntity actual = this.userService.findUserByUsername(username);
@@ -199,8 +178,8 @@ class UserServiceImplTest {
     void testUpdateProfile_ShouldUpdateProfile_OnExistingProfileWithThisId(long id) {
         UserEditDTO userToUpdate = new UserEditDTO()
                 .setId(id)
-                .setUsername("testUsername");
-        UserEntity returnUserFromRepo = new UserEntity().setId(id).setUsername("testUsername");
+                .setUsername("updated");
+        UserEntity returnUserFromRepo = new UserEntity().setId(id).setUsername("old");
         when(this.userRepository.findById(id)).thenReturn(Optional.ofNullable(returnUserFromRepo));
         this.userService.updateProfile(userToUpdate);
         verify(this.userRepository, times(1)).findById(id);
@@ -210,8 +189,7 @@ class UserServiceImplTest {
     @Test
     void testUpdateProfile_ShouldThrowException_OnNotExistingProfileWithThisId() {
         UserEditDTO userToUpdate = new UserEditDTO()
-                .setId(INDEX_ONE)
-                .setUsername("testUsername");
+                .setId(INDEX_ONE);
         assertThrows(NullPointerException.class, () -> this.userService.updateProfile(userToUpdate));
     }
 
@@ -223,15 +201,15 @@ class UserServiceImplTest {
                 .setPassword("oldPassword");
         PasswordChangeDTO passwordToUpdate = new PasswordChangeDTO()
                 .setId(id)
-                .setNewPassword("newPassword")
-                .setOldPassword("oldPassword");
+                .setNewPassword(NEW_PASSWORD)
+                .setOldPassword(OLD_PASSWORD);
         when(this.userRepository.findById(id)).thenReturn(Optional.of(userToChangePassword));
         UserEntity userWithOldPassword = this.userRepository.findById(id).get();
-        assertEquals(userWithOldPassword.getPassword(), "oldPassword");
+        assertEquals(userWithOldPassword.getPassword(), OLD_PASSWORD);
 
-        UserEntity userWithNewPassword = userWithOldPassword.setPassword("newPassword");
+        UserEntity userWithNewPassword = userWithOldPassword.setPassword(NEW_PASSWORD);
         when(this.userRepository.findById(id)).thenReturn(Optional.of(userWithNewPassword));
-        assertEquals(userWithOldPassword.getPassword(), "newPassword");
+        assertEquals(userWithOldPassword.getPassword(), NEW_PASSWORD);
 
         this.userService.updatePassword(passwordToUpdate);
         verify(this.userRepository, times(2)).findById(id);
@@ -242,8 +220,8 @@ class UserServiceImplTest {
     void testUpdatePassword_ShouldThrowException_OnNotExistingProfileWithThisId() {
         PasswordChangeDTO passwordToUpdate = new PasswordChangeDTO()
                 .setId(INDEX_ONE)
-                .setNewPassword("newPassword")
-                .setOldPassword("oldPassword");
+                .setNewPassword(NEW_PASSWORD)
+                .setOldPassword(OLD_PASSWORD);
         assertThrows(NullPointerException.class, () -> this.userService.updatePassword(passwordToUpdate));
     }
 
@@ -253,9 +231,9 @@ class UserServiceImplTest {
         UserEntity userToReturn = new UserEntity()
                 .setId(INDEX_ONE)
                 .setUsername("user")
-                .setPassword("password");
+                .setPassword(NEW_PASSWORD);
         PasswordChangeDTO passwordChangeDTO = new PasswordChangeDTO()
-                .setOldPassword("password");
+                .setOldPassword(NEW_PASSWORD);
         when(this.userRepository.findByUsername("user")).thenReturn(Optional.ofNullable(userToReturn));
         this.userService.checkIfOldPasswordIsCorrect(passwordChangeDTO, getPrincipal());
         String actualOldPassword = this.userRepository.findByUsername("user").get().getPassword();
@@ -277,7 +255,7 @@ class UserServiceImplTest {
     @ParameterizedTest
     @CsvSource(value = {"1", "2", "3", "6"})
     void testFindById_ShouldReturnUserWithCorrectId(long id) {
-        UserEntity user = initUserForInitMethod(roles.get(0), LocalDate.now()).setId(id);
+        UserEntity user = initUserForInitMethod(userRole, LocalDate.now()).setId(id);
 
         when(this.userRepository.findById(id)).thenReturn(Optional.ofNullable(user));
 
@@ -335,7 +313,7 @@ class UserServiceImplTest {
         managerInBuildings.add(building);
         UserEntity manager = new UserEntity()
                 .setId(INDEX_ONE)
-                .setRoles(List.of(roles.get(1)))
+                .setRoles(List.of(managerRole))
                 .setManagerInBuildings(managerInBuildings);
         when(this.userRepository.findById(INDEX_ONE)).thenReturn(Optional.ofNullable(manager));
         this.userService.removeManagerRightsInBuilding(manager, building);
@@ -350,7 +328,7 @@ class UserServiceImplTest {
         Set<BuildingEntity> managerInBuildings = new HashSet<>();
         UserEntity manager = new UserEntity()
                 .setId(INDEX_ONE)
-                .setRoles(List.of(roles.get(1)))
+                .setRoles(List.of(managerRole))
                 .setManagerInBuildings(managerInBuildings);
         when(this.userRepository.findById(INDEX_ONE)).thenReturn(Optional.ofNullable(manager));
         this.userService.addManagerRightsInBuilding(manager, building);
@@ -362,11 +340,10 @@ class UserServiceImplTest {
     void testAddBuildingToUser_ShouldAddBuildingToUser() {
         BuildingEntity building = new BuildingEntity()
                 .setId(INDEX_ONE);
-        Set<BuildingEntity> ownerInBuildings = new HashSet<>();
         UserEntity user = new UserEntity()
                 .setId(INDEX_ONE)
-                .setRoles(List.of(roles.get(1)))
-                .setOwnerInBuildings(ownerInBuildings);
+                .setRoles(List.of(managerRole))
+                .setOwnerInBuildings(new HashSet<>());
         when(this.userRepository.findById(INDEX_ONE)).thenReturn(Optional.ofNullable(user));
         this.userService.addBuildingToUser(user, building);
         verify(this.userRepository, times(1)).save(user);
@@ -408,8 +385,6 @@ class UserServiceImplTest {
                 .setId(INDEX_ONE);
         ApartmentEntity apartmentWithOwner = new ApartmentEntity()
                 .setOwner(ownerToRemove);
-        ApartmentEntity apartmentWithoutOwner = new ApartmentEntity()
-                .setOwner(new UserEntity());
         building.setApartments(Set.of(apartmentWithOwner));
 
         UserEntity userToUpdate = new UserEntity()
@@ -449,11 +424,10 @@ class UserServiceImplTest {
 
         this.userService.removeMessageFromUser(messageToRemove, author);
         verify(this.userRepository, times(1)).save(author);
-        assert !author.getMessages().contains(messageToRemove);
+        assertFalse(author.getMessages().contains(messageToRemove));
     }
 
-    @ParameterizedTest
-    @CsvSource(value = {"null", "3"})
+    @Test
     void testFindAllUsersWithFilterPaginated_ShouldReturnPageOfUsers() {
         List<UserEntity> users = new ArrayList<>();
         initUsers(users);
@@ -497,9 +471,6 @@ class UserServiceImplTest {
     @ParameterizedTest
     @CsvSource(value = {"0,USER", "1,MANAGER", "2,ADMIN"})
     void testChangeRole_ShouldChangeRoleToAnyRole(long id, String roleName) {
-        RoleEntity adminRole = roles.get(2);
-        RoleEntity managerRole = roles.get(1);
-        RoleEntity userRole = roles.get(0);
         RoleEntity roleToReturn = new RoleEntity()
                 .setId(id)
                 .setName(roleName);
@@ -518,7 +489,7 @@ class UserServiceImplTest {
         when(this.userRepository.findByUsername("username")).thenReturn(Optional.ofNullable(userToChangeRole));
         when(this.roleService.findRoleByName(roleName)).thenReturn(roleToReturn);
         when(this.roleService.findRoleByName("ADMIN")).thenReturn(adminRole);
-//        RoleEntity roleToSet = roles.get(0);
+//        RoleEntity roleToSet = userRole;
 //        if(roleToSet.getName().equals("USER") || roleToSet.getName().equals("MANAGER")){
 //            if(userToChangeRole.getRoles().contains(adminRole)){
 //                userToChangeRole.getRoles().clear();
@@ -528,7 +499,7 @@ class UserServiceImplTest {
 //            userToChangeRole.getRoles().clear();
 //            userToChangeRole.getRoles().addAll(roles);
 //        }
-        assert userToChangeRole != null;
+        assertNotNull(userToChangeRole);
         this.userService.changeRole(roleName, userToChangeRole.getUsername());
         verify(this.userRepository, times(1)).findByUsername(userToChangeRole.getUsername());
         verify(this.roleService, times(2)).findRoleByName(anyString());
@@ -536,7 +507,6 @@ class UserServiceImplTest {
 
     @Test
     void testChangeRole_ShouldChangeRoleToAnyRole() {
-        RoleEntity adminRole = roles.get(2);
         UserEntity userToChangeRole = new UserEntity()
                 .setId(INDEX_ONE)
                 .setUsername("username")
@@ -544,7 +514,7 @@ class UserServiceImplTest {
 
         when(this.userRepository.findByUsername("username")).thenReturn(Optional.ofNullable(userToChangeRole));
         when(this.roleService.findRoleByName("USER")).thenReturn(adminRole);
-//        RoleEntity roleToSet = roles.get(0);
+//        RoleEntity roleToSet = userRole;
 //        if(roleToSet.getName().equals("USER") || roleToSet.getName().equals("MANAGER")){
 //            if(userToChangeRole.getRoles().contains(adminRole)){
 //                userToChangeRole.getRoles().clear();
@@ -560,7 +530,8 @@ class UserServiceImplTest {
         verify(this.roleService, times(2)).findRoleByName(anyString());
     }
 
-//    @Override
+
+    //    @Override
 //    public void changeRole(String roleName, String username) {
 //        UserEntity userToChangeRole = userRepository.findByUsername(username)
 //                .orElseThrow(() -> new NullPointerException("No user with this username " + username));
@@ -580,7 +551,6 @@ class UserServiceImplTest {
 //        }
 //
 //    }
-
     @Test
     void testChangeRole_ShouldThrowNullPointerException_OnMissingUserWithThisUsername() {
         assertThrows(NullPointerException.class, () -> this.userService.changeRole("ADMIN", "missingUser"));
@@ -648,11 +618,11 @@ class UserServiceImplTest {
                 .setName("USER")
                 .setRole(UserRolesEnum.USER));
         roles.add(new RoleEntity()
-                .setId(2L)
+                .setId(INDEX_TWO)
                 .setName("MANAGER")
                 .setRole(UserRolesEnum.MANAGER));
         roles.add(new RoleEntity()
-                .setId(3L)
+                .setId(INDEX_THREE)
                 .setName("ADMIN")
                 .setRole(UserRolesEnum.ADMIN));
     }
@@ -697,8 +667,8 @@ class UserServiceImplTest {
     }
 
     private void addUsers(List<UserEntity> users) {
-        UserEntity user1 = initUserForInitMethod("user1", roles.get(0), LocalDate.now());
-        UserEntity user2 = initUserForInitMethod("user2", roles.get(0), LocalDate.now());
+        UserEntity user1 = initUserForInitMethod("user1", userRole, LocalDate.now());
+        UserEntity user2 = initUserForInitMethod("user2", userRole, LocalDate.now());
         users.add(user1);
         users.add(user2);
     }
@@ -722,9 +692,9 @@ class UserServiceImplTest {
     }
 
     private static void initUsers(List<UserEntity> users) {
-        UserEntity user1 = new UserEntity().setId(1L);
-        UserEntity user2 = new UserEntity().setId(2L);
-        UserEntity user3 = new UserEntity().setId(3L);
+        UserEntity user1 = new UserEntity().setId(INDEX_ONE);
+        UserEntity user2 = new UserEntity().setId(INDEX_TWO);
+        UserEntity user3 = new UserEntity().setId(INDEX_THREE);
         UserEntity user4 = new UserEntity().setId(4L);
         UserEntity user5 = new UserEntity().setId(5L);
         UserEntity user6 = new UserEntity().setId(6L);
@@ -734,5 +704,23 @@ class UserServiceImplTest {
         users.add(user4);
         users.add(user5);
         users.add(user6);
+    }
+
+    private UserEntity initUserForInitMethod(RoleEntity userRole, LocalDate date) {
+        return new UserEntity()
+                .setRoles(List.of(userRole))
+                .setUsername("manager")
+                .setPassword(passwordEncoder.encode("123456"))
+                .setFullName("Dimo Dimov")
+                .setEmail("manager@manager.com")
+                .setPhoneNumber("+359878123456")
+                .setCountry("Bulgaria")
+                .setCity("Plovdiv")
+                .setStreet("Vasil Levski 37")
+                .setManagerInBuildings(Collections.emptySet())
+                .setOwnerInBuildings(Collections.emptySet())
+                .setApartments(Collections.emptySet())
+                .setMessages(Collections.emptySet())
+                .setRegistrationDate(date);
     }
 }
