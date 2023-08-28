@@ -33,6 +33,7 @@ import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.*;
 
+import static bg.propertymanager.util.TestDataUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -45,23 +46,20 @@ class ExpenseServiceImplTest {
     @Mock
     private ExpenseRepository expenseRepository;
     @Mock
-    private ModelMapper modelMapper;
-    @Mock
     private BuildingService buildingService;
     @Mock
     private BuildingRepository buildingRepository;
     @Mock
     private TaxService taxService;
 
-    private static final long INDEX_OF_ONE = 1L;
-
     private static final BigDecimal AMOUNT_OF_200 = BigDecimal.valueOf(200);
-    private static ExpenseAddDTO expenseAddDTO;
     private static ExpenseEntity expenseEntity;
     private static BuildingEntity building;
     private static UserEntity manager;
     private static List<RoleEntity> roles;
 
+    private static ExpenseEditDTO expenseEditDTO;
+    private static ExpenseAddDTO expenseAddDTO;
     private static Set<ExpenseEntity> expenses;
 
     @BeforeAll
@@ -73,6 +71,8 @@ class ExpenseServiceImplTest {
         building = initBuilding();
         manager.getManagerInBuildings().add(building);
         expenseEntity = mapExpenseAddDTOtoExpenseEntity();
+        expenseEditDTO = initExpenseEditDTO();
+        expenseAddDTO = initExpenseAddDTO();
     }
 
     @Test
@@ -124,7 +124,6 @@ class ExpenseServiceImplTest {
     @Test
     void testUpdateExpenseStatus_ShouldUpdateExpenseStatus() {
         ExpenseEntity expected = expenseEntity;
-        ExpenseEditDTO expenseEditDTO = initExpenseEditDTO();
         expenseEditDTO.setTaxStatus(TaxStatusEnum.PAID);
 
         when(this.expenseRepository.findById(expected.getId())).thenReturn(Optional.of(expected));
@@ -134,24 +133,21 @@ class ExpenseServiceImplTest {
         verify(expenseRepository, times(1)).findById(expected.getId());
         verify(expenseRepository, times(1)).save(any(ExpenseEntity.class));
 
-        assert expected.getTaxStatus().equals(TaxStatusEnum.PAID);
+        assertEquals(TaxStatusEnum.PAID, expected.getTaxStatus());
     }
 
-    @ParameterizedTest
-    @CsvSource(value = {"-20", "-10", "-4", "-2", "-1"})
-    void testUpdateExpenseStatus_ShouldThrowNullPointerException_OnNotPresentExpenseWithThisId(long id) {
-        ExpenseEditDTO expenseEditDTO = initExpenseEditDTO();
+    @Test
+    void testUpdateExpenseStatus_ShouldThrowNullPointerException_OnNotPresentExpenseWithThisId() {
         assertThrows(NullPointerException.class, () -> this.expenseService.updateExpenseStatus(expenseEditDTO));
     }
 
     @Test
     void testFindAmountOfAllPaidExpensesByBuildingId_ShouldReturnCorrectAmount_OnExpensesMoreThan1() {
-        BuildingEntity buildingEntity = building;
-        buildingEntity.setExpenses(expenses); // total amount 600
+        building.setExpenses(expenses); // total amount 600
         BigDecimal expected = new BigDecimal(600);
-        when(this.expenseRepository.findAmountOfPaidExpensesByBuildingId(buildingEntity.getId()))
+        when(this.expenseRepository.findAmountOfPaidExpensesByBuildingId(building.getId()))
                 .thenReturn(Optional.of(expected));
-        BigDecimal actual = this.expenseService.findAmountOfAllPaidExpensesByBuildingId(buildingEntity.getId());
+        BigDecimal actual = this.expenseService.findAmountOfAllPaidExpensesByBuildingId(building.getId());
 
         assertEquals(expected, actual);
     }
@@ -165,16 +161,14 @@ class ExpenseServiceImplTest {
 
     @Test
     void testFindAmountOfAllUnpaidExpensesByBuildingId_ShouldReturnCorrectAmount_OnExpensesMoreThan1() {
-        BuildingEntity buildingEntity = building;
-        Set<ExpenseEntity> expenseEntities = expenses;
-        for (ExpenseEntity expense : expenseEntities) {
+        for (ExpenseEntity expense : expenses) {
             expense.setTaxStatus(TaxStatusEnum.UNPAID);
         }
-        buildingEntity.setExpenses(expenseEntities); // total amount 600
+        building.setExpenses(expenses); // total amount 600
         BigDecimal expected = new BigDecimal(600);
-        when(this.expenseRepository.findAmountOfUnpaidExpensesByBuildingId(buildingEntity.getId()))
+        when(this.expenseRepository.findAmountOfUnpaidExpensesByBuildingId(building.getId()))
                 .thenReturn(Optional.of(expected));
-        BigDecimal actual = this.expenseService.findAmountOfAllUnpaidExpensesByBuildingId(buildingEntity.getId());
+        BigDecimal actual = this.expenseService.findAmountOfAllUnpaidExpensesByBuildingId(building.getId());
 
         assertEquals(expected, actual);
     }
@@ -252,7 +246,7 @@ class ExpenseServiceImplTest {
 
     private static ExpenseAddDTO initExpenseAddDTO() {
         return new ExpenseAddDTO()
-                .setId(INDEX_OF_ONE)
+                .setId(INDEX_ONE)
                 .setAmount(AMOUNT_OF_200)
                 .setDescription("Expense No:1")
                 .setTaxType(TaxTypeEnum.EMERGENCY)
@@ -264,15 +258,15 @@ class ExpenseServiceImplTest {
     private static List<RoleEntity> initRoles() {
         List<RoleEntity> roles = new ArrayList<>();
         roles.add(new RoleEntity()
-                .setId(INDEX_OF_ONE)
+                .setId(INDEX_ONE)
                 .setName("USER")
                 .setRole(UserRolesEnum.USER));
         roles.add(new RoleEntity()
-                .setId(INDEX_OF_ONE)
+                .setId(INDEX_ONE)
                 .setName("MANAGER")
                 .setRole(UserRolesEnum.MANAGER));
         roles.add(new RoleEntity()
-                .setId(INDEX_OF_ONE)
+                .setId(INDEX_ONE)
                 .setName("ADMIN")
                 .setRole(UserRolesEnum.ADMIN));
         return roles;
@@ -280,7 +274,7 @@ class ExpenseServiceImplTest {
 
     private static BuildingEntity initBuilding() {
         return new BuildingEntity()
-                .setId(INDEX_OF_ONE)
+                .setId(INDEX_ONE)
                 .setApartments(new HashSet<>())
                 .setExpenses(new HashSet<>())
                 .setCity("Plovdiv")
@@ -308,7 +302,7 @@ class ExpenseServiceImplTest {
 
     private static UserEntity initManager() {
         return new UserEntity()
-                .setId(INDEX_OF_ONE)
+                .setId(INDEX_ONE)
                 .setUsername("manager")
                 .setCity("Plovdiv")
                 .setCountry("Bulgaria")
@@ -341,14 +335,14 @@ class ExpenseServiceImplTest {
 
     private static Set<ExpenseEntity> initExpenses() {
         Set<ExpenseEntity> expenseEntities = new HashSet<>();
-        ExpenseEntity expense1 = new ExpenseEntity().setId(INDEX_OF_ONE)
+        ExpenseEntity expense1 = new ExpenseEntity().setId(INDEX_ONE)
                 .setTaxStatus(TaxStatusEnum.PAID); // amount 200
         ExpenseEntity expense2 = new ExpenseEntity()
-                .setId(2L)
+                .setId(INDEX_TWO)
                 .setAmount(AMOUNT_OF_200)
                 .setTaxStatus(TaxStatusEnum.PAID); // amount 100
         ExpenseEntity expense3 = new ExpenseEntity()
-                .setId(3L)
+                .setId(INDEX_THREE)
                 .setAmount(AMOUNT_OF_200)
                 .setTaxStatus(TaxStatusEnum.PAID); // amount 300
         expenseEntities.add(expense1);
