@@ -51,18 +51,6 @@ public class ApartmentServiceImpl implements ApartmentService {
         apartmentRepository.save(newApartment);
     }
 
-    private ApartmentEntity createNewApartment(ApartmentAddDTO apartmentAddDTO, UserEntity ownerToAdd, BuildingEntity building) {
-        return new ApartmentEntity.ApartmentBuilder(apartmentAddDTO.getApartmentNumber(),ownerToAdd,building)
-                .floor(apartmentAddDTO.getFloor())
-                .area(apartmentAddDTO.getArea())
-                .roommateCount(apartmentAddDTO.getRoommateCount())
-                .elevatorChipsCount(apartmentAddDTO.getElevatorChipsCount())
-                .dogsCount(apartmentAddDTO.getDogsCount())
-                .periodicTax(calculatePeriodicTax(apartmentAddDTO, building))
-                .taxes(Collections.emptySet())
-                .build();
-    }
-
     @Override
     public void updateApartment(ApartmentEditDTO apartmentEditDTO) {
         ApartmentEntity apartmentToUpdate = findById(apartmentEditDTO.getId());
@@ -120,6 +108,7 @@ public class ApartmentServiceImpl implements ApartmentService {
                 .map(a -> modelMapper.map(a, ApartmentViewDTO.class))
                 .orElseThrow(() -> new NullPointerException("No such apartment is existing"));
     }
+
     @Override
     public void updatePeriodicTax(BuildingEntity buildingToSave) {
         Set<ApartmentEntity> apartments = apartmentRepository.findAllByBuildingId(buildingToSave.getId());
@@ -196,7 +185,6 @@ public class ApartmentServiceImpl implements ApartmentService {
                 .findByApartmentNumberAndBuilding_Id(apartmentNumber,buildingId);
         return apartmentWithNumberInBuilding.isPresent();
     }
-
     private UserEntity getOwnerEntity(ApartmentAddDTO apartmentAddDTO) {
         return userService
                 .findById(apartmentAddDTO.getOwner().getId());
@@ -217,5 +205,17 @@ public class ApartmentServiceImpl implements ApartmentService {
         return building.getTaxPerPerson().multiply(BigDecimal.valueOf(apartment.getRoommateCount()))
                 .add(building.getTaxPerDog().multiply(BigDecimal.valueOf(apartment.getDogsCount())))
                 .add(building.getTaxPerElevatorChip().multiply(BigDecimal.valueOf(apartment.getElevatorChipsCount())));
+    }
+
+    private ApartmentEntity createNewApartment(ApartmentAddDTO apartmentAddDTO, UserEntity ownerToAdd, BuildingEntity building) {
+        return new ApartmentEntity.ApartmentBuilder(apartmentAddDTO.getApartmentNumber(),ownerToAdd,building)
+                .floor(apartmentAddDTO.getFloor())
+                .area(apartmentAddDTO.getArea())
+                .roommateCount(apartmentAddDTO.getRoommateCount())
+                .elevatorChipsCount(apartmentAddDTO.getElevatorChipsCount())
+                .dogsCount(apartmentAddDTO.getDogsCount())
+                .periodicTax(calculatePeriodicTax(apartmentAddDTO, building))
+                .taxes(Collections.emptySet())
+                .build();
     }
 }
