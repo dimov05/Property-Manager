@@ -34,6 +34,7 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
 
+import static bg.propertymanager.util.TestDataUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -63,12 +64,6 @@ class UserServiceImplTest {
     private static RoleEntity userRole;
     private static RoleEntity managerRole;
     private static RoleEntity adminRole;
-
-    private static final long INDEX_ONE = 1L;
-    private static final long INDEX_TWO = 2L;
-    private static final long INDEX_THREE = 3L;
-    private static final String NEW_PASSWORD = "newPassoword";
-    private static final String OLD_PASSWORD = "oldPassword";
 
     @BeforeAll
     static void setup() {
