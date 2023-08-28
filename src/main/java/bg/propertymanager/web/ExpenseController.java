@@ -52,7 +52,7 @@ public class ExpenseController {
             model.addAttribute("expenseAddDTO", new ExpenseAddDTO().setSelectedApartments(new ArrayList<>()));
         }
         ModelAndView mav = new ModelAndView("add-expense-as-manager");
-        List<ApartmentEntity> apartmentsInBuilding = apartmentService.findAllApartmentsInBuilding(buildingId);
+        List<ApartmentEntity> apartmentsInBuilding = apartmentService.findAllApartmentsByBuildingId(buildingId);
         mav.addObject("apartments", apartmentsInBuilding);
         mav.addObject("taxTypes", TaxTypeEnum.values());
         mav.addObject("buildingBalance", taxService.calculateBuildingBalance(buildingId));

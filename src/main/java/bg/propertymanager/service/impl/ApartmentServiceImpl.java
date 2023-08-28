@@ -162,10 +162,6 @@ public class ApartmentServiceImpl implements ApartmentService {
         return apartmentRepository.findAllByBuilding_IdOrderById(buildingId);
     }
     @Override
-    public List<ApartmentEntity> findAllApartmentsInBuilding(Long buildingId) {
-        return apartmentRepository.findAllByBuilding_IdOrderById(buildingId);
-    }
-    @Override
     public boolean findAllApartmentsByBuildingIdAndOwnerUsername(Long buildingId, String username) {
         List<ApartmentEntity> apartments = apartmentRepository.findAllByBuilding_IdAndOwner_Username(buildingId, username);
         return apartments.size() > 0;
