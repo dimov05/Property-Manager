@@ -9,8 +9,7 @@ import bg.propertymanager.model.entity.UserEntity;
 import bg.propertymanager.repository.MessageRepository;
 import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.UserService;
-import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +18,6 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 
 import java.time.LocalDateTime;
 import java.time.Month;
@@ -29,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static bg.propertymanager.util.TestDataUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
@@ -41,24 +40,36 @@ class MessageServiceImplTest {
     @Mock
     private BuildingService buildingService;
     @Mock
-    private ModelMapper modelMapper;
-
-    @Mock
     private UserService userService;
 
     @InjectMocks
     private MessageServiceImpl messageService;
 
-    private static final long INDEX_ONE = 1L;
+    private static BuildingViewDTO buildingViewDTO;
+
+    private static UserEntity manager;
+
+    private static UserEntity user;
+    private static List<MessageEntity> messages;
+    private static MessageEntity message;
+    private static BuildingEntity building;
+
+    @BeforeAll
+    static void setup() {
+        building = new BuildingEntity();
+        message = new MessageEntity();
+        messages = new ArrayList<>();
+        manager = initManager();
+        buildingViewDTO = initBuilding(manager);
+        user = initUser();
+    }
+
 
     @Test
     @DisplayName("Should save the message when the building and author exist")
     void addMessageWhenBuildingAndAuthorExist() {
-        MessageEntity message = new MessageEntity();
-        BuildingEntity building = new BuildingEntity();
-        UserEntity author = new UserEntity();
         when(buildingService.findEntityById(anyLong())).thenReturn(building);
-        when(userService.findUserByUsername(anyString())).thenReturn(author);
+        when(userService.findUserByUsername(anyString())).thenReturn(user);
         when(messageRepository.save(any())).thenReturn(message);
 
         messageService.addMessage(new MessageAddDTO(), INDEX_ONE, "test");
@@ -72,18 +83,14 @@ class MessageServiceImplTest {
     @DisplayName("Should return all messages from manager for building sorted from new to old")
     void
     findAllManagersMessagesForBuildingSortedFromNewToOldShouldReturnAllMessagesFromManagerForBuildingSortedFromNewToOld() {
-        UserEntity manager = initManager();
-        BuildingViewDTO building = initBuilding(manager);
-
         List<MessageEntity> messages = new ArrayList<>();
         addMessagesByAuthor(messages, manager);
 
         when(messageRepository.findAllByBuilding_IdAndAuthorIdOrderByCreatedDateDesc(
-                building.getId(), building.getManager().getId()))
+                buildingViewDTO.getId(), buildingViewDTO.getManager().getId()))
                 .thenReturn(messages);
-
         List<MessageEntity> actual =
-                messageService.findAllManagersMessagesForBuildingSortedFromNewToOld(building);
+                messageService.findAllManagersMessagesForBuildingSortedFromNewToOld(buildingViewDTO);
 
         assertEquals(messages, actual);
     }
@@ -92,19 +99,14 @@ class MessageServiceImplTest {
     @DisplayName("Should return all messages for building sorted from new to old")
     void
     findAllNeighboursMessagesForBuildingSortedFromNewToOld_ShouldReturnAllMessagesForBuildingSortedFromNewToOld() {
-        UserEntity manager = initManager();
-        BuildingViewDTO building = initBuilding(manager);
-
-        List<MessageEntity> messages = new ArrayList<>();
-        UserEntity user = initUser();
         addMessagesByAuthor(messages, user);
 
         when(messageRepository.findAllByBuilding_IdAndAuthorIsNotOrderByCreatedDateDesc(
-                building.getId(), building.getManager()))
+                buildingViewDTO.getId(), buildingViewDTO.getManager()))
                 .thenReturn(messages);
 
         List<MessageEntity> actual =
-                messageService.findAllNeighboursMessagesForBuildingSortedFromNewToOld(building);
+                messageService.findAllNeighboursMessagesForBuildingSortedFromNewToOld(buildingViewDTO);
 
         assertEquals(messages, actual);
     }
@@ -113,7 +115,6 @@ class MessageServiceImplTest {
     @CsvSource(value = {"1", "2", "3", "6"})
     @DisplayName("Testing findById() should return message with the chosen id")
     void findById_ShouldReturnMessageWithCorrectId(long id) {
-        UserEntity user = initUser();
         MessageEntity message = initMessageWithIdAndAuthor(id, user);
 
         when(messageRepository.findById(id)).thenReturn(Optional.of(message));
@@ -139,7 +140,6 @@ class MessageServiceImplTest {
     @Test
     @DisplayName("Should update message on method call")
     void testUpdateMessage_ShouldUpdateMessage() {
-        UserEntity user = initUser();
         MessageEntity existingMessage = initMessageWithIdAndAuthor(INDEX_ONE, user);
         MessageEditDTO updatedMessage = new MessageEditDTO()
                 .setId(INDEX_ONE)
@@ -153,21 +153,17 @@ class MessageServiceImplTest {
             verify(this.messageRepository, times(1)).save(existingMessage);
         }
 
-        assert existingMessage.getContent().equals("Updated content");
-        assert existingMessage.getTitle().equals("Updated title");
+        assertEquals("Updated content", existingMessage.getContent());
+        assertEquals("Updated title", existingMessage.getTitle());
     }
 
     @ParameterizedTest
     @CsvSource(value = {"1", "2", "6", "8", "9"})
     @DisplayName("Should delete message on method call")
     void testDeleteMessageWithId_ShouldDeleteMessageWithId(long id) {
-        UserEntity user = initUser();
-        UserEntity manager = initManager();
-        BuildingEntity building = new BuildingEntity()
-                .setId(INDEX_ONE);
         MessageEntity existingMessage = initMessageWithIdAndAuthor(id, user);
         existingMessage.setBuilding(building);
-        when(messageRepository.findById(id)).thenReturn(Optional.ofNullable(existingMessage));
+        when(messageRepository.findById(id)).thenReturn(Optional.of(existingMessage));
 
         messageService.deleteMessageWithId(id);
 
@@ -178,44 +174,41 @@ class MessageServiceImplTest {
 
     @Test
     void findDateOfLastMessageFromManagerByBuilding_ShouldReturnStringDateWithCorrectInput() {
-        UserEntity manager = initManager();
-        BuildingViewDTO building = initBuilding(manager);
-        List<MessageEntity> messages = new ArrayList<>();
         addMessagesByAuthor(messages, manager);
-        List<LocalDateTime> dates = messages.stream().map(MessageEntity::getCreatedDate).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+        List<LocalDateTime> dates = messages
+                .stream()
+                .map(MessageEntity::getCreatedDate)
+                .sorted(Comparator.reverseOrder())
+                .collect(Collectors.toList());
         String expectedDate = String.format("%s-%s-%s",
                 messages.get(2).getCreatedDate().getYear(),
                 messages.get(2).getCreatedDate().getMonthValue(),
                 messages.get(2).getCreatedDate().getDayOfMonth());
         when(this.messageRepository.findDateOfLastMessageFromManagerByBuildingId(building.getId(), manager.getId()))
                 .thenReturn(dates);
-        String actualDate = this.messageService.findDateOfLastMessageFromManagerByBuilding(building);
+        String actualDate = this.messageService.findDateOfLastMessageFromManagerByBuilding(buildingViewDTO);
 
         assertEquals(expectedDate, actualDate);
     }
 
     @Test
     void findDateOfLastMessageFromManagerByBuilding_ShouldReturnNoMessagesString_WhenThereAreNoMessages() {
-        UserEntity manager = initManager();
-        BuildingViewDTO building = initBuilding(manager);
-        List<MessageEntity> messages = new ArrayList<>();
-        List<LocalDateTime> dates = messages.stream().map(MessageEntity::getCreatedDate).sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+        List<LocalDateTime> dates = messages
+                .stream()
+                .map(MessageEntity::getCreatedDate)
+                .sorted(Comparator.reverseOrder())
+                .collect(Collectors.toList());
         String expected = dates.isEmpty() ? "No messages" : "False";
         when(this.messageRepository.findDateOfLastMessageFromManagerByBuildingId(building.getId(), manager.getId()))
                 .thenReturn(dates);
-        String actual = this.messageService.findDateOfLastMessageFromManagerByBuilding(building);
+        String actual = this.messageService.findDateOfLastMessageFromManagerByBuilding(buildingViewDTO);
 
         assertEquals(expected, actual);
 
     }
 
-    @ParameterizedTest
-    @CsvSource(value = {"1", "2", "3", "5", "6"})
-    void findAllMessagesForBuildingByOwnerIdSortedFromNewToOld_ShouldReturnCorrectData(long id) {
-        UserEntity user = initUser();
-        UserEntity manager = initManager();
-        BuildingViewDTO building = initBuilding(manager);
-        List<MessageEntity> messages = new ArrayList<>();
+    @Test
+    void findAllMessagesForBuildingByOwnerIdSortedFromNewToOld_ShouldReturnCorrectData() {
         addMessagesByAuthor(messages, user);
         List<MessageEntity> expected = messages
                 .stream()
@@ -226,24 +219,14 @@ class MessageServiceImplTest {
                 .thenReturn(expected);
 
         List<MessageEntity> actual = this.messageService.findAllMessagesForBuildingByOwnerIdSortedFromNewToOld(building.getId(), user.getUsername());
+
         assertEquals(expected.size(), actual.size());
-        assertIterableEquals(expected,actual);
-//        for (int i = 0; i < expected.size(); i++) {
-//            int finalI = i;
-//            assertAll(
-//                    () -> assertEquals(expected.get(finalI).getId(), actual.get(finalI).getId()),
-//                    () -> assertEquals(expected.get(finalI).getAuthor(), actual.get(finalI).getAuthor()),
-//                    () -> assertEquals(expected.get(finalI).getCreatedDate(), actual.get(finalI).getCreatedDate()),
-//                    () -> assertEquals(expected.get(finalI).getTitle(), actual.get(finalI).getTitle()),
-//                    () -> assertEquals(expected.get(finalI).getContent(), actual.get(finalI).getContent())
-//            );
-//        }
+        assertIterableEquals(expected, actual);
     }
 
     @ParameterizedTest
     @CsvSource(value = {"1", "2", "3", "6"})
     void testIfUserIsAuthor_ShouldReturnTrueOnCorrectData(long id) {
-        UserEntity user = initUser();
         MessageEntity message = initMessageWithIdAndAuthor(id, user);
         when(this.messageRepository.findById(id)).thenReturn(Optional.ofNullable(message));
         boolean expected = true;
@@ -262,23 +245,14 @@ class MessageServiceImplTest {
 
     @Test
     void testIfUserIsAuthor_ShouldReturnFalseIfTheUserIsNotTheAuthorOfThisMessage() {
-        UserEntity author = initUser();
-        UserEntity notAuthor = initManager();
-        MessageEntity message = initMessageWithIdAndAuthor(1, author);
-        when(this.messageRepository.findById(message.getId())).thenReturn(Optional.ofNullable(message));
+        MessageEntity message = initMessageWithIdAndAuthor(1, user);
+        when(this.messageRepository.findById(message.getId())).thenReturn(Optional.of(message));
         boolean expected = false;
 
-        boolean actual = this.messageService.checkIfUserIsAuthor(notAuthor.getUsername(), message.getId());
+        boolean actual = this.messageService.checkIfUserIsAuthor(manager.getUsername(), message.getId());
 
         assertEquals(expected, actual);
     }
-
-//    public Boolean checkIfUserIsAuthor(String authorUsername, Long messageId) {
-//        MessageEntity message = messageRepository
-//                .findById(messageId)
-//                .orElseThrow(() -> new NullPointerException("There is no message with this id " + messageId));
-//        return message.getAuthor().getUsername().equals(authorUsername);
-//    }
 
     private static MessageEntity initMessageWithIdAndAuthor(long id, UserEntity user) {
         return new MessageEntity()
@@ -291,7 +265,7 @@ class MessageServiceImplTest {
 
     private static UserEntity initUser() {
         return new UserEntity()
-                .setId(2L)
+                .setId(INDEX_TWO)
                 .setUsername("user")
                 .setCity("Plovdiv")
                 .setCountry("Bulgaria")
@@ -325,14 +299,14 @@ class MessageServiceImplTest {
                         .setContent("Content 1"));
         messages.add(
                 new MessageEntity()
-                        .setId(2L)
+                        .setId(INDEX_TWO)
                         .setAuthor(author)
                         .setCreatedDate(LocalDateTime.of(2023, Month.AUGUST, 7, 8, 22))
                         .setTitle("Message 2")
                         .setContent("Content 2"));
         messages.add(
                 new MessageEntity()
-                        .setId(3L)
+                        .setId(INDEX_THREE)
                         .setAuthor(author)
                         .setCreatedDate(LocalDateTime.of(2023, Month.AUGUST, 8, 2, 54))
                         .setTitle("Message 3")
