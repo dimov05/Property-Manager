@@ -21,6 +21,11 @@ public class TestDataUtils {
     private BuildingRepository buildingRepository;
     private ApartmentRepository apartmentRepository;
     private PasswordEncoder passwordEncoder;
+    public static final long INDEX_ONE = 1L;
+    public static final long INDEX_TWO = 2L;
+    public static final long INDEX_THREE = 3L;
+    public static final String NEW_PASSWORD = "newPassoword";
+    public static final String OLD_PASSWORD = "oldPassword";
 
     public TestDataUtils(UserRepository userRepository, TaxRepository taxRepository,
                          RoleRepository roleRepository, MessageRepository messageRepository,
