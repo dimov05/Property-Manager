@@ -20,19 +20,19 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
 
-import javax.validation.constraints.AssertTrue;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
 
+import static bg.propertymanager.util.TestDataUtils.INDEX_ONE;
+import static bg.propertymanager.util.TestDataUtils.INDEX_TWO;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ApartmentServiceImplTest {
 
-    private static final long INDEX_TWO = 2L;
     @InjectMocks
     ApartmentServiceImpl apartmentService;
     @Mock
@@ -42,10 +42,7 @@ class ApartmentServiceImplTest {
     @Mock
     private BuildingService buildingService;
     @Mock
-    private ModelMapper modelMapper;
-    @Mock
     private TaxService taxService;
-    private static final long INDEX_ONE = 1L;
     private static ApartmentEntity apartment;
     private static ApartmentViewDTO apartmentViewDTO;
     private static BuildingEntity building;
@@ -63,40 +60,7 @@ class ApartmentServiceImplTest {
         apartment = initApartment();
         apartmentViewDTO = initApartmentViewDTO();
         building = initBuilding();
-        addApartmentsWithNumbersInBuilding();
         tax = initTax();
-    }
-
-    private static TaxEntity initTax() {
-        return new TaxEntity()
-                .setId(1L)
-                .setAmount(BigDecimal.valueOf(50))
-                .setTaxStatus(TaxStatusEnum.PAID)
-                .setTaxType(TaxTypeEnum.PERIODIC);
-    }
-
-    private static BuildingEntity initBuilding() {
-        return new BuildingEntity()
-                .setApartments(new HashSet<>())
-                .setId(1L)
-                .setNeighbours(new HashSet<>())
-                .setTaxPerPerson(BigDecimal.valueOf(3))
-                .setTaxPerDog(BigDecimal.valueOf(2))
-                .setTaxPerElevatorChip(BigDecimal.valueOf(4));
-    }
-
-    private static ApartmentViewDTO initApartmentViewDTO() {
-        return new ApartmentViewDTO()
-                .setId(apartment.getId())
-                .setFloor(apartment.getFloor())
-                .setApartmentNumber(apartment.getApartmentNumber())
-                .setArea(apartment.getArea())
-                .setBuilding(apartment.getBuilding())
-                .setDogsCount(apartment.getDogsCount())
-                .setElevatorChipsCount(apartment.getElevatorChipsCount())
-                .setOwner(apartment.getOwner())
-                .setRoommateCount(apartment.getRoommateCount())
-                .setPeriodicTax(apartment.getPeriodicTax());
     }
 
     @Test
@@ -172,35 +136,27 @@ class ApartmentServiceImplTest {
 
     @Test
     void testAddNewTaxToApartment_ShouldAddNewTaxToApartment() {
-        ApartmentEntity apartmentToAddTaxTo = apartment;
-        TaxEntity taxToAdd = tax;
-        this.apartmentService.addNewTaxToApartment(apartmentToAddTaxTo, taxToAdd);
+        this.apartmentService.addNewTaxToApartment(apartment, tax);
 
-        verify(apartmentRepository, times(1)).save(apartmentToAddTaxTo);
+        verify(apartmentRepository, times(1)).save(apartment);
 
-        assert apartmentToAddTaxTo.getTaxes().contains(taxToAdd);
+        assertTrue(apartment.getTaxes().contains(tax));
     }
 
     @Test
     void testDeleteTaxFromApartment_ShouldDeleteTaxFromApartment() {
-        ApartmentEntity apartmentToDeleteTaxFrom = apartment;
-        TaxEntity taxToDelete = tax;
-        taxToDelete.setApartment(apartmentToDeleteTaxFrom);
-        apartmentToDeleteTaxFrom.getTaxes().add(taxToDelete);
-        this.apartmentService.deleteTaxFromApartment(taxToDelete);
+        tax.setApartment(apartment);
+        apartment.getTaxes().add(tax);
+        this.apartmentService.deleteTaxFromApartment(tax);
 
-        verify(apartmentRepository, times(1)).save(apartmentToDeleteTaxFrom);
+        verify(apartmentRepository, times(1)).save(apartment);
 
-        assert !apartmentToDeleteTaxFrom.getTaxes().contains(taxToDelete);
+        assertFalse(apartment.getTaxes().contains(tax));
     }
 
     @Test
     void testCalculateTotalMonthlyPeriodicTaxesByBuildingId_ShouldReturnTaxes_WhenThereArePresentTaxes() {
-        ApartmentEntity apartment1 = apartment;
-        apartment1.setId(2L);
-        apartment1.getTaxes().add(tax.setAmount(BigDecimal.valueOf(100)));
         BigDecimal expected = BigDecimal.valueOf(250);
-        apartment.getTaxes().add(tax.setAmount(BigDecimal.valueOf(150)));
         when(this.apartmentRepository.findAmountOfMonthlyPeriodicTaxes(building.getId()))
                 .thenReturn(Optional.of(expected));
         BigDecimal actual = this.apartmentService.calculateTotalMonthlyPeriodicTaxesByBuildingId(building.getId());
@@ -210,7 +166,6 @@ class ApartmentServiceImplTest {
 
     @Test
     void testCalculateTotalMonthlyPeriodicTaxesByBuildingId_ShouldReturn0_WhenThereAreNoTaxes() {
-        ApartmentEntity apartment1 = apartment;
         BigDecimal expected = BigDecimal.valueOf(0);
         when(this.apartmentRepository.findAmountOfMonthlyPeriodicTaxes(building.getId()))
                 .thenReturn(Optional.of(expected));
@@ -222,16 +177,15 @@ class ApartmentServiceImplTest {
     @ParameterizedTest
     @CsvSource(value = {"1", "3", "6", "9", "15"})
     void testFindTotalCountOfNeighboursInBuilding_ShouldReturnCorrectCount_OnMoreThan0Neighbours(int countOfNeighbours) {
-        BuildingEntity buildingEntity = building;
         for (int i = 1; i <= countOfNeighbours; i++) {
             UserEntity neighbour = new UserEntity()
                     .setId((long) i).setUsername("User-" + i);
-            buildingEntity.getNeighbours().add(neighbour);
+            building.getNeighbours().add(neighbour);
         }
-        int expected = buildingEntity.getNeighbours().size();
+        int expected = building.getNeighbours().size();
 
         when(this.apartmentRepository.findTotalCountOfNeighboursByBuildingId(building.getId()))
-                .thenReturn(Optional.of(buildingEntity.getNeighbours().size()));
+                .thenReturn(Optional.of(building.getNeighbours().size()));
         int actual = this.apartmentService.findTotalCountOfNeighboursInBuilding(building.getId());
 
         assertEquals(expected, actual);
@@ -239,11 +193,10 @@ class ApartmentServiceImplTest {
 
     @Test
     void testFindTotalCountOfNeighboursInBuilding_Should0_OnZeroNeighboursInBuilding() {
-        BuildingEntity buildingEntity = building;
-        int expected = buildingEntity.getNeighbours().size();
+        int expected = building.getNeighbours().size();
 
         when(this.apartmentRepository.findTotalCountOfNeighboursByBuildingId(building.getId()))
-                .thenReturn(Optional.of(buildingEntity.getNeighbours().size()));
+                .thenReturn(Optional.of(building.getNeighbours().size()));
         int actual = this.apartmentService.findTotalCountOfNeighboursInBuilding(building.getId());
 
         assertEquals(expected, actual);
@@ -355,10 +308,6 @@ class ApartmentServiceImplTest {
                 .setId(INDEX_ONE)
                 .setBuilding(building)
                 .setOwner(owner);
-        ApartmentEntity apartment2 = new ApartmentEntity()
-                .setId(INDEX_TWO)
-                .setBuilding(building)
-                .setOwner(user);
         List<ApartmentEntity> expectedApartments = List.of(apartment1); // count of User's apartments in this building
         when(this.apartmentRepository.findAllByBuilding_IdAndOwner_Username(building.getId(), owner.getUsername()))
                 .thenReturn(expectedApartments);
@@ -395,14 +344,6 @@ class ApartmentServiceImplTest {
         UserEntity notOwner = new UserEntity()
                 .setId(INDEX_ONE)
                 .setUsername("owner");
-        ApartmentEntity apartment1 = new ApartmentEntity()
-                .setId(INDEX_ONE)
-                .setBuilding(building)
-                .setOwner(user);
-        ApartmentEntity apartment2 = new ApartmentEntity()
-                .setId(INDEX_TWO)
-                .setBuilding(building)
-                .setOwner(user);
         List<ApartmentEntity> expectedApartments = Collections.emptyList(); // count of User's apartments in this building
         when(this.apartmentRepository.findAllByBuilding_IdAndOwner_Username(building.getId(), notOwner.getUsername()))
                 .thenReturn(expectedApartments);
@@ -452,16 +393,17 @@ class ApartmentServiceImplTest {
 
         assertEquals(expected, actual);
     }
+
     private static ApartmentEntity initApartment() {
         return new ApartmentEntity()
-                .setId(1L)
+                .setId(INDEX_ONE)
                 .setApartmentNumber("3A")
                 .setArea(30)
-                .setBuilding(new BuildingEntity().setId(1L))
+                .setBuilding(new BuildingEntity().setId(INDEX_ONE))
                 .setFloor(3)
                 .setDogsCount(3)
                 .setElevatorChipsCount(3)
-                .setOwner(new UserEntity().setId(1L))
+                .setOwner(new UserEntity().setId(INDEX_ONE))
                 .setPeriodicTax(new BigDecimal(50))
                 .setRoommateCount(3)
                 .setTaxes(new HashSet<>());
@@ -491,7 +433,7 @@ class ApartmentServiceImplTest {
                 .setName("USER")
                 .setRole(UserRolesEnum.USER));
         roles.add(new RoleEntity()
-                .setId(2L)
+                .setId(INDEX_TWO)
                 .setName("MANAGER")
                 .setRole(UserRolesEnum.MANAGER));
         roles.add(new RoleEntity()
@@ -500,7 +442,35 @@ class ApartmentServiceImplTest {
                 .setRole(UserRolesEnum.ADMIN));
     }
 
-    private static void addApartmentsWithNumbersInBuilding() {
+    private static TaxEntity initTax() {
+        return new TaxEntity()
+                .setId(INDEX_ONE)
+                .setAmount(BigDecimal.valueOf(50))
+                .setTaxStatus(TaxStatusEnum.PAID)
+                .setTaxType(TaxTypeEnum.PERIODIC);
+    }
 
+    private static BuildingEntity initBuilding() {
+        return new BuildingEntity()
+                .setApartments(new HashSet<>())
+                .setId(INDEX_ONE)
+                .setNeighbours(new HashSet<>())
+                .setTaxPerPerson(BigDecimal.valueOf(3))
+                .setTaxPerDog(BigDecimal.valueOf(2))
+                .setTaxPerElevatorChip(BigDecimal.valueOf(4));
+    }
+
+    private static ApartmentViewDTO initApartmentViewDTO() {
+        return new ApartmentViewDTO()
+                .setId(apartment.getId())
+                .setFloor(apartment.getFloor())
+                .setApartmentNumber(apartment.getApartmentNumber())
+                .setArea(apartment.getArea())
+                .setBuilding(apartment.getBuilding())
+                .setDogsCount(apartment.getDogsCount())
+                .setElevatorChipsCount(apartment.getElevatorChipsCount())
+                .setOwner(apartment.getOwner())
+                .setRoommateCount(apartment.getRoommateCount())
+                .setPeriodicTax(apartment.getPeriodicTax());
     }
 }
