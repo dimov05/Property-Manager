@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith({MockitoExtension.class})
@@ -50,16 +51,18 @@ public class AppUserDetailsServiceImplTest {
         // Act
         AppUserDetails userDetails = mockAppUserDetailsService.loadUserByUsername(testUserEntity.getUsername());
         // Assert
-        Assertions.assertEquals(testUserEntity.getUsername(), userDetails.getUsername());
-        Assertions.assertEquals(testUserEntity.getEmail(), userDetails.getEmail());
-        Assertions.assertEquals(testUserEntity.getPassword(), userDetails.getPassword());
-        Assertions.assertEquals(testUserEntity.getCity(), userDetails.getCity());
-        Assertions.assertEquals(testUserEntity.getCountry(), userDetails.getCountry());
-        Assertions.assertEquals(testUserEntity.getStreet(), userDetails.getStreet());
-        Assertions.assertEquals(testUserEntity.getFullName(), userDetails.getFullName());
+        assertAll(
+                () -> assertEquals(testUserEntity.getUsername(), userDetails.getUsername()),
+                () -> assertEquals(testUserEntity.getEmail(), userDetails.getEmail()),
+                () -> assertEquals(testUserEntity.getPassword(), userDetails.getPassword()),
+                () -> assertEquals(testUserEntity.getCity(), userDetails.getCity()),
+                () -> assertEquals(testUserEntity.getCountry(), userDetails.getCountry()),
+                () -> assertEquals(testUserEntity.getStreet(), userDetails.getStreet()),
+                () -> assertEquals(testUserEntity.getFullName(), userDetails.getFullName())
+        );
 
         Collection<GrantedAuthority> authorities = userDetails.getAuthorities();
-        Assertions.assertEquals(2, authorities.size());
+        assertEquals(authorities.size(),2);
         Iterator<GrantedAuthority> authoritiesIter = authorities.iterator();
         Assertions.assertEquals("ROLE_" + UserRolesEnum.ADMIN.name(), authoritiesIter.next().getAuthority());
         Assertions.assertEquals("ROLE_" + UserRolesEnum.USER.name(), authoritiesIter.next().getAuthority());
