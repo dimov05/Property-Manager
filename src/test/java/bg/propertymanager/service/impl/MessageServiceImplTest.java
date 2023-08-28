@@ -227,16 +227,17 @@ class MessageServiceImplTest {
 
         List<MessageEntity> actual = this.messageService.findAllMessagesForBuildingByOwnerIdSortedFromNewToOld(building.getId(), user.getUsername());
         assertEquals(expected.size(), actual.size());
-        for (int i = 0; i < expected.size(); i++) {
-            int finalI = i;
-            assertAll(
-                    () -> assertEquals(expected.get(finalI).getId(), actual.get(finalI).getId()),
-                    () -> assertEquals(expected.get(finalI).getAuthor(), actual.get(finalI).getAuthor()),
-                    () -> assertEquals(expected.get(finalI).getCreatedDate(), actual.get(finalI).getCreatedDate()),
-                    () -> assertEquals(expected.get(finalI).getTitle(), actual.get(finalI).getTitle()),
-                    () -> assertEquals(expected.get(finalI).getContent(), actual.get(finalI).getContent())
-            );
-        }
+        assertIterableEquals(expected,actual);
+//        for (int i = 0; i < expected.size(); i++) {
+//            int finalI = i;
+//            assertAll(
+//                    () -> assertEquals(expected.get(finalI).getId(), actual.get(finalI).getId()),
+//                    () -> assertEquals(expected.get(finalI).getAuthor(), actual.get(finalI).getAuthor()),
+//                    () -> assertEquals(expected.get(finalI).getCreatedDate(), actual.get(finalI).getCreatedDate()),
+//                    () -> assertEquals(expected.get(finalI).getTitle(), actual.get(finalI).getTitle()),
+//                    () -> assertEquals(expected.get(finalI).getContent(), actual.get(finalI).getContent())
+//            );
+//        }
     }
 
     @ParameterizedTest
