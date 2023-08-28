@@ -1,12 +1,10 @@
 package bg.propertymanager.service.impl;
 
 import bg.propertymanager.model.dto.apartment.ApartmentViewDTO;
-import bg.propertymanager.model.entity.ApartmentEntity;
-import bg.propertymanager.model.entity.BuildingEntity;
-import bg.propertymanager.model.entity.TaxEntity;
-import bg.propertymanager.model.entity.UserEntity;
+import bg.propertymanager.model.entity.*;
 import bg.propertymanager.model.enums.TaxStatusEnum;
 import bg.propertymanager.model.enums.TaxTypeEnum;
+import bg.propertymanager.model.enums.UserRolesEnum;
 import bg.propertymanager.repository.ApartmentRepository;
 import bg.propertymanager.service.BuildingService;
 import bg.propertymanager.service.TaxService;
@@ -21,12 +19,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.autoconfigure.info.ProjectInfoProperties;
 
+import javax.validation.constraints.AssertTrue;
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.time.LocalDate;
+import java.time.Month;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -34,6 +32,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class ApartmentServiceImplTest {
 
+    private static final long INDEX_TWO = 2L;
     @InjectMocks
     ApartmentServiceImpl apartmentService;
     @Mock
@@ -46,18 +45,25 @@ class ApartmentServiceImplTest {
     private ModelMapper modelMapper;
     @Mock
     private TaxService taxService;
-
+    private static final long INDEX_ONE = 1L;
     private static ApartmentEntity apartment;
     private static ApartmentViewDTO apartmentViewDTO;
     private static BuildingEntity building;
+    private static List<RoleEntity> roles;
+    private static UserEntity user;
 
     private static TaxEntity tax;
 
     @BeforeAll
     static void setup() {
+        roles = new ArrayList<>();
+        user = new UserEntity();
+        initRoles();
+        initUser();
         apartment = initApartment();
         apartmentViewDTO = initApartmentViewDTO();
         building = initBuilding();
+        addApartmentsWithNumbersInBuilding();
         tax = initTax();
     }
 
@@ -73,6 +79,7 @@ class ApartmentServiceImplTest {
         return new BuildingEntity()
                 .setApartments(new HashSet<>())
                 .setId(1L)
+                .setNeighbours(new HashSet<>())
                 .setTaxPerPerson(BigDecimal.valueOf(3))
                 .setTaxPerDog(BigDecimal.valueOf(2))
                 .setTaxPerElevatorChip(BigDecimal.valueOf(4));
@@ -212,6 +219,239 @@ class ApartmentServiceImplTest {
         assertEquals(expected, actual);
     }
 
+    @ParameterizedTest
+    @CsvSource(value = {"1", "3", "6", "9", "15"})
+    void testFindTotalCountOfNeighboursInBuilding_ShouldReturnCorrectCount_OnMoreThan0Neighbours(int countOfNeighbours) {
+        BuildingEntity buildingEntity = building;
+        for (int i = 1; i <= countOfNeighbours; i++) {
+            UserEntity neighbour = new UserEntity()
+                    .setId((long) i).setUsername("User-" + i);
+            buildingEntity.getNeighbours().add(neighbour);
+        }
+        int expected = buildingEntity.getNeighbours().size();
+
+        when(this.apartmentRepository.findTotalCountOfNeighboursByBuildingId(building.getId()))
+                .thenReturn(Optional.of(buildingEntity.getNeighbours().size()));
+        int actual = this.apartmentService.findTotalCountOfNeighboursInBuilding(building.getId());
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testFindTotalCountOfNeighboursInBuilding_Should0_OnZeroNeighboursInBuilding() {
+        BuildingEntity buildingEntity = building;
+        int expected = buildingEntity.getNeighbours().size();
+
+        when(this.apartmentRepository.findTotalCountOfNeighboursByBuildingId(building.getId()))
+                .thenReturn(Optional.of(buildingEntity.getNeighbours().size()));
+        int actual = this.apartmentService.findTotalCountOfNeighboursInBuilding(building.getId());
+
+        assertEquals(expected, actual);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"1", "3", "6", "9", "15"})
+    void testFindTotalCountOfDogsInBuilding_ShouldReturnCorrectCount_OnMoreThan0Dogs(int countOfDogs) {
+        BuildingEntity buildingEntity = new BuildingEntity()
+                .setId(INDEX_ONE).setApartments(new HashSet<>());
+
+        ApartmentEntity apartment = new ApartmentEntity()
+                .setId(INDEX_ONE).setDogsCount(countOfDogs);
+        buildingEntity.getApartments().add(apartment);
+
+        int expected = buildingEntity.getApartments()
+                .stream().mapToInt(ApartmentEntity::getDogsCount).sum();
+
+        when(this.apartmentRepository.findTotalCountOfDogsByBuildingId(building.getId()))
+                .thenReturn(Optional.of(countOfDogs));
+        int actual = this.apartmentService.findTotalCountOfDogsByBuildingId(building.getId());
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testFindTotalCountOfDogsInBuilding_Should0_OnZeroDogsInBuilding() {
+        BuildingEntity buildingEntity = new BuildingEntity()
+                .setId(INDEX_ONE).setApartments(new HashSet<>());
+        int expected = buildingEntity.getApartments().stream()
+                .map(ApartmentEntity::getDogsCount).toList()
+                .stream().mapToInt(Integer::intValue).sum();
+
+
+        when(this.apartmentRepository.findTotalCountOfDogsByBuildingId(building.getId()))
+                .thenReturn(Optional.of(expected));
+        int actual = this.apartmentService.findTotalCountOfDogsByBuildingId(building.getId());
+
+        assertEquals(expected, actual);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"1", "3", "6", "9", "15"})
+    void testFindTotalCountOfElevatorChipsInBuilding_ShouldReturnCorrectCount_OnMoreThan0ElevatorChips(int countOfElevatorChips) {
+        BuildingEntity buildingEntity = new BuildingEntity()
+                .setId(INDEX_ONE).setApartments(new HashSet<>());
+
+        ApartmentEntity apartment = new ApartmentEntity()
+                .setId(INDEX_ONE).setElevatorChipsCount(countOfElevatorChips);
+        buildingEntity.getApartments().add(apartment);
+
+        int expected = buildingEntity.getApartments()
+                .stream().mapToInt(ApartmentEntity::getElevatorChipsCount).sum();
+
+        when(this.apartmentRepository.findTotalCountOfElevatorChipsByBuildingId(building.getId()))
+                .thenReturn(Optional.of(countOfElevatorChips));
+        int actual = this.apartmentService.findTotalCountOfElevatorChipsByBuildingId(building.getId());
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testFindTotalCountOfElevatorChipsInBuilding_Should0_OnZeroElevatorChipsInBuilding() {
+        BuildingEntity buildingEntity = new BuildingEntity()
+                .setId(INDEX_ONE).setApartments(new HashSet<>());
+        int expected = buildingEntity.getApartments().stream()
+                .map(ApartmentEntity::getElevatorChipsCount).toList()
+                .stream().mapToInt(Integer::intValue).sum();
+
+
+        when(this.apartmentRepository.findTotalCountOfElevatorChipsByBuildingId(building.getId()))
+                .thenReturn(Optional.of(expected));
+        int actual = this.apartmentService.findTotalCountOfElevatorChipsByBuildingId(building.getId());
+
+        assertEquals(expected, actual);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"0", "4", "7", "10", "21"})
+    void testFindAllApartmentsByBuildingId_ShouldReturnCorrectCountOfApartmentsInBuilding(int countOfApartments) {
+        BuildingEntity buildingEntity = new BuildingEntity().setId(INDEX_ONE)
+                .setApartments(new HashSet<>());
+        for (int i = 0; i < countOfApartments; i++) {
+            ApartmentEntity apartment = new ApartmentEntity()
+                    .setId((long) (i + 1)).setApartmentNumber(i + "A").setBuilding(buildingEntity);
+            buildingEntity.getApartments().add(apartment);
+        }
+        List<ApartmentEntity> expected = buildingEntity
+                .getApartments()
+                .stream()
+                .sorted(Comparator.comparing(ApartmentEntity::getId))
+                .toList();
+
+        when(this.apartmentRepository.findAllByBuilding_IdOrderById(buildingEntity.getId()))
+                .thenReturn(expected);
+        List<ApartmentEntity> actual = this.apartmentService.findAllApartmentsByBuildingId(buildingEntity.getId());
+
+        assertEquals(expected.size(), actual.size());
+        assertIterableEquals(expected, actual);
+    }
+
+    @Test
+    void testFindIfUserHasOnlyOneApartmentInBuilding_ShouldReturnTrue_WhenOwnerHasOnlyOneApartmentInTheBuilding() {
+        UserEntity owner = new UserEntity()
+                .setId(INDEX_ONE)
+                .setUsername("owner");
+        user.setUsername("notOwner");
+        ApartmentEntity apartment1 = new ApartmentEntity()
+                .setId(INDEX_ONE)
+                .setBuilding(building)
+                .setOwner(owner);
+        ApartmentEntity apartment2 = new ApartmentEntity()
+                .setId(INDEX_TWO)
+                .setBuilding(building)
+                .setOwner(user);
+        List<ApartmentEntity> expectedApartments = List.of(apartment1); // count of User's apartments in this building
+        when(this.apartmentRepository.findAllByBuilding_IdAndOwner_Username(building.getId(), owner.getUsername()))
+                .thenReturn(expectedApartments);
+
+        boolean actual = this.apartmentService.findIfUserHasOnlyOneApartmentInBuilding(building.getId(), owner.getUsername());
+
+        assertTrue(actual);
+    }
+
+    @Test
+    void testFindIfUserHasOnlyOneApartmentInBuilding_ShouldReturnFalse_WhenOwnerHasMoreThanOneApartmentInTheBuilding() {
+        UserEntity owner = new UserEntity()
+                .setId(INDEX_ONE)
+                .setUsername("owner");
+        ApartmentEntity apartment1 = new ApartmentEntity()
+                .setId(INDEX_ONE)
+                .setBuilding(building)
+                .setOwner(owner);
+        ApartmentEntity apartment2 = new ApartmentEntity()
+                .setId(INDEX_TWO)
+                .setBuilding(building)
+                .setOwner(owner);
+        List<ApartmentEntity> expectedApartments = List.of(apartment1, apartment2); // count of User's apartments in this building
+        when(this.apartmentRepository.findAllByBuilding_IdAndOwner_Username(building.getId(), owner.getUsername()))
+                .thenReturn(expectedApartments);
+
+        boolean actual = this.apartmentService.findIfUserHasOnlyOneApartmentInBuilding(building.getId(), owner.getUsername());
+
+        assertFalse(actual);
+    }
+
+    @Test
+    void testFindIfUserHasOnlyOneApartmentInBuilding_ShouldReturnFalse_WhenOwnerHas0ApartmentsInTheBuilding() {
+        UserEntity notOwner = new UserEntity()
+                .setId(INDEX_ONE)
+                .setUsername("owner");
+        ApartmentEntity apartment1 = new ApartmentEntity()
+                .setId(INDEX_ONE)
+                .setBuilding(building)
+                .setOwner(user);
+        ApartmentEntity apartment2 = new ApartmentEntity()
+                .setId(INDEX_TWO)
+                .setBuilding(building)
+                .setOwner(user);
+        List<ApartmentEntity> expectedApartments = Collections.emptyList(); // count of User's apartments in this building
+        when(this.apartmentRepository.findAllByBuilding_IdAndOwner_Username(building.getId(), notOwner.getUsername()))
+                .thenReturn(expectedApartments);
+
+        boolean actual = this.apartmentService.findIfUserHasOnlyOneApartmentInBuilding(building.getId(), notOwner.getUsername());
+
+        assertFalse(actual);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"0", "3", "10", "11", "22"})
+    void testFindAllApartmentsWithPositivePeriodicTax(int countOfApartmentsWithPositivePeriodicTax) {
+        Random random = new Random();
+        List<ApartmentEntity> expected = new ArrayList<>();
+        for (int i = 0; i < countOfApartmentsWithPositivePeriodicTax; i++) {
+            int randomPositiveTax = random.nextInt(1, 100);
+            BigDecimal positivePeriodicTax = new BigDecimal(randomPositiveTax);
+            ApartmentEntity apartment = new ApartmentEntity()
+                    .setId((long) (i + 1))
+                    .setPeriodicTax(positivePeriodicTax);
+            expected.add(apartment);
+        }
+        when(this.apartmentRepository.findAllByPeriodicTaxGreaterThan(BigDecimal.ZERO))
+                .thenReturn(expected);
+        List<ApartmentEntity> actual = this.apartmentService.findAllApartmentsWithPositivePeriodicTax();
+
+        assertEquals(expected.size(), actual.size());
+        assertIterableEquals(expected, actual);
+
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {"1A,true", "2B,true", "3N,false", "7K,false"})
+    void testCheckIfApartmentNumberToAddExistInBuilding(String apartmentNumber, boolean expected) {
+        ApartmentEntity apartmentEntity = null;
+        if (expected) {
+            apartmentEntity = new ApartmentEntity()
+                    .setApartmentNumber(apartmentNumber);
+        }
+
+        building.getApartments().add(new ApartmentEntity().setApartmentNumber("1A"));
+        building.getApartments().add(new ApartmentEntity().setApartmentNumber("2B"));
+        building.getApartments().add(new ApartmentEntity().setApartmentNumber("3C"));
+        when(this.apartmentRepository.findByApartmentNumberAndBuilding_Id(apartmentNumber, building.getId())).thenReturn(Optional.ofNullable(apartmentEntity));
+
+        boolean actual = this.apartmentService.checkIfApartmentNumberToAddExistInTheBuilding(building.getId(), apartmentNumber);
+
+        assertEquals(expected, actual);
+    }
     private static ApartmentEntity initApartment() {
         return new ApartmentEntity()
                 .setId(1L)
@@ -225,5 +465,42 @@ class ApartmentServiceImplTest {
                 .setPeriodicTax(new BigDecimal(50))
                 .setRoommateCount(3)
                 .setTaxes(new HashSet<>());
+    }
+
+    private static void initUser() {
+        user
+                .setUsername("User")
+                .setRoles(List.of(roles.get(2)))
+                .setPassword("password")
+                .setEmail("user@mail.com")
+                .setPhoneNumber("0888999999")
+                .setFullName("User Userov")
+                .setCountry("Bulgaria")
+                .setCity("Plovdiv")
+                .setStreet("Street Sl")
+                .setRegistrationDate(LocalDate.of(2023, Month.AUGUST, 10))
+                .setManagerInBuildings(Collections.emptySet())
+                .setOwnerInBuildings(Collections.emptySet())
+                .setApartments(Collections.emptySet())
+                .setMessages(Collections.emptySet());
+    }
+
+    private static void initRoles() {
+        roles.add(new RoleEntity()
+                .setId(INDEX_ONE)
+                .setName("USER")
+                .setRole(UserRolesEnum.USER));
+        roles.add(new RoleEntity()
+                .setId(2L)
+                .setName("MANAGER")
+                .setRole(UserRolesEnum.MANAGER));
+        roles.add(new RoleEntity()
+                .setId(3L)
+                .setName("ADMIN")
+                .setRole(UserRolesEnum.ADMIN));
+    }
+
+    private static void addApartmentsWithNumbersInBuilding() {
+
     }
 }
